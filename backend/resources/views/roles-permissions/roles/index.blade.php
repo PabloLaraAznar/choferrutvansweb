@@ -171,9 +171,8 @@
                                     timer: 2000,
                                     width: '300px'
                                 }).then(() => {
-                                    // Eliminar fila de la tabla sin recargar página
-                                    const row = button.closest('tr');
-                                    if (row) row.remove();
+                                    // Recargar página para evitar problemas con paginación vacía
+                                    location.reload();
                                 });
                             } else {
                                 Swal.fire({
