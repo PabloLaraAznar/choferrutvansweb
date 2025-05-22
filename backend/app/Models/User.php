@@ -9,11 +9,13 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
+
 
 class User extends Authenticatable
 {
     use HasApiTokens;
-
+    use HasRoles;
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
     use HasProfilePhoto;
@@ -63,5 +65,19 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function adminlte_profile_url()
+    {
+        return route('profile.show');
+    }
+    
+    public function adminlte_image()
+    {
+        return $this->profile_photo_url;
+    }
+    public function adminlte_desc()
+    {
+        return $this->description ?? 'Sin descripción'; // Ajusta según tus necesidades
     }
 }
