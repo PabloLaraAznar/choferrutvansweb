@@ -12,92 +12,126 @@
             <h3 class="card-title m-0">Administra la asignación de permisos</h3>
         </div>
         <div class="card-body">
-            <livewire:roles-permissions-componente />
+            <table id="rolesPermissionsTable" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>Permisos Asignados</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($roles as $role)
+                        <tr>
+                            <td>{{ $role->name }}</td>
+                            <td>
+                                @foreach ($role->permissions as $permission)
+                                    <span class="badge bg-success">{{ $permission->name }}</span>
+                                @endforeach
+                            </td>
+                            <td>
+                                <button class="btn btn-info btn-sm text-white" data-bs-toggle="modal"
+                                    data-bs-target="#editPermissionModal" data-role-id="{{ $role->id }}">
+                                    Editar Permisos
+                                </button>
+
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
+
+    @include('roles-permissions.roles-permissions.edit') <!-- Modal para edición de permisos -->
 @endsection
 
 @section('css')
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- SweetAlert2 CSS -->
+    <!-- SweetAlert2 & DataTables -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 @endsection
 
 @section('js')
-    <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery (necesario para DataTables) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- DataTables JS -->
+    <!-- DataTables -->
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script>
-        let dataTable;
-
-        // Función para inicializar DataTables
-        function initializeDataTable() {
-            if ($.fn.dataTable.isDataTable('#rolesTable')) {
-                $('#rolesTable').DataTable().destroy(); // Destruir instancia previa si existe
-            }
-
-            dataTable = $('#rolesTable').DataTable({
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json' // Traducción al español
-                },
-                responsive: true, // Hacer la tabla responsiva
-                autoWidth: false, // Evitar que se ajuste automáticamente el ancho
-            });
-        }
-
-        // Inicializar DataTables al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
-            initializeDataTable();
-
-            // Reaplicar DataTables después de que Livewire actualice la tabla
-            Livewire.on('message.processed', () => {
-                initializeDataTable();
+            $('#rolesPermissionsTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                },
+                responsive: true,
+                autoWidth: false
             });
 
-            // SweetAlert para alertas normales
-            Livewire.on('alert', (data) => {
-                const alertData = Array.isArray(data) ? data[0] : data;
-                Swal.fire({
-                    icon: alertData.icon,
-                    title: alertData.message,
-                    showConfirmButton: false,
-                    timer: 1500,
+            document.querySelectorAll('[data-bs-target="#editPermissionModal"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const roleId = this.getAttribute('data-role-id');
+                    const form = document.getElementById('editPermissionForm');
+                    const permissionsContainer = document.getElementById('permissionsContainer');
+
+                    // Configura acción del formulario
+                    form.action = `/roles-permissions/${roleId}`;
+                    document.getElementById('editRoleId').value = roleId;
+
+                    // Limpia contenedor y muestra cargando
+                    permissionsContainer.innerHTML =
+                        '<div class="text-muted">Cargando permisos...</div>';
+
+                    // AJAX para obtener datos
+                    fetch(`/roles-permissions/${roleId}/edit`)
+                        .then(response => response.json())
+                        .then(data => {
+                            permissionsContainer.innerHTML = ''; // Limpia contenedor
+
+                            data.permissions.forEach(permission => {
+                                const isChecked = data.assigned_permissions.includes(
+                                    permission.id);
+                                const checkbox = `
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="permissions[]" value="${permission.id}" ${isChecked ? 'checked' : ''}>
+                                    <label class="form-check-label">${permission.name}</label>
+                                </div>
+                            `;
+                                permissionsContainer.insertAdjacentHTML('beforeend',
+                                    checkbox);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error al cargar permisos:', error);
+                            permissionsContainer.innerHTML =
+                                '<div class="text-danger">Error al cargar permisos.</div>';
+                        });
                 });
             });
 
-            // SweetAlert para confirmación de eliminación
-            Livewire.on('confirmDelete', ({
-                roleId
-            }) => {
-                Swal.fire({
-                    title: '¿Estás seguro?',
-                    text: "¡No podrás deshacer esta acción!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Sí, eliminar',
-                    cancelButtonText: 'Cancelar',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Livewire.emit('deleteConfirmed', {
-                            id: roleId
-                        }); // Usar emit en lugar de dispatch
-                    }
-                });
+            // Limpieza al cerrar modal
+            document.getElementById('editPermissionModal').addEventListener('hidden.bs.modal', function() {
+                document.getElementById('permissionsContainer').innerHTML = '';
             });
         });
     </script>
 
+
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: '{{ session('success') }}',
+                toast: true,
+                position: 'bottom-end',
+                showConfirmButton: false,
+                timer: 2000,
+                width: '300px'
+            });
+        </script>
+    @endif
 
 @endsection

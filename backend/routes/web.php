@@ -35,8 +35,10 @@ use App\Http\Controllers\LocExpController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\TipoTarifaController;
 
-Route::get('/roles', [RolesController::class, 'index'])->name('roles.index');
-Route::get('/permissions', [PermissionsController::class, 'index'])->name('permissions.index');
+Route::resource('roles', RolesController::class);
+Route::resource('permissions', PermissionsController::class);
+Route::get('/roles-permissions/{role}/edit', [RolesPermissionsController::class, 'edit']);
+Route::put('/roles-permissions/{role}', [RolesPermissionsController::class, 'update'])->name('roles-permissions.update');
 Route::get('/roles-permissions', [RolesPermissionsController::class, 'index'])->name('roles-permissions.index');
 Route::resource('localidades', LocalidadesController::class);
 
