@@ -3,38 +3,46 @@
 @section('title', 'Asignar Permisos')
 
 @section('content_header')
-    <h1>Asignar Permisos a Roles</h1>
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="m-0">
+            <i class="fas fa-tasks me-2 text-primary"></i> Asignar Permisos a Roles
+        </h1>
+    </div>
 @endsection
 
 @section('content')
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title m-0">Administra la asignación de permisos</h3>
+    <div class="card shadow rounded-3">
+        <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+            <h3 class="card-title m-0">
+                🔧 Administra la asignación de permisos
+            </h3>
         </div>
+
         <div class="card-body">
-            <table id="rolesPermissionsTable" class="table table-striped table-bordered">
-                <thead>
+            <table id="rolesPermissionsTable" class="table table-striped table-hover table-bordered align-middle">
+                <thead class="table-light">
                     <tr>
-                        <th>Rol</th>
+                        <th style="width: 25%">Rol</th>
                         <th>Permisos Asignados</th>
-                        <th>Acciones</th>
+                        <th class="text-center" style="width: 15%">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($roles as $role)
                         <tr>
-                            <td>{{ $role->name }}</td>
+                            <td class="fw-bold">{{ $role->name }}</td>
                             <td>
-                                @foreach ($role->permissions as $permission)
-                                    <span class="badge bg-success">{{ $permission->name }}</span>
-                                @endforeach
+                                @forelse ($role->permissions as $permission)
+                                    <span class="badge bg-success mb-1">{{ $permission->name }}</span>
+                                @empty
+                                    <span class="text-muted">Sin permisos asignados</span>
+                                @endforelse
                             </td>
-                            <td>
-                                <button class="btn btn-info btn-sm text-white" data-bs-toggle="modal"
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
                                     data-bs-target="#editPermissionModal" data-role-id="{{ $role->id }}">
-                                    Editar Permisos
+                                    <i class="fas fa-pen me-1"></i>
                                 </button>
-
                             </td>
                         </tr>
                     @endforeach

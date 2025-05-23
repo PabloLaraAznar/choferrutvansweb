@@ -3,24 +3,30 @@
 @section('title', 'Permisos')
 
 @section('content_header')
-    <h1>Permisos</h1>
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="m-0">
+            <i class="fas fa-lock me-2 text-primary"></i> Gestión de Permisos
+        </h1>
+    </div>
 @endsection
 
 @section('content')
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title m-0">Administra tus permisos</h3>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createPermissionModal">
-                Agregar Permiso
+    <div class="card shadow rounded-3">
+        <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+            <h3 class="card-title m-0">🔐 Administra tus permisos</h3>
+            <button type="button" class="btn btn-light text-primary fw-bold" data-bs-toggle="modal"
+                data-bs-target="#createPermissionModal">
+                <i class="fas fa-plus-circle me-1"></i> Agregar Permiso
             </button>
         </div>
+
         <div class="card-body">
-            <table id="permissionsTable" class="table table-striped table-bordered">
-                <thead>
+            <table id="permissionsTable" class="table table-striped table-hover table-bordered align-middle">
+                <thead class="table-light">
                     <tr>
-                        <th>ID</th>
+                        <th style="width: 10%">ID</th>
                         <th>Nombre</th>
-                        <th>Acciones</th>
+                        <th class="text-center" style="width: 20%">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -28,17 +34,19 @@
                         <tr>
                             <td>{{ $permission->id }}</td>
                             <td>{{ $permission->name }}</td>
-                            <td>
-                                <button class="btn btn-info btn-sm text-white" data-bs-toggle="modal"
-                                    data-bs-target="#editPermissionModal" data-permission-id="{{ $permission->id }}"
-                                    data-permission-name="{{ $permission->name }}">
-                                    Editar
-                                </button>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
+                                        data-bs-target="#editPermissionModal" data-permission-id="{{ $permission->id }}"
+                                        data-permission-name="{{ $permission->name }}">
+                                        <i class="fas fa-edit me-1"></i>
+                                    </button>
 
-                                <button class="btn btn-danger btn-sm" data-permission-id="{{ $permission->id }}"
-                                    onclick="confirmDelete(this)">
-                                    Eliminar
-                                </button>
+                                    <button class="btn btn-sm btn-outline-danger" data-permission-id="{{ $permission->id }}"
+                                        onclick="confirmDelete(this)">
+                                        <i class="fas fa-trash-alt me-1"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     @endforeach

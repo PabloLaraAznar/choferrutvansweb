@@ -3,24 +3,30 @@
 @section('title', 'Roles')
 
 @section('content_header')
-    <h1>Roles</h1>
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="m-0">
+            <i class="fas fa-user-shield me-2 text-primary"></i> Gestión de Roles
+        </h1>
+    </div>
 @endsection
 
 @section('content')
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title m-0">Administra tus roles</h3>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createRoleModal">
-                Crear Rol
+    <div class="card shadow rounded-3">
+        <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+            <h3 class="card-title m-0">🛡️ Administra tus roles</h3>
+            <button type="button" class="btn btn-light text-primary fw-bold" data-bs-toggle="modal"
+                data-bs-target="#createRoleModal">
+                <i class="fas fa-plus-circle me-1"></i> Crear Rol
             </button>
         </div>
+
         <div class="card-body">
-            <table id="rolesTable" class="table table-striped table-bordered">
-                <thead>
+            <table id="rolesTable" class="table table-striped table-hover table-bordered align-middle">
+                <thead class="table-light">
                     <tr>
-                        <th>ID</th>
+                        <th style="width: 10%">ID</th>
                         <th>Nombre</th>
-                        <th class="text-center">Acciones</th>
+                        <th class="text-center" style="width: 20%">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -29,16 +35,18 @@
                             <td>{{ $role->id }}</td>
                             <td>{{ e($role->name) }}</td>
                             <td class="text-center">
-                                <button class="btn btn-info btn-sm text-white" data-bs-toggle="modal"
-                                    data-bs-target="#editRoleModal" data-role-id="{{ $role->id }}"
-                                    data-role-name="{{ e($role->name) }}" aria-label="Editar rol {{ e($role->name) }}">
-                                    Editar
-                                </button>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
+                                        data-bs-target="#editRoleModal" data-role-id="{{ $role->id }}"
+                                        data-role-name="{{ e($role->name) }}" aria-label="Editar rol {{ e($role->name) }}">
+                                        <i class="fas fa-edit me-1"></i>
+                                    </button>
 
-                                <button class="btn btn-danger btn-sm" data-role-id="{{ $role->id }}"
-                                    onclick="confirmDelete(this)" aria-label="Eliminar rol {{ e($role->name) }}">
-                                    Eliminar
-                                </button>
+                                    <button class="btn btn-sm btn-outline-danger" data-role-id="{{ $role->id }}"
+                                        onclick="confirmDelete(this)" aria-label="Eliminar rol {{ e($role->name) }}">
+                                        <i class="fas fa-trash-alt me-1"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
