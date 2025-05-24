@@ -16,27 +16,32 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      * @param  array<string, mixed>  $input
      */
     public function update(User $user, array $input): void
-    {
-        Validator::make($input, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
-        ])->validateWithBag('updateProfileInformation');
+{
+    Validator::make($input, [
+        'name' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+        'phone_number' => ['nullable', 'string', 'max:15'],
+        'address' => ['nullable', 'string', 'max:255'],
+        'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
+    ])->validateWithBag('updateProfileInformation');
 
-        if (isset($input['photo'])) {
-            $user->updateProfilePhoto($input['photo']);
-        }
-
-        if ($input['email'] !== $user->email &&
-            $user instanceof MustVerifyEmail) {
-            $this->updateVerifiedUser($user, $input);
-        } else {
-            $user->forceFill([
-                'name' => $input['name'],
-                'email' => $input['email'],
-            ])->save();
-        }
+    if (isset($input['photo'])) {
+        $user->updateProfilePhoto($input['photo']);
     }
+
+    if ($input['email'] !== $user->email &&
+        $user instanceof MustVerifyEmail) {
+        $this->updateVerifiedUser($user, $input);
+    } else {
+        $user->forceFill([
+            'name' => $input['name'],
+            'email' => $input['email'],
+            'phone_number' => $input['phone_number'],
+            'address' => $input['address'],
+        ])->save();
+    }
+}
+
 
     /**
      * Update the given verified user's profile information.
