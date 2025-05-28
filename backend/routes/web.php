@@ -34,8 +34,12 @@ use App\Http\Controllers\LocalidadesController;
 use App\Http\Controllers\LocExpController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\TipoTarifaController;
+use App\Http\Controllers\HorarioController;
 
 Route::resource('roles', RolesController::class);
+
+Route::resource('horarios', HorarioController::class);
+
 Route::resource('permissions', PermissionsController::class);
 Route::get('/roles-permissions/{role}/edit', [RolesPermissionsController::class, 'edit']);
 Route::put('/roles-permissions/{role}', [RolesPermissionsController::class, 'update'])->name('roles-permissions.update');
@@ -71,9 +75,9 @@ Route::get('/ventas', function () {
 // Route::get('/tipotarifa', [TipoTarifaController::class, 'index'])->name('tipotarifa.index');
 
 
-Route::get('/horarios', function () {
-    return view('Horarios.horarios');
-})->name('horarios.index');
+//Route::get('/horarios', function () {
+    //return view('Horarios.horarios');
+//})->name('horarios.index');
 
 Route::get('/unidades', function () {
     return view('Unidades.unidades');
