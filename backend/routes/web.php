@@ -35,6 +35,7 @@ use App\Http\Controllers\LocExpController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\TipoTarifaController;
 use App\Http\Controllers\HorarioController;
+use App\Http\Controllers\DriverController;
 
 Route::resource('roles', RolesController::class);
 
@@ -52,6 +53,17 @@ Route::get('exports/excel/localidades', [EXCELController::class, 'localidades'])
 Route::get('/localidades-exp', [LocExpController::class, 'index'])->name('localidades-exp.index');
 Route::post('/localidades-exp/data', [LocExpController::class, 'getLocalidades'])->name('localidades-exp.data');
 Route::get('/exports/excel/localidades', [ExcelController::class, 'expLocalidades'])->name('exports.excel.localidades');
+
+
+Route::resource('drivers', DriverController::class);
+
+// Route::get('drivers', [DriverController::class, 'index'])->name('drivers.index');
+// Route::post('drivers', [DriverController::class, 'store'])->name('drivers.store');
+// Route::get('drivers/{id}/edit', [DriverController::class, 'edit'])->name('drivers.edit');
+// Route::put('drivers/{id}', [DriverController::class, 'update'])->name('drivers.update');
+// Route::delete('drivers/{id}', [DriverController::class, 'destroy'])->name('drivers.destroy');
+
+
 
 
 
@@ -76,7 +88,7 @@ Route::get('/ventas', function () {
 
 
 //Route::get('/horarios', function () {
-    //return view('Horarios.horarios');
+//return view('Horarios.horarios');
 //})->name('horarios.index');
 
 Route::get('/unidades', function () {
