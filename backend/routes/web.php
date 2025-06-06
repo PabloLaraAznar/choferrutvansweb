@@ -116,3 +116,11 @@ Route::get('/ruta', function () {
 })->name('ruta.index');
 // Ruta para la tabla con DataTables ServerSide
 // Route::get('/ventas/data', [VentaController::class, 'getVentas'])->name('ventas.data');
+
+
+use App\Http\Controllers\UnitController;
+
+Route::resource('units', UnitController::class);
+Route::post('units/{unit}/assign-driver', [UnitController::class, 'assignDriver'])->name('units.assignDriver');
+Route::delete('units/{unit}/remove-driver/{driver}', [UnitController::class, 'removeDriver'])->name('units.removeDriver');
+
