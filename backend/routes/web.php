@@ -37,6 +37,7 @@ use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\CoordinateController;
 use App\Http\Controllers\CashierController;
+use App\Http\Controllers\UnitController;
 
 Route::resource('roles', RolesController::class);
 
@@ -58,8 +59,6 @@ Route::get('/exports/excel/localidades', [ExcelController::class, 'expLocalidade
 Route::resource('drivers', DriverController::class);
 Route::resource('coordinates', CoordinateController::class);
 Route::resource('cashiers', CashierController::class);
-
-use App\Http\Controllers\UnitController;
 
 Route::resource('units', UnitController::class);
 Route::post('units/{unit}/assign-driver', [UnitController::class, 'assignDriver'])->name('units.assignDriver');
@@ -115,11 +114,3 @@ Route::get('/ruta', function () {
 })->name('ruta.index');
 // Ruta para la tabla con DataTables ServerSide
 // Route::get('/ventas/data', [VentaController::class, 'getVentas'])->name('ventas.data');
-
-
-use App\Http\Controllers\UnitController;
-
-Route::resource('units', UnitController::class);
-Route::post('units/{unit}/assign-driver', [UnitController::class, 'assignDriver'])->name('units.assignDriver');
-Route::delete('units/{unit}/remove-driver/{driver}', [UnitController::class, 'removeDriver'])->name('units.removeDriver');
-
