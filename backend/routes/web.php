@@ -1,5 +1,6 @@
 <?php
 
+
 use App\Http\Controllers\EXCELController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatbotController;
@@ -15,7 +16,6 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -26,7 +26,6 @@ Route::middleware([
     })->name('dashboard');
 });
 
-
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\RolesPermissionsController;
@@ -36,6 +35,8 @@ use App\Http\Controllers\PDFController;
 use App\Http\Controllers\TipoTarifaController;
 use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\CoordinateController;
+use App\Http\Controllers\CashierController;
 
 Route::resource('roles', RolesController::class);
 
@@ -54,17 +55,15 @@ Route::get('/localidades-exp', [LocExpController::class, 'index'])->name('locali
 Route::post('/localidades-exp/data', [LocExpController::class, 'getLocalidades'])->name('localidades-exp.data');
 Route::get('/exports/excel/localidades', [ExcelController::class, 'expLocalidades'])->name('exports.excel.localidades');
 
-
 Route::resource('drivers', DriverController::class);
+Route::resource('coordinates', CoordinateController::class);
+Route::resource('cashiers', CashierController::class);
 
-// Route::get('drivers', [DriverController::class, 'index'])->name('drivers.index');
-// Route::post('drivers', [DriverController::class, 'store'])->name('drivers.store');
-// Route::get('drivers/{id}/edit', [DriverController::class, 'edit'])->name('drivers.edit');
-// Route::put('drivers/{id}', [DriverController::class, 'update'])->name('drivers.update');
-// Route::delete('drivers/{id}', [DriverController::class, 'destroy'])->name('drivers.destroy');
+use App\Http\Controllers\UnitController;
 
-
-
+Route::resource('units', UnitController::class);
+Route::post('units/{unit}/assign-driver', [UnitController::class, 'assignDriver'])->name('units.assignDriver');
+Route::delete('units/{unit}/remove-driver/{driver}', [UnitController::class, 'removeDriver'])->name('units.removeDriver');
 
 
 use App\Livewire\VentaComponent;
