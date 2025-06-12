@@ -459,10 +459,11 @@ return [
                 ],
                 [
                     'text' => 'Administrar Unidades',
-                    'url' => '/unidades',
+                    'url' => '/units',
                     'icon' => 'fas fa-shuttle-van',  // Vehículo más general
                     'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'unidades') !== false ? 'bg-gradient-orange text-white' : '',
                 ],
+
             ],
         ],
 
