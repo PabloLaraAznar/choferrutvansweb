@@ -1,69 +1,81 @@
-<?php  
-namespace App\Http\Controllers;  
+<?php
+
+namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Localidad;
-use Illuminate\Support\Facades\Log;  
 
-class LocalidadesController extends Controller 
+class LocalidadesController extends Controller
 {
-    public function index()     
+    /**
+     * Mostrar la lista de localidades y pasar conteo al index.
+     */
+    public function index()
     {
-        // Cargar todas las localidades incluyendo el ID
-        $localidades = Localidad::select('id', 'longitude', 'latitude', 'locality', 'street', 'postal_code')->get(); 
-
-        $localidadesCount = Localidad::count();
+        $localidades = Localidad::all();
+        $localidadesCount = $localidades->count();
 
         return view('localidades.index', compact('localidades', 'localidadesCount'));
-    
-    } 
+    }
 
-    public function store(Request $request)     
+    /**
+     * Guardar una nueva localidad en la base de datos.
+     */
+    public function store(Request $request)
     {
-        // Validar y guardar la nueva localidad
+        // Validamos todos los campos: municipality, state y locality_type ahora son nullable
         $validated = $request->validate([
-            'longitude' => 'required',
-            'latitude' => 'required',
-            'locality' => 'required|string|max:255',
-            'street' => 'nullable|string|max:255',
-            'postal_code' => 'nullable|string|max:10',
+            'longitude'      => 'required|numeric',
+            'latitude'       => 'required|numeric',
+            'locality'       => 'required|string|max:255',
+            'street'         => 'nullable|string|max:255',
+            'postal_code'    => 'nullable|string|max:20',
+            'municipality'   => 'nullable|string|max:100',
+            'state'          => 'nullable|string|max:100',
+            'country'        => 'required|string|max:100',
+            'locality_type'  => 'nullable|string|max:50',
         ]);
 
         Localidad::create($validated);
 
-        // Redirigir con mensaje de éxito
-        return redirect()->route('localidades.index')->with('success', '¡Ubicación guardada correctamente!');
-    } 
-
-    public function update(Request $request, $id)     
-    {
-        try {
-            $localidad = Localidad::findOrFail($id);
-
-            $validated = $request->validate([
-                'longitude' => 'required|numeric',
-                'latitude' => 'required|numeric',
-                'locality' => 'required|string|max:255',
-                'street' => 'nullable|string|max:255',
-                'postal_code' => 'nullable|string|max:10',
-            ]);
-
-            $localidad->update($validated);
-
-            return redirect()->route('localidades.index')->with('success', '¡Ubicación actualizada con éxito!');
-        } catch (\Exception $e) {
-            return redirect()->route('localidades.index')->with('error', 'Error al actualizar la ubicación.');
-        }
+        return redirect()->route('localidades.index')
+                         ->with('success', '¡Ubicación guardada correctamente!');
     }
 
+    /**
+     * Actualizar una localidad existente.
+     */
+    public function update(Request $request, $id)
+    {
+        $localidad = Localidad::findOrFail($id);
+
+        $validated = $request->validate([
+            'longitude'      => 'required|numeric',
+            'latitude'       => 'required|numeric',
+            'locality'       => 'required|string|max:255',
+            'street'         => 'nullable|string|max:255',
+            'postal_code'    => 'nullable|string|max:20',
+            'municipality'   => 'nullable|string|max:100',
+            'state'          => 'nullable|string|max:100',
+            'country'        => 'required|string|max:100',
+            'locality_type'  => 'nullable|string|max:50',
+        ]);
+
+        $localidad->update($validated);
+
+        return redirect()->route('localidades.index')
+                         ->with('success', '¡Ubicación actualizada con éxito!');
+    }
+
+    /**
+     * Eliminar una localidad.
+     */
     public function destroy($id)
     {
-        try {
-            $localidad = Localidad::findOrFail($id);
-            $localidad->delete();
-            return redirect()->route('localidades.index')->with('success', '¡Ubicación eliminada correctamente!');
-        } catch (\Exception $e) {
-            return redirect()->route('localidades.index')->with('error', 'Error al eliminar la ubicación.');
-        }
+        $localidad = Localidad::findOrFail($id);
+        $localidad->delete();
+
+        return redirect()->route('localidades.index')
+                         ->with('success', '¡Ubicación eliminada correctamente!');
     }
 }
