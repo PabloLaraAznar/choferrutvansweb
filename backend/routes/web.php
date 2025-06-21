@@ -83,9 +83,7 @@ Route::get('/unidades', function () {
     return view('Unidades.unidades');
 })->name('unidades.index');
 
-Route::get('/envios', function () {
-    return view('Envios.envios');
-})->name('envios.index');
+//Route::get('/envios', function () { return view('Envios.envios'); })->name('envios.index');
 
 Route::get('/conductores', function () {
     return view('Conductores.conductores');
@@ -104,3 +102,12 @@ Route::get('/ruta', function () {
 })->name('ruta.index');
 // Ruta para la tabla con DataTables ServerSide
 // Route::get('/ventas/data', [VentaController::class, 'getVentas'])->name('ventas.data');
+
+
+use App\Http\Controllers\EnvioController;
+
+Route::resource('envios', EnvioController::class);
+
+
+use App\Http\Controllers\RutaController;
+Route::resource('rutas',RutaController::class);

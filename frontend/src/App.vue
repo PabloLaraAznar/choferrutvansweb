@@ -1,85 +1,65 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
+// Estado reactivo
+const envios = ref([])
+
+// Cargar datos al montar el componente
+onMounted(async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/envios')
+    envios.value = response.data
+  } catch (error) {
+    console.error('Error al cargar envíos:', error)
+  }
+})
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <div class="envio-view p-4">
+    <h1 class="text-2xl font-bold mb-4">Lista de Envíos</h1>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+    <table class="w-full border border-gray-300">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="border px-2 py-1">ID</th>
+          <th class="border px-2 py-1">Emisor</th>
+          <th class="border px-2 py-1">Receptor</th>
+          <th class="border px-2 py-1">Total</th>
+          <th class="border px-2 py-1">Descripción</th>
+          <th class="border px-2 py-1">Foto</th>
+          <th class="border px-2 py-1">Ruta Unidad</th>
+          <th class="border px-2 py-1">Horario</th>
+          <th class="border px-2 py-1">Ruta</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="envio in envios" :key="envio.id">
+          <td class="border px-2 py-1">{{ envio.id }}</td>
+          <td class="border px-2 py-1">{{ envio.sender_name }}</td>
+          <td class="border px-2 py-1">{{ envio.receiver_name }}</td>
+          <td class="border px-2 py-1">${{ parseFloat(envio.total).toFixed(2) }}</td>
+          <td class="border px-2 py-1">{{ envio.description }}</td>
+          <td class="border px-2 py-1 text-center">
+            <img v-if="envio.photo" :src="`/storage/${envio.photo}`" alt="Foto" width="80" />
+            <span v-else>Sin foto</span>
+          </td>
+          <td class="border px-2 py-1">{{ envio.route_unit_id }}</td>
+          <td class="border px-2 py-1">{{ envio.schedule_id }}</td>
+          <td class="border px-2 py-1">{{ envio.route_id }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+table {
+  border-collapse: collapse;
 }
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+th, td {
+  text-align: left;
+  padding: 8px;
 }
 </style>

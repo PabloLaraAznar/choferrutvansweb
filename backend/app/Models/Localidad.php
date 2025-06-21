@@ -20,4 +20,13 @@ class Localidad extends Model
 
     // Si tienes timestamps habilitados (creado_at y actualizado_at)
     public $timestamps = true;
+    public function rutas_salida()
+    {
+        return $this->hasMany(Ruta::class, 'id_location_s');
+    }
+
+    public function rutas_llegada()
+    {
+        return $this->hasMany(Ruta::class, 'id_location_f');
+    }
 }

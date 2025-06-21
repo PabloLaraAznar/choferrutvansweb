@@ -437,7 +437,7 @@ return [
                 ],
                 [
                     'text' => 'Rutas - Unidades',
-                    'url' => '/rutas-unidades',
+                    'url' => '/ruta_unidad',
                     'icon' => 'fas fa-bus-alt',
                     'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'rutas-unidades') !== false ? 'bg-gradient-orange text-white' : '',
                 ],
