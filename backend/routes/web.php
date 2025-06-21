@@ -11,7 +11,9 @@ use App\Http\Controllers\{
     LocalidadesController,
     LocExpController,
     TipoTarifaController,
-    HorarioController
+    HorarioController,
+    RouteUnitScheduleController,
+    ProfileController,
 };
 
 use App\Livewire\{
@@ -37,7 +39,7 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-
+Route::post('/chatbot/handle', [ChatbotController::class, 'handle'])->name('chatbot.handle');
 /*
 |--------------------------------------------------------------------------
 | Rutas protegidas por autenticación (Jetstream / Sanctum)
@@ -75,6 +77,21 @@ Route::middleware([
 
     /*
     |--------------------------------------------------------------------------
+    | Perfil de usuario
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/perfil', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/perfil', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/perfil/password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+    Route::post('/logout-other-sessions', [ProfileController::class, 'logoutOtherSessions'])->name('logout.other.sessions');
+    Route::get('/profile/sessions', [ProfileController::class, 'showSessions'])->middleware('auth')->name('sessions.index');
+    Route::delete('/profile/sessions/{id}', [ProfileController::class, 'destroySession'])->middleware('auth')->name('sessions.destroy');
+    Route::post('/profile/verify-password', [ProfileController::class, 'verifyPassword'])->name('profile.verify-password');
+    Route::post('/profile/delete-account', [ProfileController::class, 'eliminarUsuario'])->name('profile.eliminar');
+
+
+    /*
+    |--------------------------------------------------------------------------
     | Exportaciones - PDF / Excel
     |--------------------------------------------------------------------------
     */
@@ -88,6 +105,17 @@ Route::middleware([
     */
     Route::get('/localidades-exp', [LocExpController::class, 'index'])->name('localidades-exp.index');
     Route::post('/localidades-exp/data', [LocExpController::class, 'getLocalidades'])->name('localidades-exp.data');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Calendario de Horarios
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/route-unit-schedule', [RouteUnitScheduleController::class, 'index'])->name('route_unit_schedule.index');
+    Route::get('/route-unit-schedule/events', [RouteUnitScheduleController::class, 'getEvents'])->name('route_unit_schedule.events');
+    Route::post('/route-unit-schedule', [RouteUnitScheduleController::class, 'store'])->name('route_unit_schedule.store');
+    Route::put('/route-unit-schedule/{id}', [RouteUnitScheduleController::class, 'update'])->name('route_unit_schedule.update');
+    Route::delete('/route-unit-schedule/{id}', [RouteUnitScheduleController::class, 'destroy'])->name('route_unit_schedule.destroy');
 
     /*
     |--------------------------------------------------------------------------

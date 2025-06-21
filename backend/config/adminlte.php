@@ -376,6 +376,19 @@ return [
             'url' => 'localidades',
             'icon' => 'fas fa-map-marker-alt'
         ],
+        
+
+
+   [
+    'header' => 'Calendario',
+],
+[
+    'text' => 'Calendario',
+    'url' => 'route-unit-schedule',
+    'icon' => 'fas fa-calendar-alt',
+],
+
+
         ['header' => 'Usuario'],
 
         [
