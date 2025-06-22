@@ -20,10 +20,11 @@ onMounted(async () => {
   <div class="envio-view p-4">
     <h1 class="text-2xl font-bold mb-4">Lista de Envíos</h1>
 
+
     <table class="w-full border border-gray-300">
       <thead class="bg-gray-200">
         <tr>
-          <th class="border px-2 py-1">ID</th>
+          <th class="bosrder px-2 py-1">ID</th>
           <th class="border px-2 py-1">Emisor</th>
           <th class="border px-2 py-1">Receptor</th>
           <th class="border px-2 py-1">Total</th>
@@ -52,6 +53,20 @@ onMounted(async () => {
       </tbody>
     </table>
   </div>
+
+    <div class="wrapper">
+      <HelloWorld msg="You did it!" />
+
+      <nav>
+        <RouterLink to="/">Home</RouterLink>
+        <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/Horarios">Horarios</RouterLink>
+      </nav>
+    </div>
+  </header>
+
+  <RouterView />
+
 </template>
 
 <style scoped>

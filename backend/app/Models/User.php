@@ -27,11 +27,20 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+
+
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    'name',
+    'email',
+    'phone_number',
+    'date_of_birth',
+    'gender',
+    'address',
+    'two_factor_secret',
+    'profile_photo_path',
+    'password',
+    // Otros que uses
+];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -67,11 +76,16 @@ class User extends Authenticatable
         ];
     }
 
-    public function adminlte_profile_url()
-    {
-        return route('profile.show');
-    }
-    
+    public function driver()
+{
+    return $this->hasOne(Driver::class, 'id_user');
+}
+
+public function adminlte_profile_url()
+{
+    return route('profile.edit');
+}
+
     public function adminlte_image()
     {
         return $this->profile_photo_url;

@@ -9,6 +9,8 @@ Route::get('/user', function (Request $request) {
 
 
 use App\Http\Controllers\EnvioController;
+use App\Http\Controllers\HorarioController;
+
 
 Route::get('/envios', [EnvioController::class, 'apiIndex']);
-
+Route::get('/horarios', [HorarioController::class, 'apiIndex']);
