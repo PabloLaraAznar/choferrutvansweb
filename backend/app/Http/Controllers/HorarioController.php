@@ -14,6 +14,11 @@ class HorarioController extends Controller
         return view('horarios.index', compact('horarios'));
     }
 
+    public function apiIndex()
+    {
+    return response()->json(Horario::all());
+    }
+
     public function create()
     {
         return view('hora.create');

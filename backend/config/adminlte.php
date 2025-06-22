@@ -354,12 +354,41 @@ return [
                 ],
             ]
         ],
+        ['header' => 'Empleados'],
+        [
+            'text' => 'Coordinadores',
+            'url' => 'coordinates',
+            'icon' => 'fas fa-user-tie' // Representa roles de liderazgo y coordinación
+        ],
+        [
+            'text' => 'Conductores',
+            'url' => 'drivers',
+             'icon' => 'fas fa-taxi' // Representa la conducción de vehículos
+        ],
+        [
+            'text' => 'Cajeros',
+            'url' => 'cashiers',
+            'icon' => 'fas fa-cash-register' // Representa la gestión de pagos y dinero
+        ],
         ['header' => 'Rutas'],
         [
             'text' => 'Crear localidades',
             'url' => 'localidades',
             'icon' => 'fas fa-map-marker-alt'
         ],
+        
+
+
+   [
+    'header' => 'Calendario',
+],
+[
+    'text' => 'Calendario',
+    'url' => 'route-unit-schedule',
+    'icon' => 'fas fa-calendar-alt',
+],
+
+
         ['header' => 'Usuario'],
 
         [
@@ -398,7 +427,7 @@ return [
                 ],
             ],
         ],
-    
+
         ['header' => 'Gestión de Ventas'],
         [
             'text' => 'Ventas',
@@ -418,7 +447,7 @@ return [
                 ],
             ],
         ],
-    
+
         ['header' => 'Gestión de Rutas y Unidades'],
         [
             'text' => 'Rutas y Unidades',
@@ -437,19 +466,20 @@ return [
                 ],
                 [
                     'text' => 'Rutas - Unidades',
-                    'url' => '/rutas-unidades',
+                    'url' => '/ruta_unidad',
                     'icon' => 'fas fa-bus-alt',
                     'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'rutas-unidades') !== false ? 'bg-gradient-orange text-white' : '',
                 ],
                 [
                     'text' => 'Administrar Unidades',
-                    'url' => '/unidades',
+                    'url' => '/units',
                     'icon' => 'fas fa-shuttle-van',  // Vehículo más general
                     'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'unidades') !== false ? 'bg-gradient-orange text-white' : '',
                 ],
+
             ],
         ],
-    
+
         ['header' => 'Gestión de Tarifas y Horarios'],
         [
             'text' => 'Tarifas y Horarios',
@@ -469,7 +499,7 @@ return [
                 ],
             ],
         ],
-    
+
         ['header' => 'Gestión de Usuarios y Permisos'],
         [
             'text' => 'Usuarios y Permisos',
@@ -496,7 +526,6 @@ return [
                 ],
             ],
         ],
-    
         [
     'header' => 'Otros Módulos',
 ],
