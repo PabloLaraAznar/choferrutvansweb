@@ -497,26 +497,37 @@ return [
             ],
         ],
     
-        ['header' => 'Otros Módulos'],
         [
-            'text' => 'Otros',
-            'icon' => 'fas fa-cogs',  // Icono más general de configuración
-            'submenu' => [
-
-                [
-                    'text' => 'Administrar Envíos',
-                    'url' => '/envios',
-                    'icon' => 'fas fa-truck',  // Ícono de camión para envíos
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'envios') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-                [
-                    'text' => 'Administrar Conductores',
-                    'url' => '/conductores',
-                    'icon' => 'fas fa-id-card-alt',  // Para conductores, un ícono más relacionado
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'conductores') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-            ],
+    'header' => 'Otros Módulos',
+],
+[
+    'text' => 'Otros',
+    'icon' => 'fas fa-cogs',
+    'submenu' => [
+        [
+            'text' => 'Administrar Envíos',
+            'url' => '/envios',
+            'icon' => 'fas fa-truck',
+            'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'envios') !== false ? 'bg-gradient-orange text-white' : '',
         ],
+        [
+            'text' => 'Administrar Conductores',
+            'url' => '/conductores',
+            'icon' => 'fas fa-id-card-alt',
+            'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'conductores') !== false ? 'bg-gradient-orange text-white' : '',
+        ],
+        [
+    'text' => 'Métodos de Pago',
+    'url'  => '/metodoPago', // Debe coincidir con tu ruta
+    'icon' => 'fas fa-money-check-alt',
+    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'metodoPago') !== false ? 'bg-gradient-orange text-white' : '',
+],
+
+
+
+    ],
+],
+
     ],
 
     /*

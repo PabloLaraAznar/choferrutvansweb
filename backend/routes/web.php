@@ -99,6 +99,19 @@ Route::get('/destino-intermedio', function () {
     return view('Destino_intermedio.destino_intermedio');
 })->name('destino-intermedio.index');
 
+//Route::get('/pagos', [App\Http\Controllers\PagoController::class, 'index'])->name('pagos.index');
+use App\Http\Controllers\MetodoPagoController;
+
+Route::resource('metodoPago', MetodoPagoController::class)->names([
+    'index' => 'metodoPago.index',
+    'store' => 'metodoPago.store',
+    'update' => 'metodoPago.update',
+    'destroy' => 'metodoPago.destroy',
+]);
+
+
+
+
 Route::get('/ruta', function () {
     return view('Ruta.ruta');
 })->name('ruta.index');
