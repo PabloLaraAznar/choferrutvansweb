@@ -18,7 +18,7 @@
             <!-- Contenedor del mapa -->
             <div class="col-md-7">
                 <div id="map" class="border border-primary rounded-3 shadow-sm flex-grow-1"
-                     style="width: 100%; height: 500px; border-radius: 10px;"></div>
+                     style="width: 100%; height: 500px; border-radius: 10px; box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37);"></div>
             </div>
             <!-- Formulario de localidades -->
             <div class="col-md-5">
@@ -36,7 +36,7 @@
 @endsection
 
 @section('css')
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         .swal-toast {
@@ -59,25 +59,58 @@
             border-radius: 50%;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
+        /* Estilo para el control personalizado */
+        .mapboxgl-ctrl {
+            border-radius: 12px!important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.16)!important;
+            background: rgba(255,255,255,0.95)!important;
+        }
+        #map {
+            background: linear-gradient(140deg, #e0e7ef 0%, #d0e0fc 100%);
+        }
     </style>
 @endsection
 
 @section('js')
-<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+// Función para suavizar animaciones de la cámara
+function flyToLocation(map, lng, lat) {
+    map.flyTo({
+        center: [lng, lat],
+        zoom: 17,
+        bearing: map.getBearing(),
+        pitch: map.getPitch(),
+        speed: 1.4,
+        curve: 1.1,
+        easing: function (t) { return t; }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     mapboxgl.accessToken = 'pk.eyJ1IjoiYW5nZWwwNDE4IiwiYSI6ImNtOG5idHFybzBob3EyaW85NmkxYXZub3EifQ.m1qJwwbbT_wyOqPtDFGb7A';
 
+    // Mapa con estilo 3D y controles avanzados
     const map = new mapboxgl.Map({
         container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v11',
+        style: 'mapbox://styles/mapbox/satellite-streets-v12',
         center: [-89.5133, 20.9256],
-        zoom: 15,
-        pitch: 45,
-        bearing: -17.6,
+        zoom: 16.5,
+        pitch: 65,
+        bearing: -30,
         antialias: true
     });
+
+    // Añadir controles 3D y navegación de estilo Google Maps
+    map.addControl(new mapboxgl.NavigationControl({ showCompass: true, showZoom: true }), 'top-right');
+    map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
+    // Añadir control de rotación 3D interactivo
+    map.dragRotate.enable();
+    map.touchZoomRotate.enableRotation();
+
+    // Control de tipo Street View (Mapbox no tiene streetview, pero puedes simularlo con Mapillary u Openverse)
+    // Aquí solo agregamos la sensación de 3D y navegación fluida
 
     map.on('load', () => {
         map.resize();
@@ -85,6 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const labelLayerId = layers.find(
             layer => layer.type === 'symbol' && layer.layout['text-field']
         )?.id;
+        // Capa de edificios extruidos para efecto 3D realista
         map.addLayer(
             {
                 id: '3d-buildings',
@@ -94,10 +128,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 type: 'fill-extrusion',
                 minzoom: 15,
                 paint: {
-                    'fill-extrusion-color': '#aaa',
+                    'fill-extrusion-color': [
+                        'interpolate', ['linear'], ['get', 'height'],
+                        0, "#d1d5db",
+                        20, "#b2bec3",
+                        50, "#636e72"
+                    ],
                     'fill-extrusion-height': ['get', 'height'],
                     'fill-extrusion-base': ['get', 'min_height'],
-                    'fill-extrusion-opacity': 0.6
+                    'fill-extrusion-opacity': 0.85
                 }
             },
             labelLayerId
@@ -134,16 +173,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function createCustomMarker() {
         const markerDiv = document.createElement('div');
-        markerDiv.style.fontSize = '24px';
-        markerDiv.style.color = '#FF5733';
+        markerDiv.style.fontSize = '28px';
+        markerDiv.style.color = '#ff006e';
         markerDiv.style.cursor = 'pointer';
-        markerDiv.classList.add('fas', 'fa-map-marker-alt');
+        markerDiv.style.filter = 'drop-shadow(0 4px 12px #3336)';
+        markerDiv.classList.add('fas', 'fa-map-marker-alt', 'animate__animated', 'animate__bounceInDown');
         return markerDiv;
     }
 
     // --------- FUNCIONES PARA LOCALIDAD Y CALLE --------
     function getRealLocality(features) {
-        // Busca feature o context que sea id que empiece con "place."
         for (const feat of features) {
             if (feat.id && feat.id.startsWith('place.')) {
                 return feat.text;
@@ -153,13 +192,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (ctx) return ctx.text;
             }
         }
-        // Si no encontró nada, busca algún 'village', 'town', etc.
         const types = ['village','town','locality','neighborhood','hamlet','city'];
         for (const type of types) {
             const f = features.find(f => f.place_type && f.place_type.includes(type));
             if (f) return f.text;
         }
-        // Si nada, regresa el label principal
         return features[0]?.text || 'N/A';
     }
     function getStreet(features) {
@@ -190,6 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
         marker.setDraggable(true);
 
         marker.getElement().addEventListener('click', () => {
+            flyToLocation(map, location.longitude, location.latitude);
             setTimeout(() => {
                 const deleteBtn = document.querySelector('.delete-btn');
                 if (deleteBtn) {
@@ -219,11 +257,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                     });
                 }
-            }, 300);
+            }, 250);
         });
 
         marker.on('dragend', async function() {
             const newCoords = marker.getLngLat();
+            flyToLocation(map, newCoords.lng, newCoords.lat);
             const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${newCoords.lng},${newCoords.lat}.json?access_token=${mapboxgl.accessToken}`;
             let updatedStreet     = location.street;
             let updatedLocality   = location.locality;
@@ -337,6 +376,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const coordinates = e.lngLat;
         if (currentMarker) currentMarker.remove();
         currentMarker = new mapboxgl.Marker({ color: '#007BFF' }).setLngLat(coordinates).addTo(map);
+
+        flyToLocation(map, coordinates.lng, coordinates.lat);
 
         const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${coordinates.lng},${coordinates.lat}.json?access_token=${mapboxgl.accessToken}`;
         try {
