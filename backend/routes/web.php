@@ -1,6 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use App\Http\Controllers\{
     HomeController,
     EXCELController,
@@ -18,6 +22,8 @@ use App\Http\Controllers\{
     SalesHistoryController,
     ProfileController,
     UnitController,
+    RutaController,
+    UserController,
 };
 
 use App\Livewire\{
@@ -59,6 +65,39 @@ Route::middleware([
     Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
 });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Email Verification Routes
+    |--------------------------------------------------------------------------
+    */
+    // Ruta para ver página de "verifica tu correo"
+    Route::get('/email/verify', function () {
+        return view('auth.verify-email');
+    })->middleware('auth')->name('verification.notice');
+
+    // Ruta para manejar el clic en el enlace de verificación sin requerir autenticación
+    Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
+        $user = User::findOrFail($id);
+
+        // Validar que el hash coincida con el email del usuario
+        if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            abort(403);
+        }
+
+        if (! $user->hasVerifiedEmail()) {
+            $user->markEmailAsVerified();
+        }
+
+        return redirect('/login?verified=1'); // Redirige al login con parámetro de verificación exitosa
+    })->middleware('signed')->name('verification.verify');
+
+    // Ruta para reenviar el email de verificación (requiere autenticación)
+    Route::post('/email/verification-notification', function (Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+
+        return back()->with('message', 'Correo de verificación reenviado.');
+    })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
     /*
     |--------------------------------------------------------------------------
@@ -158,10 +197,33 @@ Route::middleware([
     Route::get('/conductores', fn () => view('Conductores.conductores'))->name('conductores.index');
     Route::get('/tipos-tarifas', fn () => view('tipoTarifas.tipoTarifas'))->name('tipotarifas.index');
     Route::get('/destino-intermedio', fn () => view('Destino_intermedio.destino_intermedio'))->name('destino-intermedio.index');
-   
+    /*
+    |--------------------------------------------------------------------------
+    | Venta
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/venta', fn() => view('Ventas.venta'))->name('venta.index');
 
+    /*
+    |--------------------------------------------------------------------------
+    | Rutas de transporte
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('rutas', RutaController::class);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Usuarios
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('usuarios', UserController::class);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Vistas adicionales
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/ruta', function () {
+        return view('Ruta.ruta');
+    })->name('ruta.index');
 });
-
-use App\Http\Controllers\RutaController;
-Route::resource('rutas',RutaController::class);
-
