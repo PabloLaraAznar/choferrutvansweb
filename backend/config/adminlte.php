@@ -423,22 +423,10 @@ return [
             'can' => 'admin-coordinate', // Solo admin y coordinate pueden gestionar boletos
             'submenu' => [
                 [
-                    'text' => 'Administrar Boletos',
-                    'url' => '/boletos',
-                    'icon' => 'fas fa-cogs',  // Icono de administración, más variado
-                    'active' => ['boletos'],
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'boletos') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-                [
                     'text' => 'Destinos Intermedios',
                     'url' => '/destino-intermedio',
                     'icon' => 'fas fa-map-marked-alt',  // Ícono más preciso para mapas
                     'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'destino-intermedio') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-                [
-                    'text' => 'Detalles de Boletos',
-                    'url' => 'admin/detalles-boletos',
-                    'icon' => 'fas fa-info-circle',
                 ],
             ],
         ],
@@ -471,14 +459,8 @@ return [
             'can' => 'admin-coordinate', // Solo admin y coordinate pueden gestionar rutas
             'submenu' => [
                 [
-                    'text' => 'Administrar Rutas',
-                    'url' => '/ruta',
-                    'icon' => 'fas fa-route',  // Ícono para administración de rutas
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'ruta') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-                [
                     'text' => 'Rutas',
-                    'icon' => 'fas fa-key',
+                    'icon' => 'fas fa-route',
                     'url' => 'rutas',
                 ],
                 [
@@ -496,22 +478,7 @@ return [
 
             ],
         ],
-        ['header' => 'Usuario'],
-        [
-            'text' => 'profile',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-user',
-        ],
-        [
-            'text' => 'change_password',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-lock',
-        ],
-        [
-            'header' => 'Otros Módulos',
-            'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver este header
-        ],
-        [
+         [
             'text' => 'Otros',
             'icon' => 'fas fa-cogs',
             'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver otros módulos
@@ -528,11 +495,27 @@ return [
                 ],
                 [
                     'text' => 'Métodos de Pago',
-                    'url'  => '/metodoPago',
+                    'route'  => 'metodoPago.index',
                     'icon' => 'fas fa-money-check-alt',
                 ],
             ],
         ],
+        ['header' => 'Usuario'],
+        [
+            'text' => 'profile',
+            'url' => 'admin/settings',
+            'icon' => 'fas fa-fw fa-user',
+        ],
+        [
+            'text' => 'change_password',
+            'url' => 'admin/settings',
+            'icon' => 'fas fa-fw fa-lock',
+        ],
+        [
+            'header' => 'Otros Módulos',
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver este header
+        ],
+       
 
     ],
 

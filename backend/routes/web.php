@@ -28,6 +28,7 @@ use App\Http\Controllers\{
     UnitController,
     RutaController,
     UserController,
+    MetodoPagoController,
 };
 
 use App\Livewire\{
@@ -260,16 +261,19 @@ Route::middleware([
     Route::middleware('can:admin-coordinate')->group(function () {
         Route::resource('usuarios', UserController::class);
     });
-
+    
     /*
     |--------------------------------------------------------------------------
-    | Vistas adicionales (Admin y Coordinate)
+    | Métodos de Pago - CRUD (Admin y Coordinate)
     |--------------------------------------------------------------------------
     */
     Route::middleware('can:admin-coordinate')->group(function () {
-        Route::get('/ruta', function () {
-            return view('Ruta.ruta');
-        })->name('ruta.index');
+        Route::resource('metodoPago', MetodoPagoController::class)->names([
+            'index' => 'metodoPago.index',
+            'store' => 'metodoPago.store',
+            'update' => 'metodoPago.update',
+            'destroy' => 'metodoPago.destroy',
+        ]);
     });
 
 });

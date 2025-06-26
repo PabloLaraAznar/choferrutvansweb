@@ -1,14 +1,20 @@
+{{-- 
+TEMPLATE RUTVANS ADMIN - VISTA CRUD
+Copiar y adaptar este template para todas las vistas CRUD
+Colores: #ff6600 (naranja), #000 (negro), #f0f2f5 (fondo)
+--}}
+
 @extends('adminlte::page')
 
-@section('title', 'Métodos de Pago')
+@section('title', 'NOMBRE_MODULO')
 
 @section('content_header')
     <div class="rutvans-content-header rutvans-fade-in">
         <div class="container-fluid">
             <h1>
-                <i class="fas fa-money-check-alt me-2"></i> Métodos de Pago
+                <i class="fas fa-ICONO me-2"></i> TITULO_PRINCIPAL
             </h1>
-            <p class="subtitle">Administra los métodos de pago disponibles en el sistema</p>
+            <p class="subtitle">DESCRIPCION_SUBTITULO</p>
         </div>
     </div>
 @endsection
@@ -17,46 +23,50 @@
     <div class="rutvans-card rutvans-hover-lift rutvans-fade-in">
         <div class="rutvans-card-header d-flex justify-content-between align-items-center">
             <h3 class="m-0">
-                <i class="fas fa-credit-card me-2"></i> Gestión de Métodos de Pago
+                <i class="fas fa-ICONO_CARD me-2"></i> TITULO_CARD
             </h3>
-            <button type="button" class="rutvans-btn rutvans-btn-primary" data-bs-toggle="modal"
-                data-bs-target="#crearMetodoModal">
-                <i class="fas fa-plus-circle"></i> Nuevo Método
+            <button type="button" class="rutvans-btn rutvans-btn-primary" data-bs-toggle="modal" data-bs-target="#MODAL_CREAR">
+                <i class="fas fa-plus"></i> Nuevo ELEMENTO
             </button>
         </div>
-
+        
         <div class="rutvans-card-body">
             <div class="table-responsive">
-                <table id="tablaMetodos" class="table rutvans-table table-striped table-hover align-middle">
+                <table id="TABLA_ID" class="table rutvans-table table-striped table-hover align-middle">
                     <thead>
                         <tr>
                             <th><i class="fas fa-hashtag me-1"></i> ID</th>
-                            <th><i class="fas fa-tag me-1"></i> Nombre</th>
+                            <th><i class="fas fa-ICONO me-1"></i> COLUMNA1</th>
+                            <th><i class="fas fa-ICONO me-1"></i> COLUMNA2</th>
                             <th><i class="fas fa-cogs me-1"></i> Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($metodos as $metodo)
+                        @forelse ($ELEMENTOS as $elemento)
                             <tr>
                                 <td>
-                                    <span class="rutvans-badge rutvans-badge-primary">{{ $metodo->id }}</span>
+                                    <span class="rutvans-badge rutvans-badge-primary">{{ $elemento->id }}</span>
                                 </td>
                                 <td>
-                                    <i class="fas fa-money-check-alt text-muted me-2"></i>
-                                    {{ $metodo->name }}
+                                    <i class="fas fa-ICONO text-muted me-2"></i>
+                                    {{ $elemento->CAMPO }}
+                                </td>
+                                <td>
+                                    <!-- CONTENIDO COLUMNA -->
                                 </td>
                                 <td>
                                     <div class="d-flex justify-content-center gap-2">
-                                        <button class="rutvans-btn rutvans-btn-info rutvans-btn-sm" 
+                                        <!-- Botón Editar -->
+                                        <button class="rutvans-btn rutvans-btn-warning rutvans-btn-sm" 
                                             data-bs-toggle="modal"
-                                            data-bs-target="#editarMetodoModal"
-                                            data-id="{{ $metodo->id }}"
-                                            data-nombre="{{ $metodo->name }}">
+                                            data-bs-target="#MODAL_EDITAR"
+                                            data-id="{{ $elemento->id }}">
                                             <i class="fas fa-edit"></i> Editar
                                         </button>
 
-                                        <form method="POST" action="{{ route('metodoPago.destroy', $metodo->id) }}"
-                                            onsubmit="return confirm('¿Estás seguro de eliminar este método de pago?');">
+                                        <!-- Botón Eliminar -->
+                                        <form method="POST" action="{{ route('RUTA.destroy', $elemento->id) }}"
+                                            onsubmit="return confirm('¿Estás seguro de eliminar este ELEMENTO?');">
                                             @csrf
                                             @method('DELETE')
                                             <button class="rutvans-btn rutvans-btn-danger rutvans-btn-sm" type="submit">
@@ -66,7 +76,17 @@
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="X" class="text-center">
+                                    <div class="d-flex flex-column align-items-center py-4">
+                                        <i class="fas fa-ICONO_EMPTY text-muted mb-3" style="font-size: 3rem;"></i>
+                                        <h5 class="text-muted">No hay ELEMENTOS registrados</h5>
+                                        <p class="text-muted">Agrega el primer ELEMENTO para comenzar</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -74,23 +94,22 @@
     </div>
 
     <!-- Modal Crear -->
-    <div class="modal fade" id="crearMetodoModal" tabindex="-1" aria-labelledby="crearMetodoModalLabel" aria-hidden="true">
+    <div class="modal fade" id="MODAL_CREAR" tabindex="-1">
         <div class="modal-dialog">
-            <form method="POST" action="{{ route('metodoPago.store') }}" class="rutvans-modal-content needs-validation" novalidate id="formCrearMetodo">
+            <form method="POST" action="{{ route('RUTA.store') }}" class="rutvans-modal-content needs-validation" novalidate>
                 @csrf
                 <div class="rutvans-modal-header">
-                    <h5 class="modal-title" id="crearMetodoModalLabel">
-                        <i class="fas fa-plus-circle me-2"></i> Agregar Método de Pago
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus-circle me-2"></i> Agregar ELEMENTO
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="rutvans-modal-body">
                     <div class="rutvans-form-group">
-                        <label for="nombreMetodo" class="rutvans-form-label">
-                            <i class="fas fa-tag me-1"></i> Nombre del método
+                        <label for="CAMPO" class="rutvans-form-label">
+                            <i class="fas fa-ICONO me-1"></i> ETIQUETA
                         </label>
-                        <input type="text" class="form-control rutvans-form-control" id="nombreMetodo" name="name" required
-                            placeholder="Ej: Efectivo, Tarjeta de Crédito, Transferencia">
+                        <input type="text" class="form-control rutvans-form-control" id="CAMPO" name="CAMPO" required>
                         <div class="invalid-feedback">Este campo es obligatorio.</div>
                     </div>
                 </div>
@@ -107,27 +126,19 @@
     </div>
 
     <!-- Modal Editar -->
-    <div class="modal fade" id="editarMetodoModal" tabindex="-1" aria-labelledby="editarMetodoModalLabel" aria-hidden="true">
+    <div class="modal fade" id="MODAL_EDITAR" tabindex="-1">
         <div class="modal-dialog">
-            <form method="POST" action="" class="rutvans-modal-content needs-validation" novalidate id="formEditarMetodo">
+            <form method="POST" action="" class="rutvans-modal-content needs-validation" novalidate>
                 @csrf
                 @method('PUT')
                 <div class="rutvans-modal-header" style="background: linear-gradient(135deg, #17a2b8, #138496);">
-                    <h5 class="modal-title" id="editarMetodoModalLabel">
-                        <i class="fas fa-edit me-2"></i> Editar Método de Pago
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit me-2"></i> Editar ELEMENTO
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="rutvans-modal-body">
-                    <input type="hidden" name="id" id="editarMetodoId">
-                    <div class="rutvans-form-group">
-                        <label for="editarNombreMetodo" class="rutvans-form-label">
-                            <i class="fas fa-tag me-1"></i> Nombre del método
-                        </label>
-                        <input type="text" class="form-control rutvans-form-control" id="editarNombreMetodo" name="name" required
-                            placeholder="Ej: Efectivo, Tarjeta de Crédito, Transferencia">
-                        <div class="invalid-feedback">Este campo es obligatorio.</div>
-                    </div>
+                    <!-- CAMPOS DEL FORMULARIO -->
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="rutvans-btn rutvans-btn-secondary" data-bs-dismiss="modal">
@@ -166,7 +177,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            $('#tablaMetodos').DataTable({
+            // Inicializar DataTable
+            $('#TABLA_ID').DataTable({
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
                 },
@@ -174,29 +186,8 @@
                 autoWidth: false
             });
 
-            // Editar: llenar formulario
-            const editarModal = document.getElementById('editarMetodoModal');
-            editarModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const id = button.getAttribute('data-id');
-                const nombre = button.getAttribute('data-nombre');
-
-                const form = document.getElementById('formEditarMetodo');
-                form.action = `/metodoPago/${id}`;
-                document.getElementById('editarNombreMetodo').value = nombre;
-            });
-
-            // Validación formularios
-            ['formCrearMetodo', 'formEditarMetodo'].forEach(function (formId) {
-                const form = document.getElementById(formId);
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                });
-            });
+            // Lógica para modales de edición
+            // ...
         });
     </script>
 

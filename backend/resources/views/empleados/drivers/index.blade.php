@@ -3,70 +3,107 @@
 @section('title', 'Conductores')
 
 @section('content_header')
-    <div class="d-flex justify-content-between align-items-center">
-        <h1 class="m-0">
-            <i class="fas fa-user-shield me-2 text-primary"></i> Gestión de Chóferes
-        </h1>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreateDriver">
-            <i class="fas fa-plus me-1"></i> Nuevo Chófer
-        </button>
+    <div class="rutvans-content-header rutvans-fade-in">
+        <div class="container-fluid">
+            <h1>
+                <i class="fas fa-id-card me-2"></i> Gestión de Conductores
+            </h1>
+            <p class="subtitle">Administra los conductores del sistema de transporte</p>
+        </div>
     </div>
 @endsection
 
 @section('content')
-    <div class="card">
-        <div class="card-body table-responsive p-0">
-            <table class="table table-hover text-nowrap">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Usuario</th>
-                        <th>Correo</th>
-                        <th>Licencia</th>
-                        <th>Foto</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($drivers as $driver)
+    <div class="rutvans-card rutvans-hover-lift rutvans-fade-in">
+        <div class="rutvans-card-header d-flex justify-content-between align-items-center">
+            <h3 class="m-0">
+                <i class="fas fa-steering-wheel me-2"></i> Conductores Registrados
+            </h3>
+            <button type="button" class="rutvans-btn rutvans-btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreateDriver">
+                <i class="fas fa-plus"></i> Nuevo Conductor
+            </button>
+        </div>
+        
+        <div class="rutvans-card-body">
+            <div class="table-responsive">
+                <table class="table rutvans-table table-hover">
+                    <thead>
                         <tr>
-                            <td>{{ $driver->id }}</td>
-                            <td>{{ $driver->user->name ?? 'Sin usuario' }}</td>
-                            <td>{{ $driver->user->email ?? 'Sin correo' }}</td>
-                            <td>{{ $driver->license }}</td>
-                            <td>
-                                @if ($driver->photo)
-                                    <img src="{{ asset('storage/' . $driver->photo) }}"
-                                        alt="Foto de {{ $driver->user->name ?? '' }}"
-                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
-                                @else
-                                    <span class="text-muted">Sin foto</span>
-                                @endif
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-sm btn-warning btn-edit-driver"
-                                    data-id="{{ $driver->id }}" data-name="{{ $driver->user->name ?? '' }}"
-                                    data-email="{{ $driver->user->email ?? '' }}" data-license="{{ $driver->license }}"
-                                    data-photo="{{ $driver->photo ? asset('storage/' . $driver->photo) : '' }}">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <form action="{{ route('drivers.destroy', $driver) }}" method="POST" class="d-inline"
-                                    onsubmit="return confirm('¿Seguro que quieres eliminar este chófer?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-danger" type="submit">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
+                            <th><i class="fas fa-hashtag me-1"></i> ID</th>
+                            <th><i class="fas fa-user me-1"></i> Usuario</th>
+                            <th><i class="fas fa-envelope me-1"></i> Correo</th>
+                            <th><i class="fas fa-id-card me-1"></i> Licencia</th>
+                            <th><i class="fas fa-camera me-1"></i> Foto</th>
+                            <th><i class="fas fa-cogs me-1"></i> Acciones</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="text-center text-muted">No hay chóferes registrados.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse ($drivers as $driver)
+                            <tr>
+                                <td>
+                                    <span class="rutvans-badge rutvans-badge-primary">{{ $driver->id }}</span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-user-circle text-muted me-2"></i>
+                                    {{ $driver->user->name ?? 'Sin usuario' }}
+                                </td>
+                                <td>
+                                    <i class="fas fa-at text-muted me-2"></i>
+                                    {{ $driver->user->email ?? 'Sin correo' }}
+                                </td>
+                                <td>
+                                    <i class="fas fa-id-badge text-muted me-2"></i>
+                                    {{ $driver->license }}
+                                </td>
+                                <td>
+                                    @if ($driver->photo)
+                                        <img src="{{ asset('storage/' . $driver->photo) }}"
+                                            alt="Foto de {{ $driver->user->name ?? '' }}"
+                                            class="rounded-circle shadow-sm"
+                                            style="width: 50px; height: 50px; object-fit: cover;">
+                                    @else
+                                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-light"
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-user text-muted"></i>
+                                        </div>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="rutvans-btn rutvans-btn-warning rutvans-btn-sm btn-edit-driver"
+                                            data-id="{{ $driver->id }}" 
+                                            data-name="{{ $driver->user->name ?? '' }}"
+                                            data-email="{{ $driver->user->email ?? '' }}" 
+                                            data-license="{{ $driver->license }}"
+                                            data-photo="{{ $driver->photo ? asset('storage/' . $driver->photo) : '' }}">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </button>
+                                        
+                                        <form action="{{ route('drivers.destroy', $driver) }}" method="POST" class="d-inline"
+                                            onsubmit="return confirm('¿Seguro que quieres eliminar este conductor?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="rutvans-btn rutvans-btn-danger rutvans-btn-sm" type="submit">
+                                                <i class="fas fa-trash"></i> Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="d-flex flex-column align-items-center py-4">
+                                        <i class="fas fa-car-side text-muted mb-3" style="font-size: 3rem;"></i>
+                                        <h5 class="text-muted">No hay conductores registrados</h5>
+                                        <p class="text-muted">Agrega el primer conductor para comenzar</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -76,7 +113,16 @@
 
 @section('css')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <link href="{{ asset('css/rutvans-admin.css') }}" rel="stylesheet">
+    <style>
+        body {
+            background-color: var(--rutvans-background);
+        }
+        
+        .content-wrapper {
+            background-color: var(--rutvans-background);
+        }
+    </style>
 @endsection
 
 @section('js')
