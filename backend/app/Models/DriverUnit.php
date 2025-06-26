@@ -20,5 +20,19 @@ class DriverUnit extends Pivot
                     ->withTimestamps();
     }
 
+    public function driver()
+    {
+        return $this->belongsTo(Driver::class, 'id_driver');
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class, 'id_unit');
+    }
+
+    public function routeUnits()
+    {
+        return $this->hasMany(RouteUnit::class, 'id_driver_unit');
+    }
 
 }

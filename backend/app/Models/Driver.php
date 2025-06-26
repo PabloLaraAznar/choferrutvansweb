@@ -26,7 +26,10 @@ class Driver extends Model
     {
         return $this->belongsTo(User::class, 'id_user');
     }
-
+    public function driverUnits()
+    {
+        return $this->hasMany(DriverUnit::class, 'id_driver');
+    }
     /**
      * Relación con unidades (driver_unit)
      */

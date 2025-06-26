@@ -18,7 +18,8 @@
         <div class="row">
             <!-- Contenedor del mapa -->
             <div class="col-md-7">
-                <div id="map" class="border border-primary rounded-3 shadow-sm flex-grow-1" style="width: 100%; height: 500px; border-radius: 10px;"></div>
+                <div id="map" class="border border-primary rounded-3 shadow-sm flex-grow-1"
+                     style="width: 100%; height: 500px; border-radius: 10px;"></div>
             </div>
 
             <!-- Formulario de localidades -->
@@ -26,6 +27,7 @@
                 <h4 class="text-center mb-3">Formulario de Localidad</h4>
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
+                        {{-- Incluimos el formulario de creación --}}
                         @include('localidades.create')
                     </div>
                 </div>
@@ -73,13 +75,46 @@
         document.addEventListener('DOMContentLoaded', function() {
             mapboxgl.accessToken = 'pk.eyJ1IjoiYW5nZWwwNDE4IiwiYSI6ImNtOG5idHFybzBob3EyaW85NmkxYXZub3EifQ.m1qJwwbbT_wyOqPtDFGb7A';
         
+            //Nuevo Mapa
             const map = new mapboxgl.Map({
-                container: 'map',
-                style: 'mapbox://styles/mapbox/streets-v11',
-                center: [-89.5133, 20.9256],
-                zoom: 8
-            });
-        
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    center: [-89.5133, 20.9256],
+    zoom: 15,
+    pitch: 45, // Inclinación para efecto 3D
+    bearing: -17.6, // Rotación del mapa
+    antialias: true // Suavizado para render 3D
+});
+
+// Espera a que el mapa cargue para agregar edificios en 3D
+map.on('load', () => {
+    map.resize();
+
+    const layers = map.getStyle().layers;
+    const labelLayerId = layers.find(
+        layer => layer.type === 'symbol' && layer.layout['text-field']
+    )?.id;
+
+    map.addLayer(
+        {
+            id: '3d-buildings',
+            source: 'composite',
+            'source-layer': 'building',
+            filter: ['==', 'extrude', 'true'],
+            type: 'fill-extrusion',
+            minzoom: 15,
+            paint: {
+                'fill-extrusion-color': '#aaa',
+                'fill-extrusion-height': ['get', 'height'],
+                'fill-extrusion-base': ['get', 'min_height'],
+                'fill-extrusion-opacity': 0.6
+            }
+        },
+        labelLayerId
+    );
+});
+
+
             let currentMarker = null;
         
             // Mostrar mensaje de éxito o error desde el controlador
@@ -108,27 +143,71 @@
                 });
             }
         
-            // Agregar marcadores para las localidades guardadas
+            // Agregar marcadores para las localidades ya guardadas
             const savedLocations = @json($localidades);
         
             savedLocations.forEach(location => {
-                // Crear el marcador con FontAwesome
-                const marker = new mapboxgl.Marker({
-                        element: createCustomMarker()  // Método para crear un marcador con FontAwesome
-                    })
-                    .setLngLat([location.longitude, location.latitude])
-                    .setPopup(new mapboxgl.Popup().setText(
-                        `${location.locality}, ${location.street}, ${location.postal_code}`
-                    ))
-                    .addTo(map);
+    const marker = new mapboxgl.Marker({
+            element: createCustomMarker()
+        })
+        .setLngLat([location.longitude, location.latitude])
+        .setPopup(new mapboxgl.Popup().setHTML(`
+            <strong>${location.locality}</strong><br>
+            Calle: ${location.street || 'N/A'}<br>
+            Código Postal: ${location.postal_code || 'N/A'}<br>
+            Municipio: ${location.municipality}<br>
+            Estado: ${location.state}<br>
+            País: ${location.country}<br>
+            Tipo: ${location.locality_type}<br><br>
+            <button class="btn btn-sm btn-danger delete-btn" data-id="${location.id}">
+                <i class="fas fa-trash-alt"></i> Eliminar
+            </button>
+        `))
+        .addTo(map);
+
+    marker.setDraggable(true);
+
+    marker.getElement().addEventListener('click', () => {
+        setTimeout(() => {
+            const deleteBtn = document.querySelector('.delete-btn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function () {
+                    const id = this.dataset.id;
+                    Swal.fire({
+                        title: '¿Eliminar esta localidad?',
+                        text: "Esta acción no se puede deshacer.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = `{{ url('localidades') }}/${id}`;
+                            form.innerHTML = `
+                                @csrf
+                                @method('DELETE')
+                            `;
+                            document.body.appendChild(form);
+                            form.submit();
+                        }
+                    });
+                });
+            }
+        }, 300); // Pequeño delay para asegurar que el popup esté renderizado
+    });
+
         
                 // Función para crear un marcador con FontAwesome
                 function createCustomMarker() {
                     const markerDiv = document.createElement('div');
-                    markerDiv.style.fontSize = '24px';  // Tamaño del ícono
-                    markerDiv.style.color = '#FF5733';  // Color del ícono
-                    markerDiv.style.cursor = 'pointer';  // Para indicar que es interactivo
-                    markerDiv.classList.add('fas', 'fa-map-marker-alt');  // Clases de FontAwesome (ícono de marcador de mapa)
+                    markerDiv.style.fontSize = '24px';
+                    markerDiv.style.color = '#FF5733';
+                    markerDiv.style.cursor = 'pointer';
+                    markerDiv.classList.add('fas', 'fa-map-marker-alt');
                     return markerDiv;
                 }
 
@@ -138,40 +217,52 @@
                 // Evento: Cuando el marcador deja de arrastrarse
                 marker.on('dragend', async function() {
                     const newCoords = marker.getLngLat();
-                    console.log(`Marcador movido. ID: ${location.id}, Nueva posición:`, newCoords);
         
                     // Obtener datos nuevos para localidad
-                    const url =
-                        `https://api.mapbox.com/geocoding/v5/mapbox.places/${newCoords.lng},${newCoords.lat}.json?access_token=${mapboxgl.accessToken}`;
-                    let updatedStreet = location.street;
-                    let updatedLocality = location.locality;
+                    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${newCoords.lng},${newCoords.lat}.json?access_token=${mapboxgl.accessToken}`;
+                    let updatedStreet     = location.street;
+                    let updatedLocality   = location.locality;
                     let updatedPostalCode = location.postal_code;
+                    let updatedMunicipality = location.municipality;
+                    let updatedState        = location.state;
+                    let updatedCountry      = location.country;
+                    let updatedLocalityType = location.locality_type;
         
                     try {
                         const response = await fetch(url);
                         const data = await response.json();
                         if (data.features.length > 0) {
                             const place = data.features[0];
-                            updatedStreet = place.text || location.street;
-                            updatedLocality = place.context?.find(c => c.id.includes('place'))
-                                ?.text || location.locality;
-                            updatedPostalCode = place.context?.find(c => c.id.includes(
-                                'postcode'))?.text || location.postal_code;
+                            updatedStreet       = place.text || location.street;
+                            updatedLocality     = place.context?.find(c => c.id.includes('place'))?.text || location.locality;
+                            updatedPostalCode   = place.context?.find(c => c.id.includes('postcode'))?.text || location.postal_code;
+                            updatedMunicipality = place.context?.find(c => c.id.includes('district'))?.text || location.municipality;
+                            updatedState        = place.context?.find(c => c.id.includes('region'))?.text || location.state;
+                            updatedCountry      = place.context?.find(c => c.id.includes('country'))?.text || location.country;
+                            updatedLocalityType = place.place_type ? place.place_type.join(', ') : location.locality_type;
                         }
                     } catch (error) {
                         console.error('Error obteniendo datos actualizados:', error);
                     }
         
-                    // Mostrar la alerta de confirmación con los valores actuales y nuevos
+                    // Mostrar alerta de confirmación con valores antiguos y nuevos
                     Swal.fire({
                         title: '¿Estás seguro?',
                         html: `
                             <p><b>Localidad Actual:</b> ${location.locality}</p>
                             <p><b>Nueva Localidad:</b> ${updatedLocality}</p>
-                            <p><b>Calle Actual:</b> ${location.street}</p>
+                            <p><b>Calle Actual:</b> ${location.street || 'N/A'}</p>
                             <p><b>Calle Nueva:</b> ${updatedStreet}</p>
-                            <p><b>Código Postal Actual:</b> ${location.postal_code}</p>
+                            <p><b>Código Postal Actual:</b> ${location.postal_code || 'N/A'}</p>
                             <p><b>Código Postal Nuevo:</b> ${updatedPostalCode}</p>
+                            <p><b>Municipio Actual:</b> ${location.municipality}</p>
+                            <p><b>Municipio Nuevo:</b> ${updatedMunicipality}</p>
+                            <p><b>Estado Actual:</b> ${location.state}</p>
+                            <p><b>Estado Nuevo:</b> ${updatedState}</p>
+                            <p><b>País Actual:</b> ${location.country}</p>
+                            <p><b>País Nuevo:</b> ${updatedCountry}</p>
+                            <p><b>Tipo Actual:</b> ${location.locality_type}</p>
+                            <p><b>Tipo Nuevo:</b> ${updatedLocalityType}</p>
                         `,
                         icon: 'warning',
                         showCancelButton: true,
@@ -193,6 +284,10 @@
                                 <input type="hidden" name="locality" value="${updatedLocality}">
                                 <input type="hidden" name="street" value="${updatedStreet}">
                                 <input type="hidden" name="postal_code" value="${updatedPostalCode}">
+                                <input type="hidden" name="municipality" value="${updatedMunicipality}">
+                                <input type="hidden" name="state" value="${updatedState}">
+                                <input type="hidden" name="country" value="${updatedCountry}">
+                                <input type="hidden" name="locality_type" value="${updatedLocalityType}">
                             `;
                             document.body.appendChild(form);
                             form.submit();
@@ -204,7 +299,7 @@
         
                 // Evento: Eliminar marcador con clic derecho
                 marker.getElement().addEventListener('contextmenu', function(e) {
-                    e.preventDefault(); // Prevenir el menú contextual del navegador
+                    e.preventDefault();
                     Swal.fire({
                         title: '¿Estás seguro de que deseas eliminar este marcador?',
                         icon: 'warning',
@@ -215,10 +310,7 @@
                         cancelButtonColor: '#3085d6'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            // Eliminar marcador del mapa
                             marker.remove();
-        
-                            // Eliminar también desde el servidor
                             const form = document.createElement('form');
                             form.method = 'POST';
                             form.action = `{{ url('localidades') }}/${location.id}`;
@@ -237,20 +329,17 @@
             map.on('click', async function(e) {
                 const coordinates = e.lngLat;
             
-                // Eliminar marcador previo si existe
+                // Eliminar marcador previo si exista
                 if (currentMarker) {
                     currentMarker.remove();
                 }
             
-                // Crear un nuevo marcador en la nueva ubicación
-                currentMarker = new mapboxgl.Marker({
-                        color: '#007BFF'
-                    })
-                    .setLngLat(coordinates)
-                    .addTo(map);
+                // Crear y agregar nuevo marcador
+                currentMarker = new mapboxgl.Marker({ color: '#007BFF' })
+                                  .setLngLat(coordinates)
+                                  .addTo(map);
             
-                const url =
-                    `https://api.mapbox.com/geocoding/v5/mapbox.places/${coordinates.lng},${coordinates.lat}.json?access_token=${mapboxgl.accessToken}`;
+                const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${coordinates.lng},${coordinates.lat}.json?access_token=${mapboxgl.accessToken}`;
             
                 try {
                     const response = await fetch(url);
@@ -258,40 +347,63 @@
             
                     if (data.features.length > 0) {
                         const place = data.features[0];
-                        let street = 'N/A';  // Valor por defecto para la calle
-                        let locality = 'N/A';  // Valor por defecto para la localidad
-                        let postalCode = 'N/A';  // Valor por defecto para el código postal
+                        let street = 'N/A';
+                        let locality = 'N/A';
+                        let postalCode = 'N/A';
+                        let municipality = '';
+                        let state = '';
+                        let country = '';
+                        let locality_type = '';
             
-                        // Buscar la calle, si existe
-                        const streetFeature = data.features.find(feature => feature.place_type.includes('address'));
+                        // Extraer calle
+                        const streetFeature = data.features.find(f => f.place_type.includes('address'));
                         if (streetFeature) {
                             street = streetFeature.text;
                         }
             
-                        // Buscar la localidad, si existe
+                        // Extraer localidad (town/place)
                         const localityFeature = place.context?.find(c => c.id.includes('place'));
                         if (localityFeature) {
                             locality = localityFeature.text;
                         }
             
-                        // Buscar el código postal, si existe
+                        // Extraer código postal
                         const postalCodeFeature = place.context?.find(c => c.id.includes('postcode'));
                         if (postalCodeFeature) {
                             postalCode = postalCodeFeature.text;
                         }
             
-                        // Asignar los valores correctos a los campos del formulario
+                        // Extraer municipio, estado y país
+                        const municipalityFeature = place.context?.find(c => c.id.includes('district'));
+                        if (municipalityFeature) {
+                            municipality = municipalityFeature.text;
+                        }
+                        const stateFeature = place.context?.find(c => c.id.includes('region'));
+                        if (stateFeature) {
+                            state = stateFeature.text;
+                        }
+                        const countryFeature = place.context?.find(c => c.id.includes('country'));
+                        if (countryFeature) {
+                            country = countryFeature.text;
+                        }
+            
+                        locality_type = place.place_type ? place.place_type.join(', ') : '';
+            
+                        // Rellenar formulario
                         document.getElementById('longitude').value = coordinates.lng;
                         document.getElementById('latitude').value = coordinates.lat;
-                        document.getElementById('locality').value = locality;  // Asignar localidad correctamente
-                        document.getElementById('street').value = street;  // Asignar calle correctamente
-                        document.getElementById('postal_code').value = postalCode;  // Asignar código postal correctamente
+                        document.getElementById('locality').value = locality;
+                        document.getElementById('street').value = street;
+                        document.getElementById('postal_code').value = postalCode;
+                        document.getElementById('municipality').value = municipality;
+                        document.getElementById('state').value = state;
+                        document.getElementById('country').value = country;
+                        document.getElementById('locality_type').value = locality_type;
                     }
                 } catch (error) {
                     console.error('Error obteniendo la ubicación:', error);
                 }
             });
-            
         });
     </script>
 @endsection

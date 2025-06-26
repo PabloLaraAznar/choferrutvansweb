@@ -1,145 +1,177 @@
 @extends('adminlte::page')
 
-@section('title', ' Dashboard')
+@section('title', 'Dashboard')
 
 @section('content_header')
-    <h1>Dashboard</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Panel Administrativo</h1>
+        <div class="px-3 py-2 bg-light rounded shadow-sm">
+        <div><strong>Fecha actual:</strong> {{ \Carbon\Carbon::now()->format('d/m/Y') }}</div>
+        <div id="reloj" class="text-muted small font-weight-bold" style="font-size: 1rem;"></div>
+    </div>
+
+    </div>
 @stop
 
 @section('content')
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Bienvenido a tu panel</h3>
+    <!-- Tarjetas resumen -->
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <div class="small-box" style="background-color: rgba(40,167,69,0.1); color: #155724;">
+                <div class="inner">
+                    <h3>${{ number_format($totalSales, 2) }}</h3>
+                    <p>Ingresos de hoy</p>
+                </div>
+                <div class="icon"><i class="fas fa-dollar-sign"></i></div>
+            </div>
         </div>
-        <div class="card-body">
-            <p>Aquí puedes gestionar tu aplicación.</p>
+        <div class="col-md-3 mb-3">
+            <div class="small-box" style="background-color: rgba(0,123,255,0.1); color: #858100;">
+                <div class="inner">
+                    <h3>{{ $activeDrivers }}</h3>
+                    <p>Choferes activos</p>
+                </div>
+                <div class="icon"><i class="fas fa-user-tie"></i></div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="small-box" style="background-color: rgba(23,162,184,0.1); color: #0c5460;">
+                <div class="inner">
+                    <h3>{{ $activeUnits }}</h3>
+                    <p>Unidades registradas</p>
+                </div>
+                <div class="icon"><i class="fas fa-shuttle-van"></i></div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="small-box" style="background-color: rgba(255,193,7,0.1); color: #856404;">
+                <div class="inner">
+                    <h3>{{ $todayTrips }}</h3>
+                    <p>Viajes de hoy</p>
+                </div>
+                <div class="icon"><i class="fas fa-calendar-day"></i></div>
+            </div>
         </div>
     </div>
 
-    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; align-items: flex-end;">
-        <div style="margin-bottom: 10px;">
-            <div x-data="chatbot()" style="z-index: 1001;">
-                <button @click="toggleChat" class="btn btn-lg shadow-lg" style="background: linear-gradient(135deg, #FF9800, #FF5722); color: white; border-radius: 50px; padding: 15px; border: none;">
-                    <i class="fas fa-comment-dots"></i>
-                </button>
-                <div x-show="isOpen" x-transition class="card shadow-lg" style="width: 350px; height: 450px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); display: flex; flex-direction: column;">
-                    <div class="card-header" style="background: linear-gradient(135deg, #FF9800, #FF5722); color: white; border-radius: 15px 15px 0 0; display: flex; justify-content: space-between; align-items: center; padding: 10px;">
-                        <h3 class="card-title mb-0" style="margin-right: auto;">Asistente Virtual</h3>
-                        <button @click="isOpen = false" class="btn btn-tool text-white" style="margin-left: auto;">
-                            <i class="fas fa-times"></i>
-                        </button>
+    <!-- Filtro + Gráficos como sección unificada -->
+    <div class="card shadow-sm border rounded-lg mb-4" style="border: 1px solid #dee2e6;">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <strong>Filtrar gráficos por rango de fechas</strong>
+            <form method="GET" class="form-inline m-0">
+                <label class="mr-2 mb-0"><strong>De:</strong></label>
+                <input type="date" name="start_date" class="form-control mr-3" value="{{ $startDate->toDateString() }}" style="width: 160px;">
+
+                <label class="mr-2 mb-0"><strong>A:</strong></label>
+                <input type="date" name="end_date" class="form-control mr-3" value="{{ $endDate->toDateString() }}" style="width: 160px;">
+
+                <button class="btn btn-primary mr-2">Aplicar filtro</button>
+                <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary">Borrar filtro</a>
+            </form>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-4">
+                <strong>Visualizando datos del:</strong>
+                @if($startDate->equalTo($endDate))
+                    {{ $startDate->format('d/m/Y') }}
+                @else
+                    {{ $startDate->format('d/m/Y') }} al {{ $endDate->format('d/m/Y') }}
+                @endif
+            </p>
+
+            <div class="row">
+                <div class="col-md-8 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white">Ventas por día</div>
+                        <div class="card-body p-0" style="height:250px; position: relative;">
+                            <canvas id="barChart" width="100%" height="250"></canvas>
+                        </div>
                     </div>
-                    <div class="card-body p-3 overflow-auto" style="flex-grow: 1; background-color: #f0f0f0;">
-                        <template x-for="(message, index) in messages" :key="index">
-                            <div class="mb-2" :class="{ 'text-left': message.sender === 'bot', 'text-right': message.sender === 'user' }">
-                                <div class="chat-bubble" :class="{ 'user': message.sender === 'user', 'bot': message.sender === 'bot' }">
-                                    <div x-html="message.text"></div>
-                                </div>
-                                <div class="text-xs text-muted mt-1" x-text="message.sender === 'user' ? 'Tú' : 'Asistente'"></div>
-                            </div>
-                        </template>
-                    </div>
-                    <div class="card-footer">
-                        <form @submit.prevent="sendMessage" class="form-inline">
-                            <div class="input-group w-100">
-                                <input x-model="inputMessage" type="text" class="form-control" placeholder="Escribe tu mensaje..." required @keyup.enter="sendMessage">
-                                <div class="input-group-append">
-                                    <button type="submit" class="btn" style="background: linear-gradient(135deg, #FF9800, #FF5722); color: white;">
-                                        <i class="fas fa-paper-plane"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-warning text-dark">Ventas por chofer</div>
+                        <div class="card-body p-0" style="height:250px; position: relative;">
+                            <canvas id="pieChart" width="100%" height="250"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div>
-            <a href="https://wa.me/529991577905" target="_blank" class="btn btn-lg shadow-lg" style="background-color: #25D366; color: white; border-radius: 50px; padding: 15px; border: none;">
-                <i class="fab fa-whatsapp"></i>
-            </a>
-        </div>
     </div>
-
-    <style>
-        .chat-bubble {
-            border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 10px;
-            display: inline-block;
-            max-width: 80%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .chat-bubble.user {
-            background: linear-gradient(135deg, #FF9800, #FF5722);
-            color: white;
-            border-radius: 20px 20px 0 20px;
-        }
-
-        .chat-bubble.bot {
-            background-color: #e8e8e8;
-            color: black;
-            border-radius: 20px 20px 20px 0;
-        }
-    </style>
 @stop
 
 @section('js')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    function chatbot() {
-        return {
-            isOpen: false,
-            inputMessage: '',
-            messages: [],
+    const dates   = {!! json_encode($salesData->pluck('date')) !!};
+    const vals    = {!! json_encode($salesData->pluck('total')) !!};
+    const dLabels = {!! json_encode($pieData->pluck('driver')) !!};
+    const dVals   = {!! json_encode($pieData->pluck('total')) !!};
 
-            init() {
-                this.addMessage('Hola, soy tu asistente virtual. ¿En qué puedo ayudarte?', 'bot');
-            },
-
-            toggleChat() {
-                this.isOpen = !this.isOpen;
-                if (this.isOpen) {
-                    this.scrollToBottom();
-                }
-            },
-
-            addMessage(text, sender) {
-                this.messages.push({
-                    text: text,
-                    sender: sender
-                });
-                this.scrollToBottom();
-            },
-
-            sendMessage() {
-                if (!this.inputMessage.trim()) return;
-
-                const message = this.inputMessage;
-                this.addMessage(message, 'user');
-                this.inputMessage = '';
-
-                fetch('{{ route("chatbot.handle") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ message: message })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    this.addMessage(data.response, 'bot');
-                });
-            },
-
-            scrollToBottom() {
-                this.$nextTick(() => {
-                    const container = this.$el.querySelector('.card-body');
-                    container.scrollTop = container.scrollHeight;
-                });
+    new Chart(document.getElementById('barChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Ventas ($)',
+                data: vals,
+                backgroundColor: 'rgba(54,162,235,0.3)',
+                borderColor:     'rgba(54,162,235,0.6)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
+                y: { beginAtZero: true }
             }
         }
-    }
+    });
+
+    new Chart(document.getElementById('pieChart').getContext('2d'), {
+        type: 'pie',
+        data: {
+            labels: dLabels,
+            datasets: [{
+                data: dVals,
+                backgroundColor: [
+                    'rgba(255,99,132,0.3)',
+                    'rgba(54,162,235,0.3)',
+                    'rgba(255,206,86,0.3)',
+                    'rgba(75,192,192,0.3)',
+                    'rgba(153,102,255,0.3)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,0.6)',
+                    'rgba(54,162,235,0.6)',
+                    'rgba(255,206,86,0.6)',
+                    'rgba(75,192,192,0.6)',
+                    'rgba(153,102,255,0.6)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
 </script>
+<script>
+    function actualizarReloj() {
+        const reloj = document.getElementById("reloj");
+        const ahora = new Date();
+        const horas = ahora.getHours().toString().padStart(2, '0');
+        const minutos = ahora.getMinutes().toString().padStart(2, '0');
+        const segundos = ahora.getSeconds().toString().padStart(2, '0');
+        reloj.textContent = Hora actual: ${horas}:${minutos}:${segundos};
+    }
+
+    setInterval(actualizarReloj, 1000);
+    actualizarReloj(); // ejecutar al cargar
+</script>
+
 @stop
