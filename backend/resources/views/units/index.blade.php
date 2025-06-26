@@ -3,6 +3,15 @@
 
 @section('title', 'Unidades')
 
+@section('css')
+    <link rel="stylesheet" href="{{ asset('css/rutvans-admin.css') }}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.10/select2-bootstrap.min.css" rel="stylesheet" />
+@endsection
+@endsection
+
 @section('content_header')
     <div class="rutvans-content-header rutvans-fade-in">
         <div class="container-fluid">
@@ -79,8 +88,9 @@
 
     <div class="card">
         <div class="card-body">
-            <table class="table table-hover">
-                <thead class="thead-dark">
+            <div class="rutvans-table-container">
+                <table id="unitsTable" class="rutvans-table table-hover">
+                    <thead class="rutvans-table-header">
                     <tr>
                         <th>Placa</th>
                         <th>Capacidad</th>
@@ -115,7 +125,7 @@
                                         method="POST">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        <button type="submit" class="rutvans-btn rutvans-btn-sm rutvans-btn-outline-danger"
                                                 onclick="return confirm('¿Quitar conductor?')">
                                             <i class="fas fa-times"></i>
                                         </button>
@@ -126,13 +136,13 @@
                             @endforelse
                         </td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-warning mr-1"
+                            <button class="rutvans-btn rutvans-btn-sm rutvans-btn-warning mr-1"
                                     data-toggle="modal"
                                     data-target="#editUnitModal{{ $unit->id }}">
                                 <i class="fas fa-edit"></i>
                             </button>
 
-                            <button class="btn btn-sm btn-success mr-1"
+                            <button class="rutvans-btn rutvans-btn-sm rutvans-btn-success mr-1"
                                     data-toggle="modal"
                                     data-target="#assignDriverModal{{ $unit->id }}">
                                 <i class="fas fa-user-plus"></i>
@@ -143,7 +153,7 @@
                                 style="display:inline-block">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger"
+                                <button type="submit" class="rutvans-btn rutvans-btn-sm rutvans-btn-danger"
                                         onclick="return confirm('¿Eliminar unidad?')">
                                     <i class="fas fa-trash"></i>
                                 </button>
@@ -315,13 +325,34 @@
 @endforeach
 
 @push('js')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
+
 <script>
     $(document).ready(function() {
+        // Inicializar DataTable
+        $('#unitsTable').DataTable({
+            responsive: true,
+            language: {
+                "url": "https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json"
+            },
+            pageLength: 25,
+            order: [[0, 'asc']],
+            columnDefs: [
+                { orderable: false, targets: [4] }
+            ]
+        });
+
+        // Inicializar Select2
         $('.select2').select2({
             theme: 'bootstrap4',
             placeholder: 'Seleccione un conductor'
         });
 
+        // Manejo de archivos
         $('.custom-file-input').on('change', function() {
             let fileName = $(this).val().split('\\').pop();
             $(this).next('.custom-file-label').addClass("selected").html(fileName);
