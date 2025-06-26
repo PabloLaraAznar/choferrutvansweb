@@ -26,6 +26,38 @@ Route::middleware([
     })->name('dashboard');
 });
 
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+
+// Ruta para ver página de "verifica tu correo"
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+// Ruta para manejar el clic en el enlace de verificación sin requerir autenticación
+Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
+    $user = User::findOrFail($id);
+
+    // Validar que el hash coincida con el email del usuario
+    if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+        abort(403);
+    }
+
+    if (! $user->hasVerifiedEmail()) {
+        $user->markEmailAsVerified();
+    }
+
+    return redirect('/login?verified=1'); // Redirige al login con parámetro de verificación exitosa
+})->middleware('signed')->name('verification.verify');
+
+// Ruta para reenviar el email de verificación (requiere autenticación)
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+
+    return back()->with('message', 'Correo de verificación reenviado.');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\PermissionsController;
@@ -104,3 +136,9 @@ Route::get('/ruta', function () {
 })->name('ruta.index');
 // Ruta para la tabla con DataTables ServerSide
 // Route::get('/ventas/data', [VentaController::class, 'getVentas'])->name('ventas.data');
+
+use App\Http\Controllers\UserController;
+Route::resource('usuarios', UserController::class);
+
+// use App\Http\Controllers\TipoTarifaController;
+// Route::resource('tarifas', TipoTarifaController::class);
