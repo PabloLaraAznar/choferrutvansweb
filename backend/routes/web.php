@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
+    HomeController,
     EXCELController,
     PDFController,
     ChatbotController,
@@ -13,7 +14,10 @@ use App\Http\Controllers\{
     TipoTarifaController,
     HorarioController,
     RouteUnitScheduleController,
+    RutasUnidadesController,
+    SalesHistoryController,
     ProfileController,
+    UnitController,
 };
 
 use App\Livewire\{
@@ -52,9 +56,9 @@ Route::middleware([
 ])->group(function () {
 
     // Dashboard principal
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
+});
 
     /*
     |--------------------------------------------------------------------------
@@ -106,6 +110,23 @@ Route::middleware([
     Route::get('/localidades-exp', [LocExpController::class, 'index'])->name('localidades-exp.index');
     Route::post('/localidades-exp/data', [LocExpController::class, 'getLocalidades'])->name('localidades-exp.data');
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Vista de unidades con asignacion a choferes
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('rutas-unidades', RutasUnidadesController::class)->except(['show']);
+    Route::post('rutas-unidades/asignar', [RutasUnidadesController::class, 'store'])->name('rutaunidad.store');
+    Route::delete('rutas-unidades/{id}', [RutasUnidadesController::class, 'destroy'])->name('rutaunidad.destroy');
+    Route::put('rutas-unidades/{id}', [RutasUnidadesController::class, 'update'])->name('rutaunidad.update');
+    //EXPORTACION PDF Y EXCEL DE UNIDADES
+    Route::get('units/unitsexportexcel', [EXCELController::class, 'expUnidades'])->name('exports.unitsexportexcel');
+    Route::get('units/unitsexportpdf', [PDFController::class, 'expUnidades'])->name('exports.unitsexportpdf');
+    Route::resource('units', UnitController::class)->except(['show']);
+    Route::post('units/{unit}/assign-driver', [UnitController::class, 'assignDriver'])->name('units.assignDriver');
+    Route::delete('units/{unit}/remove-driver/{driver}', [UnitController::class, 'removeDriver'])->name('units.removeDriver');
+    
     /*
     |--------------------------------------------------------------------------
     | Calendario de Horarios
@@ -117,6 +138,15 @@ Route::middleware([
     Route::put('/route-unit-schedule/{id}', [RouteUnitScheduleController::class, 'update'])->name('route_unit_schedule.update');
     Route::delete('/route-unit-schedule/{id}', [RouteUnitScheduleController::class, 'destroy'])->name('route_unit_schedule.destroy');
 
+    /*
+    |--------------------------------------------------------------------------
+    | Rutas Sales
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/sales/history', [SalesHistoryController::class, 'index'])->name('sales.history');
+    Route::post('/sales/by-date', [SalesHistoryController::class, 'getSalesByDate']);
+
+    
     /*
     |--------------------------------------------------------------------------
     | Vistas Livewire personalizadas

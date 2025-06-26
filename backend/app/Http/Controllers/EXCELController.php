@@ -6,6 +6,8 @@ use App\Exports\LocalidadesExport; // Importa la clase de exportación de Excel
 use Illuminate\Http\Request; // Clase para manejar solicitudes HTTP
 use App\Models\Localidad; // Modelo que representa las localidades
 use Maatwebsite\Excel\Facades\Excel; // Facade para la exportación a Excel
+use App\Models\Unit;
+use App\Exports\UnitsExportExcel;
 
 class EXCELController extends Controller
 {
@@ -29,5 +31,21 @@ class EXCELController extends Controller
 
         // Exporta los resultados de la consulta a un archivo Excel
         return Excel::download(new LocalidadesExport($query), 'localidades.xlsx'); // Descarga el archivo con los datos exportados
+    }
+
+    public function expUnidades(Request $request)
+    {
+        $query = Unit::with(['drivers.user']);
+
+        if ($request->has('search') && !empty($request->search)) {
+            $query->where('plate', 'like', '%' . $request->search . '%')
+                ->orWhereHas('drivers.user', function ($q) use ($request) {
+                    $q->where('name', 'like', '%' . $request->search . '%');
+                });
+        }
+
+        $units = $query->get();
+
+        return Excel::download(new UnitsExportExcel($units), 'unidades.xlsx');
     }
 }

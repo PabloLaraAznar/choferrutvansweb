@@ -434,16 +434,10 @@ return [
             'icon' => 'fas fa-dollar-sign',  // Cambié a un ícono relacionado con ventas
             'submenu' => [
                 [
-                    'text' => 'Administrar Ventas',
-                    'url' => '/ventas',
+                    'text' => 'Historial de Ventas',
+                    'url' => 'sales/history', // <-- Este es el cambio clave
                     'icon' => 'fas fa-cash-register',
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'ventas') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-                [
-                    'text' => 'Detalles de Ventas',
-                    'url' => '/detalles-ventas',
-                    'icon' => 'fas fa-clipboard-list',
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'detalles-ventas') !== false ? 'bg-gradient-orange text-white' : '',
+                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'sales/history') !== false ? 'bg-gradient-orange text-white' : '',
                 ],
             ],
         ],
@@ -466,7 +460,7 @@ return [
                 ],
                 [
                     'text' => 'Rutas - Unidades',
-                    'url' => '/ruta_unidad',
+                    'url' => '/rutas-unidades',
                     'icon' => 'fas fa-bus-alt',
                     'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'rutas-unidades') !== false ? 'bg-gradient-orange text-white' : '',
                 ],

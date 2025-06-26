@@ -14,6 +14,38 @@
         </div>
     </div>
 
+        <form method="GET" action="{{ route('units.index') }}" class="mb-3">
+    <div class="form-row">
+        {{-- Campo de búsqueda --}}
+        <div class="col-md-4">
+            <input type="text" name="search" class="form-control" placeholder="Buscar por nombre o placa" value="{{ request('search') }}">
+        </div>
+
+        <div class="col-md-8 mt-2 mt-md-0">
+            <button type="submit" class="btn btn-info mr-2">
+                <i class="fas fa-search"></i> Buscar
+            </button>
+            <a href="{{ route('units.index') }}" class="btn btn-secondary">
+                Limpiar
+            </a>
+        </div>
+    </div>
+
+    <div class="form-row mt-3">
+        <div class="col-md-12">
+            <div class="btn-group" role="group" aria-label="Export buttons">
+                <a href="{{ route('exports.unitsexportexcel', ['search' => request('search')]) }}" class="btn btn-success mr-2">
+                    <i class="fas fa-file-excel"></i> Exportar Excel
+                </a>
+                <a href="{{ route('exports.unitsexportpdf', ['search' => request('search')]) }}" class="btn btn-danger">
+                    <i class="fas fa-file-pdf"></i> Exportar PDF
+                </a>
+            </div>
+        </div>
+    </div>
+</form>
+
+
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show">
             {{ session('success') }}
@@ -272,13 +304,11 @@
 @push('js')
 <script>
     $(document).ready(function() {
-        // Inicializar Select2
         $('.select2').select2({
             theme: 'bootstrap4',
             placeholder: 'Seleccione un conductor'
         });
 
-        // Mostrar nombre de archivo en input file
         $('.custom-file-input').on('change', function() {
             let fileName = $(this).val().split('\\').pop();
             $(this).next('.custom-file-label').addClass("selected").html(fileName);
@@ -288,3 +318,4 @@
 @endpush
 
 @endsection
+            
