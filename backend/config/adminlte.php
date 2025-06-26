@@ -321,10 +321,14 @@ return [
             'url' => 'admin/blog',
             'can' => 'manage-blog',
         ],
-        ['header' => 'Panel administrador RutVans'],
+        [
+            'header' => 'Panel administrador RutVans',
+            'can' => 'super-admin', // Solo super-admin puede ver este header
+        ],
         [
             'text' => 'Registrar clientes',
             'icon' => 'fas fa-user-shield',
+            'can' => 'super-admin', // Solo super-admin
             'submenu' => [
                 [
                     'text' => 'Clientes',
@@ -333,10 +337,14 @@ return [
                 ],
             ]
         ],
-        ['header' => 'Panel administrativo'],
+        [
+            'header' => 'Panel administrativo',
+            'can' => 'super-admin', // Solo super-admin puede ver este header
+        ],
         [
             'text' => 'Roles y permisos',
             'icon' => 'fas fa-user-shield',
+            'can' => 'super-admin', // Solo super-admin
             'submenu' => [
                 [
                     'text' => 'Roles',
@@ -358,6 +366,7 @@ return [
         [
             'text' => 'Administrador',
             'icon' => 'fas fa-user-cog',
+            'can' => 'admin-coordinate', // Usa el Gate definido
             'submenu' => [
                 [
                     'text' => 'Coordinadores',
@@ -379,6 +388,7 @@ return [
         [
             'text' => 'Localidades',
             'icon' => 'fas fa-file-export', // Ícono representativo para exportaciones
+            'can' => 'admin-coordinate', // Usa el Gate definido
             'submenu' => [
                 [
                     'text' => 'Exportar localidades',
@@ -392,35 +402,25 @@ return [
                 ],
             ]
         ],
-
-        ['header' => 'Empleados'],
         [
-            'text' => 'Coordinadores',
-            'url' => 'coordinates',
-            'icon' => 'fas fa-user-tie' // Representa roles de liderazgo y coordinación
+            'header' => 'Calendario',
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver este header
         ],
-        [
-            'text' => 'Conductores',
-            'url' => 'drivers',
-             'icon' => 'fas fa-taxi' // Representa la conducción de vehículos
-        ],
-        [
-            'text' => 'Cajeros',
-            'url' => 'cashiers',
-            'icon' => 'fas fa-cash-register' // Representa la gestión de pagos y dinero
-        ],
-
-        ['header' => 'Calendario'],
         [
             'text' => 'Calendario',
             'url' => 'route-unit-schedule',
             'icon' => 'fas fa-calendar-alt',
+            'can' => 'admin-coordinate', // Usa el Gate definido
         ],
 
-        ['header' => 'Gestión de Boletos'],
+        [
+            'header' => 'Gestión de Boletos',
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver este header
+        ],
         [
             'text' => 'Boletos',
             'icon' => 'fas fa-ticket-alt',
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden gestionar boletos
             'submenu' => [
                 [
                     'text' => 'Administrar Boletos',
@@ -443,10 +443,14 @@ return [
             ],
         ],
 
-        ['header' => 'Gestión de Ventas'],
+        [
+            'header' => 'Gestión de Ventas',
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver este header
+        ],
         [
             'text' => 'Ventas',
             'icon' => 'fas fa-dollar-sign',  // Cambié a un ícono relacionado con ventas
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver ventas
             'submenu' => [
                 [
                     'text' => 'Historial de Ventas',
@@ -457,10 +461,14 @@ return [
             ],
         ],
 
-        ['header' => 'Gestión de Rutas y Unidades'],
+        [
+            'header' => 'Gestión de Rutas y Unidades',
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver este header
+        ],
         [
             'text' => 'Rutas y Unidades',
             'icon' => 'fas fa-directions',  // Ícono más relacionado con rutas
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden gestionar rutas
             'submenu' => [
                 [
                     'text' => 'Administrar Rutas',
@@ -499,34 +507,14 @@ return [
             'url' => 'admin/settings',
             'icon' => 'fas fa-fw fa-lock',
         ],
-
-        ['header' => 'Usuarios y Permisos'],
         [
-            'text' => 'Usuarios y Permisos',
-            'icon' => 'fas fa-users-cog',
-            'submenu' => [
-                [
-                    'text' => 'Administrar Usuarios',
-                    'url' => '/usuarios',
-                    'icon' => 'fas fa-user-tie',
-                ],
-                [
-                    'text' => 'Administrar Roles',
-                    'url' => '/roles',
-                    'icon' => 'fas fa-user-shield',
-                ],
-                [
-                    'text' => 'Roles y Permisos',
-                    'url' => '/roles-permisos',
-                    'icon' => 'fas fa-key',
-                ],
-            ],
+            'header' => 'Otros Módulos',
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver este header
         ],
-
-        ['header' => 'Otros Módulos'],
         [
             'text' => 'Otros',
             'icon' => 'fas fa-cogs',
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver otros módulos
             'submenu' => [
                 [
                     'text' => 'Administrar Envíos',
