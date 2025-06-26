@@ -135,7 +135,7 @@ return [
 
     'usermenu_enabled' => true,
     'usermenu_header' => true,
-    'usermenu_header_class' => 'bg-info',
+    'usermenu_header_class' => 'bg-primary',
     'usermenu_image' => true,
     'usermenu_desc' => true,
     'usermenu_profile_url' => 'true',
@@ -321,10 +321,30 @@ return [
             'url' => 'admin/blog',
             'can' => 'manage-blog',
         ],
-        ['header' => 'Administrador'],
+        [
+            'header' => 'Panel administrador RutVans',
+            'can' => 'super-admin', // Solo super-admin puede ver este header
+        ],
+        [
+            'text' => 'Registrar clientes',
+            'icon' => 'fas fa-user-shield',
+            'can' => 'super-admin', // Solo super-admin
+            'submenu' => [
+                [
+                    'text' => 'Clientes',
+                    'icon' => 'fas fa-user-tag',
+                    'url' => '#',
+                ],
+            ]
+        ],
+        [
+            'header' => 'Panel administrativo',
+            'can' => 'super-admin', // Solo super-admin puede ver este header
+        ],
         [
             'text' => 'Roles y permisos',
             'icon' => 'fas fa-user-shield',
+            'can' => 'super-admin', // Solo super-admin
             'submenu' => [
                 [
                     'text' => 'Roles',
@@ -344,68 +364,63 @@ return [
             ]
         ],
         [
-            'text' => 'Exportaciones',
-            'icon' => 'fas fa-file-export', // Ícono representativo para exportaciones
+            'text' => 'Administrador',
+            'icon' => 'fas fa-user-cog',
+            'can' => 'admin-coordinate', // Usa el Gate definido
             'submenu' => [
                 [
-                    'text' => 'Localidades',
-                    'icon' => 'fas fa-map-marker-alt', // Ícono representativo para localidades
+                    'text' => 'Coordinadores',
+                    'url' => 'coordinates',
+                    'icon' => 'fas fa-user-tie' // Representa roles de liderazgo y coordinación
+                ],
+                [
+                    'text' => 'Conductores',
+                    'url' => 'drivers',
+                    'icon' => 'fas fa-taxi' // Representa la conducción de vehículos
+                ],
+                [
+                    'text' => 'Cajeros',
+                    'url' => 'cashiers',
+                    'icon' => 'fas fa-cash-register' // Representa la gestión de pagos y dinero
+                ],
+            ],
+        ],
+        [
+            'text' => 'Localidades',
+            'icon' => 'fas fa-file-export', // Ícono representativo para exportaciones
+            'can' => 'admin-coordinate', // Usa el Gate definido
+            'submenu' => [
+                [
+                    'text' => 'Exportar localidades',
+                    'icon' => 'fas fa-file-export', // Ícono representativo para localidades
                     'url' => 'localidades-exp', // Ruta para la exportación de localidades
+                ],
+                [
+                    'text' => 'Crear localidades',
+                    'url' => 'localidades',
+                    'icon' => 'fas fa-pencil-alt'
                 ],
             ]
         ],
-        ['header' => 'Empleados'],
         [
-            'text' => 'Coordinadores',
-            'url' => 'coordinates',
-            'icon' => 'fas fa-user-tie' // Representa roles de liderazgo y coordinación
+            'header' => 'Calendario',
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver este header
         ],
         [
-            'text' => 'Conductores',
-            'url' => 'drivers',
-             'icon' => 'fas fa-taxi' // Representa la conducción de vehículos
-        ],
-        [
-            'text' => 'Cajeros',
-            'url' => 'cashiers',
-            'icon' => 'fas fa-cash-register' // Representa la gestión de pagos y dinero
-        ],
-        ['header' => 'Rutas'],
-        [
-            'text' => 'Crear localidades',
-            'url' => 'localidades',
-            'icon' => 'fas fa-map-marker-alt'
-        ],
-        
-
-
-   [
-    'header' => 'Calendario',
-],
-[
-    'text' => 'Calendario',
-    'url' => 'route-unit-schedule',
-    'icon' => 'fas fa-calendar-alt',
-],
-
-
-        ['header' => 'Usuario'],
-
-        [
-            'text' => 'profile',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-user',
+            'text' => 'Calendario',
+            'url' => 'route-unit-schedule',
+            'icon' => 'fas fa-calendar-alt',
+            'can' => 'admin-coordinate', // Usa el Gate definido
         ],
 
         [
-            'text' => 'change_password',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-lock',
+            'header' => 'Gestión de Boletos',
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver este header
         ],
-        ['header' => 'Gestión de Boletos'],
         [
             'text' => 'Boletos',
             'icon' => 'fas fa-ticket-alt',
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden gestionar boletos
             'submenu' => [
                 [
                     'text' => 'Administrar Boletos',
@@ -428,30 +443,32 @@ return [
             ],
         ],
 
-        ['header' => 'Gestión de Ventas'],
+        [
+            'header' => 'Gestión de Ventas',
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver este header
+        ],
         [
             'text' => 'Ventas',
             'icon' => 'fas fa-dollar-sign',  // Cambié a un ícono relacionado con ventas
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver ventas
             'submenu' => [
                 [
-                    'text' => 'Administrar Ventas',
-                    'url' => '/ventas',
+                    'text' => 'Historial de Ventas',
+                    'url' => 'sales/history', // <-- Este es el cambio clave
                     'icon' => 'fas fa-cash-register',
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'ventas') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-                [
-                    'text' => 'Detalles de Ventas',
-                    'url' => '/detalles-ventas',
-                    'icon' => 'fas fa-clipboard-list',
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'detalles-ventas') !== false ? 'bg-gradient-orange text-white' : '',
+                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'sales/history') !== false ? 'bg-gradient-orange text-white' : '',
                 ],
             ],
         ],
 
-        ['header' => 'Gestión de Rutas y Unidades'],
+        [
+            'header' => 'Gestión de Rutas y Unidades',
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver este header
+        ],
         [
             'text' => 'Rutas y Unidades',
             'icon' => 'fas fa-directions',  // Ícono más relacionado con rutas
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden gestionar rutas
             'submenu' => [
                 [
                     'text' => 'Administrar Rutas',
@@ -466,7 +483,7 @@ return [
                 ],
                 [
                     'text' => 'Rutas - Unidades',
-                    'url' => '/ruta_unidad',
+                    'url' => '/rutas-unidades',
                     'icon' => 'fas fa-bus-alt',
                     'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'rutas-unidades') !== false ? 'bg-gradient-orange text-white' : '',
                 ],
@@ -479,83 +496,43 @@ return [
 
             ],
         ],
-
-        ['header' => 'Gestión de Tarifas y Horarios'],
+        ['header' => 'Usuario'],
         [
-            'text' => 'Tarifas y Horarios',
-            'icon' => 'fas fa-clock',
+            'text' => 'profile',
+            'url' => 'admin/settings',
+            'icon' => 'fas fa-fw fa-user',
+        ],
+        [
+            'text' => 'change_password',
+            'url' => 'admin/settings',
+            'icon' => 'fas fa-fw fa-lock',
+        ],
+        [
+            'header' => 'Otros Módulos',
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver este header
+        ],
+        [
+            'text' => 'Otros',
+            'icon' => 'fas fa-cogs',
+            'can' => 'admin-coordinate', // Solo admin y coordinate pueden ver otros módulos
             'submenu' => [
                 [
-                    'text' => 'Administrar Horarios',
-                    'url' => '/horarios',
-                    'icon' => 'fas fa-calendar-day',  // Cambié a un ícono más específico de calendario
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'horarios') !== false ? 'bg-gradient-orange text-white' : '',
+                    'text' => 'Administrar Envíos',
+                    'url' => '/envios',
+                    'icon' => 'fas fa-truck',
                 ],
                 [
-                    'text' => 'Tipos de Tarifas',
-                    'url' => '/tipos-tarifas',
-                    'icon' => 'fas fa-tag',
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'tipos-tarifas') !== false ? 'bg-gradient-orange text-white' : '',
+                    'text' => 'Administrar Conductores',
+                    'url' => '/conductores',
+                    'icon' => 'fas fa-id-card-alt',
+                ],
+                [
+                    'text' => 'Métodos de Pago',
+                    'url'  => '/metodoPago',
+                    'icon' => 'fas fa-money-check-alt',
                 ],
             ],
         ],
-
-        ['header' => 'Gestión de Usuarios y Permisos'],
-        [
-            'text' => 'Usuarios y Permisos',
-            'icon' => 'fas fa-users-cog',
-            'submenu' => [
-                [
-                    'text' => 'Administrar Usuarios',
-                    'url' => '/usuarios',
-                    'icon' => 'fas fa-user-tie',  // Icono de usuario más específico
-                    'active' => ['usuarios'],
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'usuarios') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-                [
-                    'text' => 'Administrar Roles',
-                    'url' => '/roles',
-                    'icon' => 'fas fa-user-shield',
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'roles') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-                [
-                    'text' => 'Roles y Permisos',
-                    'url' => '/roles-permisos',
-                    'icon' => 'fas fa-key',
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'roles-permisos') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-            ],
-        ],
-        [
-    'header' => 'Otros Módulos',
-],
-[
-    'text' => 'Otros',
-    'icon' => 'fas fa-cogs',
-    'submenu' => [
-        [
-            'text' => 'Administrar Envíos',
-            'url' => '/envios',
-            'icon' => 'fas fa-truck',
-            'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'envios') !== false ? 'bg-gradient-orange text-white' : '',
-        ],
-        [
-            'text' => 'Administrar Conductores',
-            'url' => '/conductores',
-            'icon' => 'fas fa-id-card-alt',
-            'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'conductores') !== false ? 'bg-gradient-orange text-white' : '',
-        ],
-        [
-    'text' => 'Métodos de Pago',
-    'url'  => '/metodoPago', // Debe coincidir con tu ruta
-    'icon' => 'fas fa-money-check-alt',
-    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'metodoPago') !== false ? 'bg-gradient-orange text-white' : '',
-],
-
-
-
-    ],
-],
 
     ],
 

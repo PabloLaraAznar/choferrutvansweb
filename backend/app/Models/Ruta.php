@@ -14,6 +14,8 @@ class Ruta extends Model
     
     'id_location_s',
     'id_location_f',
+    'created_at',
+    'updated_at',
 
     ];
 
@@ -35,10 +37,15 @@ public function ubicacionFinal()
         return $this->HasMany(Envio::class, 'id');
     }
 
-    // public function fare()
-    // {
+    public function source()
+    {
+        return $this->belongsTo(Localidad::class, 'id_location_s');
+    }
 
-    //     return $this->belongsTo(Tarifa::class, 'origin_locality_id', 'id');
-    // }
+    // Relación con localidad de destino
+    public function destination()
+    {
+        return $this->belongsTo(Localidad::class, 'id_location_f');
+    }
 
 }

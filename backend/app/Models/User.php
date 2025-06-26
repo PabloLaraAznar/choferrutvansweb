@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -12,7 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens;
     use HasRoles;
@@ -30,17 +30,17 @@ class User extends Authenticatable
 
 
     protected $fillable = [
-    'name',
-    'email',
-    'phone_number',
-    'date_of_birth',
-    'gender',
-    'address',
-    'two_factor_secret',
-    'profile_photo_path',
-    'password',
-    // Otros que uses
-];
+        'name',
+        'email',
+        'password',
+        'phone_number',
+        'date_of_birth',
+        'gender',
+        'address',
+        'current_team_id',
+        'two_factor_secret',
+        'profile_photo_path',
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -77,14 +77,14 @@ class User extends Authenticatable
     }
 
     public function driver()
-{
-    return $this->hasOne(Driver::class, 'id_user');
-}
+    {
+        return $this->hasOne(Driver::class, 'id_user');
+    }
 
-public function adminlte_profile_url()
-{
-    return route('profile.edit');
-}
+    public function adminlte_profile_url()
+    {
+        return route('profile.edit');
+    }
 
     public function adminlte_image()
     {
@@ -93,5 +93,9 @@ public function adminlte_profile_url()
     public function adminlte_desc()
     {
         return $this->description ?? 'Sin descripción'; // Ajusta según tus necesidades
+    }
+    public function getDescriptionAttribute()
+    {
+        return $this->email; // Retorna el correo en lugar de la descripción
     }
 }

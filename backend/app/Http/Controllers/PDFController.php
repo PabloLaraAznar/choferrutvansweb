@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Localidad; // Modelo que representa las localidades
 use Illuminate\Http\Request; // Clase para manejar solicitudes HTTP
 use Barryvdh\DomPDF\Facade\Pdf; // Facade para generar PDFs con DomPDF
+use App\Models\Unit;
 
 class PDFController extends Controller
 {
@@ -47,5 +48,32 @@ class PDFController extends Controller
 
         // Descarga el PDF generado
         return $pdf->download('localidades.pdf');
+    }
+
+    public function expUnidades(Request $request)
+    {
+        $query = Unit::with(['drivers.user']);
+
+        $filtroBuscado = $request->search ?? 'Ninguno';
+
+        if ($request->has('search') && !empty($request->search)) {
+            $query->where('plate', 'like', '%' . $request->search . '%')
+                ->orWhereHas('drivers.user', function ($q) use ($request) {
+                    $q->where('name', 'like', '%' . $request->search . '%');
+                });
+        }
+
+        $unidades = $query->get();
+        $totalUnidades = Unit::count();
+        $datosMostrados = $unidades->count();
+
+        $pdf = Pdf::loadView('units.units_pdf', [
+            'unidades' => $unidades,
+            'filtroBuscado' => $filtroBuscado,
+            'totalUnidades' => $totalUnidades,
+            'datosMostrados' => $datosMostrados,
+        ]);
+
+        return $pdf->download('unidades.pdf');
     }
 }

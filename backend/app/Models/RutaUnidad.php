@@ -17,6 +17,8 @@ class RutaUnidad extends Model
     'id_driver_unit',
     'intermediate_location_id',
     'price',
+    'created_at',
+    'updated_at',
 ];
 
 
@@ -50,5 +52,15 @@ class RutaUnidad extends Model
     {
 
         return $this->HasMany(Envio::class, 'id');
+    }
+
+    public function ruta()
+    {
+        return $this->belongsTo(Ruta::class, 'id_route');
+    }
+
+    public function driverUnit()
+    {
+        return $this->belongsTo(DriverUnit::class, 'id_driver_unit');
     }
 }
