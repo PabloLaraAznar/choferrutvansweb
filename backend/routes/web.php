@@ -120,8 +120,6 @@ Route::middleware([
     Route::middleware('can:super-admin')->group(function () {
         Route::resource('roles', RolesController::class);
         Route::resource('permissions', PermissionsController::class);
-        Route::resource('horarios', HorarioController::class);
-        Route::resource('localidades', LocalidadesController::class);
     });
 
     /*
@@ -166,6 +164,8 @@ Route::middleware([
     |--------------------------------------------------------------------------
     */
     Route::middleware('can:admin-coordinate')->group(function () {
+        Route::resource('horarios', HorarioController::class);
+        Route::resource('localidades', LocalidadesController::class);
         Route::get('/localidades-exp', [LocExpController::class, 'index'])->name('localidades-exp.index');
         Route::post('/localidades-exp/data', [LocExpController::class, 'getLocalidades'])->name('localidades-exp.data');
     });
@@ -261,7 +261,7 @@ Route::middleware([
     Route::middleware('can:admin-coordinate')->group(function () {
         Route::resource('usuarios', UserController::class);
     });
-    
+
     /*
     |--------------------------------------------------------------------------
     | Métodos de Pago - CRUD (Admin y Coordinate)
@@ -275,5 +275,4 @@ Route::middleware([
             'destroy' => 'metodoPago.destroy',
         ]);
     });
-
 });
