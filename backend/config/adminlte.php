@@ -135,7 +135,7 @@ return [
 
     'usermenu_enabled' => true,
     'usermenu_header' => true,
-    'usermenu_header_class' => 'bg-info',
+    'usermenu_header_class' => 'bg-primary',
     'usermenu_image' => true,
     'usermenu_desc' => true,
     'usermenu_profile_url' => 'true',
@@ -321,7 +321,19 @@ return [
             'url' => 'admin/blog',
             'can' => 'manage-blog',
         ],
-        ['header' => 'Administrador'],
+        ['header' => 'Panel administrador RutVans'],
+        [
+            'text' => 'Registrar clientes',
+            'icon' => 'fas fa-user-shield',
+            'submenu' => [
+                [
+                    'text' => 'Clientes',
+                    'icon' => 'fas fa-user-tag',
+                    'url' => '#',
+                ],
+            ]
+        ],
+        ['header' => 'Panel administrativo'],
         [
             'text' => 'Roles y permisos',
             'icon' => 'fas fa-user-shield',
@@ -344,95 +356,41 @@ return [
             ]
         ],
         [
-            'text' => 'Exportaciones',
+            'text' => 'Administrador',
+            'icon' => 'fas fa-user-cog',
+            'submenu' => [
+                [
+                    'text' => 'Coordinadores',
+                    'url' => 'coordinates',
+                    'icon' => 'fas fa-user-tie' // Representa roles de liderazgo y coordinación
+                ],
+                [
+                    'text' => 'Conductores',
+                    'url' => 'drivers',
+                    'icon' => 'fas fa-taxi' // Representa la conducción de vehículos
+                ],
+                [
+                    'text' => 'Cajeros',
+                    'url' => 'cashiers',
+                    'icon' => 'fas fa-cash-register' // Representa la gestión de pagos y dinero
+                ],
+            ],
+        ],
+        [
+            'text' => 'Localidades',
             'icon' => 'fas fa-file-export', // Ícono representativo para exportaciones
             'submenu' => [
                 [
-                    'text' => 'Localidades',
-                    'icon' => 'fas fa-map-marker-alt', // Ícono representativo para localidades
+                    'text' => 'Exportar localidades',
+                    'icon' => 'fas fa-file-export', // Ícono representativo para localidades
                     'url' => 'localidades-exp', // Ruta para la exportación de localidades
                 ],
+                [
+                    'text' => 'Crear localidades',
+                    'url' => 'localidades',
+                    'icon' => 'fas fa-pencil-alt'
+                ],
             ]
-        ],
-        ['header' => 'Empleados'],
-        [
-            'text' => 'Coordinadores',
-            'url' => 'coordinates',
-            'icon' => 'fas fa-user-tie' // Representa roles de liderazgo y coordinación
-        ],
-        [
-            'text' => 'Conductores',
-            'url' => 'drivers',
-             'icon' => 'fas fa-taxi' // Representa la conducción de vehículos
-        ],
-        [
-            'text' => 'Cajeros',
-            'url' => 'cashiers',
-            'icon' => 'fas fa-cash-register' // Representa la gestión de pagos y dinero
-        ],
-        ['header' => 'Rutas'],
-        [
-            'text' => 'Crear localidades',
-            'url' => 'localidades',
-            'icon' => 'fas fa-map-marker-alt'
-        ],
-        ['header' => 'Usuario'],
-
-        [
-            'text' => 'profile',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-user',
-        ],
-
-        [
-            'text' => 'change_password',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-lock',
-        ],
-        ['header' => 'Gestión de Boletos'],
-        [
-            'text' => 'Boletos',
-            'icon' => 'fas fa-ticket-alt',
-            'submenu' => [
-                [
-                    'text' => 'Administrar Boletos',
-                    'url' => '/boletos',
-                    'icon' => 'fas fa-cogs',  // Icono de administración, más variado
-                    'active' => ['boletos'],
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'boletos') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-                [
-                    'text' => 'Destinos Intermedios',
-                    'url' => '/destino-intermedio',
-                    'icon' => 'fas fa-map-marked-alt',  // Ícono más preciso para mapas
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'destino-intermedio') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-                [
-                    'text' => 'Detalles de Boletos',
-                    'url' => 'admin/detalles-boletos',
-                    'icon' => 'fas fa-info-circle',
-                ],
-            ],
-        ],
-
-        ['header' => 'Gestión de Ventas'],
-        [
-            'text' => 'Ventas',
-            'icon' => 'fas fa-dollar-sign',  // Cambié a un ícono relacionado con ventas
-            'submenu' => [
-                [
-                    'text' => 'Administrar Ventas',
-                    'url' => '/ventas',
-                    'icon' => 'fas fa-cash-register',
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'ventas') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-                [
-                    'text' => 'Detalles de Ventas',
-                    'url' => '/detalles-ventas',
-                    'icon' => 'fas fa-clipboard-list',
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'detalles-ventas') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-            ],
         ],
 
         ['header' => 'Gestión de Rutas y Unidades'],
@@ -466,73 +424,18 @@ return [
 
             ],
         ],
+        ['header' => 'Usuario'],
 
-        ['header' => 'Gestión de Tarifas y Horarios'],
         [
-            'text' => 'Tarifas y Horarios',
-            'icon' => 'fas fa-clock',
-            'submenu' => [
-                [
-                    'text' => 'Administrar Horarios',
-                    'url' => '/horarios',
-                    'icon' => 'fas fa-calendar-day',  // Cambié a un ícono más específico de calendario
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'horarios') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-                [
-                    'text' => 'Tipos de Tarifas',
-                    'url' => '/tipos-tarifas',
-                    'icon' => 'fas fa-tag',
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'tipos-tarifas') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-            ],
+            'text' => 'profile',
+            'url' => 'admin/settings',
+            'icon' => 'fas fa-fw fa-user',
         ],
 
-        ['header' => 'Gestión de Usuarios y Permisos'],
         [
-            'text' => 'Usuarios y Permisos',
-            'icon' => 'fas fa-users-cog',
-            'submenu' => [
-                [
-                    'text' => 'Administrar Usuarios',
-                    'url' => '/usuarios',
-                    'icon' => 'fas fa-user-tie',  // Icono de usuario más específico
-                    'active' => ['usuarios'],
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'usuarios') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-                [
-                    'text' => 'Administrar Roles',
-                    'url' => '/roles',
-                    'icon' => 'fas fa-user-shield',
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'roles') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-                [
-                    'text' => 'Roles y Permisos',
-                    'url' => '/roles-permisos',
-                    'icon' => 'fas fa-key',
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'roles-permisos') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-            ],
-        ],
-
-        ['header' => 'Otros Módulos'],
-        [
-            'text' => 'Otros',
-            'icon' => 'fas fa-cogs',  // Icono más general de configuración
-            'submenu' => [
-
-                [
-                    'text' => 'Administrar Envíos',
-                    'url' => '/envios',
-                    'icon' => 'fas fa-truck',  // Ícono de camión para envíos
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'envios') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-                [
-                    'text' => 'Administrar Conductores',
-                    'url' => '/conductores',
-                    'icon' => 'fas fa-id-card-alt',  // Para conductores, un ícono más relacionado
-                    'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'conductores') !== false ? 'bg-gradient-orange text-white' : '',
-                ],
-            ],
+            'text' => 'change_password',
+            'url' => 'admin/settings',
+            'icon' => 'fas fa-fw fa-lock',
         ],
     ],
 

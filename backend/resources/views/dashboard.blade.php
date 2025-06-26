@@ -55,7 +55,7 @@
             </div>
         </div>
         <div>
-            <a href="https://wa.me/5219993010426" target="_blank" class="btn btn-lg shadow-lg" style="background-color: #25D366; color: white; border-radius: 50px; padding: 15px; border: none;">
+            <a href="https://wa.me/529991577905" target="_blank" class="btn btn-lg shadow-lg" style="background-color: #25D366; color: white; border-radius: 50px; padding: 15px; border: none;">
                 <i class="fab fa-whatsapp"></i>
             </a>
         </div>

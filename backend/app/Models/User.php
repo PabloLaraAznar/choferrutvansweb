@@ -71,7 +71,7 @@ class User extends Authenticatable
     {
         return route('profile.show');
     }
-    
+
     public function adminlte_image()
     {
         return $this->profile_photo_url;
@@ -79,5 +79,9 @@ class User extends Authenticatable
     public function adminlte_desc()
     {
         return $this->description ?? 'Sin descripción'; // Ajusta según tus necesidades
+    }
+    public function getDescriptionAttribute()
+    {
+        return $this->email; // Retorna el correo en lugar de la descripción
     }
 }
