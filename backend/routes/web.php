@@ -263,11 +263,13 @@ Route::middleware([
 
     /*
     |--------------------------------------------------------------------------
-    | Vistas adicionales
+    | Vistas adicionales (Admin y Coordinate)
     |--------------------------------------------------------------------------
     */
-    Route::get('/ruta', function () {
-        return view('Ruta.ruta');
-    })->name('ruta.index');
+    Route::middleware('can:admin-coordinate')->group(function () {
+        Route::get('/ruta', function () {
+            return view('Ruta.ruta');
+        })->name('ruta.index');
+    });
 
 });
