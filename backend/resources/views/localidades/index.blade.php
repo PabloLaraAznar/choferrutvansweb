@@ -3,17 +3,24 @@
 @section('title', 'Localidades')
 
 @section('content_header')
-    <h1 class="text-center text-primary">Administra tus Localidades</h1>
+    <div class="rutvans-content-header rutvans-fade-in">
+        <div class="container-fluid">
+            <h1>
+                <i class="fas fa-map-marker-alt me-2"></i> Gestión de Localidades
+            </h1>
+            <p class="subtitle">Administra las ubicaciones geográficas del sistema</p>
+        </div>
+    </div>
 @endsection
 
 @section('content')
-<div class="card shadow-lg rounded-lg border-0">
-    <div class="card-header d-flex justify-content-between align-items-center bg-light border-bottom">
-        <h3 class="badge bg-success text-white p-3 rounded-pill shadow-sm">
-            <i class="fas fa-map-marker-alt me-2"></i> Total de Localidades: {{ $localidadesCount }}
+<div class="rutvans-card rutvans-hover-lift rutvans-fade-in">
+    <div class="rutvans-card-header d-flex justify-content-between align-items-center">
+        <h3 class="m-0">
+            <i class="fas fa-globe-americas me-2"></i> Total de Localidades: <span class="rutvans-badge rutvans-badge-primary">{{ $localidadesCount }}</span>
         </h3>
     </div>
-    <div class="card-body p-4">
+    <div class="rutvans-card-body">
         <div class="row">
             <!-- Contenedor del mapa -->
             <div class="col-md-7">
@@ -22,9 +29,9 @@
             </div>
             <!-- Formulario de localidades -->
             <div class="col-md-5">
-                <h4 class="text-center mb-3">Formulario de Localidad</h4>
-                <div class="card shadow-sm border-0">
-                    <div class="card-body">
+                <h4 class="text-center mb-3 rutvans-text-primary">Formulario de Localidad</h4>
+                <div class="rutvans-card rutvans-card-secondary">
+                    <div class="rutvans-card-body">
                         {{-- Incluimos el formulario de creación --}}
                         @include('localidades.create')
                     </div>
@@ -38,7 +45,16 @@
 @section('css')
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="{{ asset('css/rutvans-admin.css') }}" rel="stylesheet">
     <style>
+        body {
+            background-color: var(--rutvans-background);
+        }
+        
+        .content-wrapper {
+            background-color: var(--rutvans-background);
+        }
+        
         .swal-toast {
             font-size: 14px;
             border-radius: 8px;

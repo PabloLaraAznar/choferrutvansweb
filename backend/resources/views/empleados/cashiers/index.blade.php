@@ -25,8 +25,8 @@
         </div>
         
         <div class="rutvans-card-body">
-            <div class="table-responsive">
-                <table class="table rutvans-table table-striped table-hover align-middle">
+            <div class="rutvans-table-responsive">
+                <table id="cashiersTable" class="rutvans-table">
                     <thead>
                         <tr>
                             <th><i class="fas fa-hashtag me-1"></i> ID</th>
@@ -104,6 +104,7 @@
 @section('css')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('css/rutvans-admin.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <style>
         body {
             background-color: var(--rutvans-background);
@@ -117,7 +118,21 @@
 
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
     <script>
+        $(document).ready(function () {
+            $('#cashiersTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                },
+                responsive: true,
+                autoWidth: false
+            });
+        });
+
         const modalEditCashier = new bootstrap.Modal(document.getElementById('modalEditCashier'));
         const formEditCashier = document.getElementById('formEditCashier');
 
@@ -129,51 +144,6 @@
                 document.getElementById('edit_name').value = cashier.name;
                 document.getElementById('edit_email').value = cashier.email;
                 document.getElementById('edit_employee_code').value = cashier.employeeCode;
-                document.getElementById('current_photo_preview').src = cashier.photo || '';
-
-                formEditCashier.action = "{{ url('cashiers') }}/" + cashier.id;
-
-                modalEditCashier.show();
-            });
-        });
-    </script>
-@endsection
-                                    onsubmit="return confirm('¿Seguro que quieres eliminar este cajeor?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-danger" type="submit">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-    @include('empleados.cashiers.create')
-    @include('empleados.cashiers.edit')
-@endsection
-
-@section('css')
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-@endsection
-
-@section('js')
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const modalEditCashier = new bootstrap.Modal(document.getElementById('modalEditCashier'));
-        const formEditCashier = document.getElementById('formEditCashier');
-
-        document.querySelectorAll('.btn-edit-cashier').forEach(button => {
-            button.addEventListener('click', function() {
-                const cashier = this.dataset;
-
-                document.getElementById('edit_cashier_id').value = cashier.id;
-                document.getElementById('edit_name').value = cashier.name;
-                document.getElementById('edit_email').value = cashier.email;
                 document.getElementById('current_photo_preview').src = cashier.photo || '';
 
                 formEditCashier.action = "{{ url('cashiers') }}/" + cashier.id;

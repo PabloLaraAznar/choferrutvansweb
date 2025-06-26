@@ -25,8 +25,8 @@
         </div>
         
         <div class="rutvans-card-body">
-            <div class="table-responsive">
-                <table class="table rutvans-table table-striped table-hover align-middle">
+            <div class="rutvans-table-responsive">
+                <table id="coordinatesTable" class="rutvans-table">
                     <thead>
                         <tr>
                             <th><i class="fas fa-hashtag me-1"></i> ID</th>
@@ -103,6 +103,7 @@
 @section('css')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('css/rutvans-admin.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <style>
         body {
             background-color: var(--rutvans-background);
@@ -116,7 +117,21 @@
 
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
     <script>
+        $(document).ready(function () {
+            $('#coordinatesTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                },
+                responsive: true,
+                autoWidth: false
+            });
+        });
+
         const modalEditCoordinate = new bootstrap.Modal(document.getElementById('modalEditCoordinate'));
         const formEditCoordinate = document.getElementById('formEditCoordinate');
 

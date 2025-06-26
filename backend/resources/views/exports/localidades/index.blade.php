@@ -3,57 +3,66 @@
 @section('title', 'Datos Localidades')
 
 @section('content_header')
-    <h1>Datos de Localidades</h1>
+    <div class="rutvans-content-header rutvans-fade-in">
+        <div class="container-fluid">
+            <h1>
+                <i class="fas fa-table me-2"></i> Datos de Localidades
+            </h1>
+            <p class="subtitle">Consulta y exporta información de localidades registradas</p>
+        </div>
+    </div>
 @stop
 
 @section('content')
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Lista de Localidades</h3>
+    <div class="rutvans-card rutvans-hover-lift rutvans-fade-in">
+        <div class="rutvans-card-header d-flex justify-content-between align-items-center">
+            <h3 class="m-0">
+                <i class="fas fa-list me-2"></i> Lista de Localidades
+            </h3>
             <!-- Botones de exportación -->
-            <div class="float-right">
-                <label for="filter-date" class="mr-2">Fecha específica:</label>
-                <input type="date" id="filter-date" class="form-control mr-2" style="display: inline-block; width: auto;">
+            <div class="d-flex align-items-center">
+                <label for="filter-date" class="me-2 rutvans-text-primary">Fecha específica:</label>
+                <input type="date" id="filter-date" class="form-control me-2" style="display: inline-block; width: auto;">
 
-                <a href="#" id="export-pdf" class="btn btn-danger">
+                <button id="export-pdf" class="rutvans-btn rutvans-btn-danger me-2">
                     <i class="fas fa-file-pdf"></i> Exportar PDF
-                </a>
-                <a href="#" id="export-excel" class="btn btn-success">
+                </button>
+                <button id="export-excel" class="rutvans-btn rutvans-btn-success">
                     <i class="fas fa-file-excel"></i> Exportar Excel
-                </a>
+                </button>
             </div>
-
         </div>
-        <div class="card-body">
+        <div class="rutvans-card-body">
             <!-- Tabla de Localidades -->
-            <table id="localidades-table" class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Longitud</th>
-                        <th>Latitud</th>
-                        <th>Localidad</th>
-                        <th>Calle</th>
-                        <th>Código Postal</th>
-                        <th>Fecha</th> <!-- Nueva columna para la fecha -->
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($localidades as $localidad)
+            <div class="rutvans-table-responsive">
+                <table id="localidades-table" class="rutvans-table">
+                    <thead>
                         <tr>
-                            <td>{{ $localidad->id }}</td>
-                            <td>{{ $localidad->longitude }}</td>
-                            <td>{{ $localidad->latitude }}</td>
-                            <td>{{ $localidad->locality }}</td>
-                            <td>{{ $localidad->street }}</td>
-                            <td>{{ $localidad->postal_code }}</td>
-                            <td>{{ \Carbon\Carbon::parse($localidad->created_at)->format('Y-m-d') }}</td>
-                            <!-- Formato solo de fecha -->
+                            <th>ID</th>
+                            <th>Longitud</th>
+                            <th>Latitud</th>
+                            <th>Localidad</th>
+                            <th>Calle</th>
+                            <th>Código Postal</th>
+                            <th>Fecha</th> <!-- Nueva columna para la fecha -->
                         </tr>
-                    @endforeach
-                </tbody>
-
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($localidades as $localidad)
+                            <tr>
+                                <td>{{ $localidad->id }}</td>
+                                <td>{{ $localidad->longitude }}</td>
+                                <td>{{ $localidad->latitude }}</td>
+                                <td>{{ $localidad->locality }}</td>
+                                <td>{{ $localidad->street }}</td>
+                                <td>{{ $localidad->postal_code }}</td>
+                                <td>{{ \Carbon\Carbon::parse($localidad->created_at)->format('Y-m-d') }}</td>
+                                <!-- Formato solo de fecha -->
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     <!-- Paginación -->
@@ -65,6 +74,16 @@
 @section('css')
     <!-- Estilos de DataTables con Bootstrap -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    <link href="{{ asset('css/rutvans-admin.css') }}" rel="stylesheet">
+    <style>
+        body {
+            background-color: var(--rutvans-background);
+        }
+        
+        .content-wrapper {
+            background-color: var(--rutvans-background);
+        }
+    </style>
 @stop
 
 @section('js')
