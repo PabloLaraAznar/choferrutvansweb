@@ -3,69 +3,115 @@
 @section('title', 'Coordinadores')
 
 @section('content_header')
-    <div class="d-flex justify-content-between align-items-center">
-        <h1 class="m-0">
-            <i class="fas fa-user-shield me-2 text-primary"></i> Gestión de Coordinadores
-        </h1>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreateCoordinate">
-            <i class="fas fa-plus me-1"></i> Nuevo Coordinador
-        </button>
+    <div class="rutvans-content-header rutvans-fade-in">
+        <div class="container-fluid">
+            <h1>
+                <i class="fas fa-user-tie me-2"></i> Gestión de Coordinadores
+            </h1>
+            <p class="subtitle">Administra los coordinadores responsables de las operaciones</p>
+        </div>
     </div>
 @endsection
 
 @section('content')
-    <div class="card">
-        <div class="card-header">Lista de Coordinadores</div>
-        <div class="card-body">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Correo</th>
-                        <th>Código de empleado</th>
-                        <th>Foto</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($coordinators as $coordinate)
-                        <tr>
-                            <td>{{ $coordinate->id }}</td>
-                            <td>{{ $coordinate->user->name ?? 'Sin usuario' }}</td>
-                            <td>{{ $coordinate->user->email ?? 'Sin correo' }}</td>
-                            <td>{{ $coordinate->employee_code }}</td>
-                            <td>
-                                @if ($coordinate->photo)
-                                    <img src="{{ asset('storage/' . $coordinate->photo) }}"
-                                        alt="Foto de {{ $coordinate->user->name ?? '' }}"
-                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
-                                @else
-                                    <span class="text-muted">Sin foto</span>
-                                @endif
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-sm btn-warning btn-edit-coordinate"
-                                    data-id="{{ $coordinate->id }}" data-name="{{ $coordinate->user->name ?? '' }}"
-                                    data-email="{{ $coordinate->user->email ?? '' }}"
-                                    data-photo="{{ $coordinate->photo ? asset('storage/' . $coordinate->photo) : '' }}">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <form action="{{ route('coordinates.destroy', $coordinate) }}" method="POST"
-                                    class="d-inline"
-                                    onsubmit="return confirm('¿Seguro que quieres eliminar este coordinador?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-danger" type="submit">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+    <div class="rutvans-card rutvans-hover-lift rutvans-fade-in">
+        <div class="rutvans-card-header d-flex justify-content-between align-items-center">
+            <h3 class="m-0">
+                <i class="fas fa-users-cog me-2"></i> Coordinadores del Sistema
+            </h3>
+            <button type="button" class="rutvans-btn rutvans-btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreateCoordinate">
+                <i class="fas fa-plus"></i> Nuevo Coordinador
+            </button>
         </div>
+        
+        <div class="rutvans-card-body">
+            <div class="table-responsive">
+                <table class="table rutvans-table table-striped table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag me-1"></i> ID</th>
+                            <th><i class="fas fa-user me-1"></i> Nombre</th>
+                            <th><i class="fas fa-envelope me-1"></i> Correo</th>
+                            <th><i class="fas fa-id-badge me-1"></i> Código</th>
+                            <th><i class="fas fa-camera me-1"></i> Foto</th>
+                            <th><i class="fas fa-cogs me-1"></i> Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($coordinators as $coordinate)
+                            <tr>
+                                <td>
+                                    <span class="rutvans-badge rutvans-badge-info">{{ $coordinate->id }}</span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-user-circle text-muted me-2"></i>
+                                    {{ $coordinate->user->name ?? 'Sin usuario' }}
+                                </td>
+                                <td>
+                                    <i class="fas fa-at text-muted me-2"></i>
+                                    {{ $coordinate->user->email ?? 'Sin correo' }}
+                                </td>
+                                <td>
+                                    <span class="rutvans-badge rutvans-badge-secondary">{{ $coordinate->employee_code }}</span>
+                                </td>
+                                <td>
+                                    @if ($coordinate->photo)
+                                        <img src="{{ asset('storage/' . $coordinate->photo) }}"
+                                            alt="Foto de {{ $coordinate->user->name ?? '' }}"
+                                            class="rounded-circle shadow-sm"
+                                            style="width: 50px; height: 50px; object-fit: cover;">
+                                    @else
+                                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-light"
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-user text-muted"></i>
+                                        </div>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="rutvans-btn rutvans-btn-warning rutvans-btn-sm btn-edit-coordinate"
+                                            data-id="{{ $coordinate->id }}" 
+                                            data-name="{{ $coordinate->user->name ?? '' }}"
+                                            data-email="{{ $coordinate->user->email ?? '' }}"
+                                            data-photo="{{ $coordinate->photo ? asset('storage/' . $coordinate->photo) : '' }}">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </button>
+                                        
+                                        <form action="{{ route('coordinates.destroy', $coordinate) }}" method="POST"
+                                            class="d-inline"
+                                            onsubmit="return confirm('¿Seguro que quieres eliminar este coordinador?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="rutvans-btn rutvans-btn-danger rutvans-btn-sm" type="submit">
+                                                <i class="fas fa-trash"></i> Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @include('empleados.coordinates.create')
+    @include('empleados.coordinates.edit')
+@endsection
+
+@section('css')
+    <link href="{{ asset('css/rutvans-admin.css') }}" rel="stylesheet">
+    <style>
+        body {
+            background-color: var(--rutvans-background);
+        }
+        
+        .content-wrapper {
+            background-color: var(--rutvans-background);
+        }
+    </style>
+@endsection
     </div>
     @include('empleados.coordinates.create')
     @include('empleados.coordinates.edit')

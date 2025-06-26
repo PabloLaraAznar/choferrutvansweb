@@ -1,49 +1,62 @@
 <!-- resources/views/units/index.blade.php -->
 @extends('adminlte::page')
 
+@section('title', 'Unidades')
+
+@section('content_header')
+    <div class="rutvans-content-header rutvans-fade-in">
+        <div class="container-fluid">
+            <h1>
+                <i class="fas fa-shuttle-van me-2"></i> Gestión de Unidades
+            </h1>
+            <p class="subtitle">Administra las unidades de transporte del sistema</p>
+        </div>
+    </div>
+@endsection
+
 @section('content')
-<div class="container-fluid">
-    <div class="row mb-3">
-        <div class="col">
-            <h1>Unidades Registradas</h1>
-        </div>
-        <div class="col text-right">
-            <button class="btn btn-primary" data-toggle="modal" data-target="#createUnitModal">
-                <i class="fas fa-plus"></i> Nueva Unidad
-            </button>
-        </div>
+<div class="rutvans-card rutvans-hover-lift rutvans-fade-in">
+    <div class="rutvans-card-header d-flex justify-content-between align-items-center">
+        <h3 class="m-0">
+            <i class="fas fa-bus me-2"></i> Unidades Registradas
+        </h3>
+        <button class="rutvans-btn rutvans-btn-primary" data-toggle="modal" data-target="#createUnitModal">
+            <i class="fas fa-plus"></i> Nueva Unidad
+        </button>
     </div>
-
-        <form method="GET" action="{{ route('units.index') }}" class="mb-3">
-    <div class="form-row">
-        {{-- Campo de búsqueda --}}
-        <div class="col-md-4">
-            <input type="text" name="search" class="form-control" placeholder="Buscar por nombre o placa" value="{{ request('search') }}">
-        </div>
-
-        <div class="col-md-8 mt-2 mt-md-0">
-            <button type="submit" class="btn btn-info mr-2">
-                <i class="fas fa-search"></i> Buscar
-            </button>
-            <a href="{{ route('units.index') }}" class="btn btn-secondary">
-                Limpiar
-            </a>
-        </div>
-    </div>
-
-    <div class="form-row mt-3">
-        <div class="col-md-12">
-            <div class="btn-group" role="group" aria-label="Export buttons">
-                <a href="{{ route('exports.unitsexportexcel', ['search' => request('search')]) }}" class="btn btn-success mr-2">
-                    <i class="fas fa-file-excel"></i> Exportar Excel
-                </a>
-                <a href="{{ route('exports.unitsexportpdf', ['search' => request('search')]) }}" class="btn btn-danger">
-                    <i class="fas fa-file-pdf"></i> Exportar PDF
-                </a>
+    
+    <div class="rutvans-card-body">
+        <!-- Filtros y búsqueda -->
+        <form method="GET" action="{{ route('units.index') }}" class="mb-4">
+            <div class="row align-items-end">
+                <div class="col-md-4">
+                    <div class="rutvans-form-group">
+                        <label class="rutvans-form-label">
+                            <i class="fas fa-search me-1"></i> Buscar unidad
+                        </label>
+                        <input type="text" name="search" class="form-control rutvans-form-control" 
+                            placeholder="Buscar por nombre o placa" value="{{ request('search') }}">
+                    </div>
+                </div>
+                
+                <div class="col-md-8">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="submit" class="rutvans-btn rutvans-btn-info">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                        <a href="{{ route('units.index') }}" class="rutvans-btn rutvans-btn-secondary">
+                            <i class="fas fa-eraser"></i> Limpiar
+                        </a>
+                        <a href="{{ route('exports.unitsexportexcel', ['search' => request('search')]) }}" class="rutvans-btn rutvans-btn-success">
+                            <i class="fas fa-file-excel"></i> Excel
+                        </a>
+                        <a href="{{ route('exports.unitsexportpdf', ['search' => request('search')]) }}" class="rutvans-btn rutvans-btn-danger">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </a>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-</form>
+        </form>
 
 
     @if(session('success'))

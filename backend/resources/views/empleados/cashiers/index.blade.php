@@ -3,51 +3,76 @@
 @section('title', 'Cajeros')
 
 @section('content_header')
-    <div class="d-flex justify-content-between align-items-center">
-        <h1 class="m-0">
-            <i class="fas fa-user-shield me-2 text-primary"></i> Gestión de Cajeros
-        </h1>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreateCashier">
-            <i class="fas fa-plus me-1"></i> Nuevo Cajero
-        </button>
+    <div class="rutvans-content-header rutvans-fade-in">
+        <div class="container-fluid">
+            <h1>
+                <i class="fas fa-cash-register me-2"></i> Gestión de Cajeros
+            </h1>
+            <p class="subtitle">Administra los cajeros responsables de las ventas y pagos</p>
+        </div>
     </div>
 @endsection
 
 @section('content')
-    <div class="card">
-        <div class="card-header">Lista de Cajeros</div>
-        <div class="card-body">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Correo</th>
-                        <th>Código de empleado</th>
-                        <th>Foto</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($cashiers as $cashier)
+    <div class="rutvans-card rutvans-hover-lift rutvans-fade-in">
+        <div class="rutvans-card-header d-flex justify-content-between align-items-center">
+            <h3 class="m-0">
+                <i class="fas fa-money-bill-wave me-2"></i> Cajeros del Sistema
+            </h3>
+            <button type="button" class="rutvans-btn rutvans-btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreateCashier">
+                <i class="fas fa-plus"></i> Nuevo Cajero
+            </button>
+        </div>
+        
+        <div class="rutvans-card-body">
+            <div class="table-responsive">
+                <table class="table rutvans-table table-striped table-hover align-middle">
+                    <thead>
                         <tr>
-                            <td>{{ $cashier->id }}</td>
-                            <td>{{ $cashier->user->name ?? 'Sin usuario' }}</td>
-                            <td>{{ $cashier->user->email ?? 'Sin correo' }}</td>
-                            <td>{{ $cashier->employee_code }}</td>
-                            <td>
-                                @if ($cashier->photo)
-                                    <img src="{{ asset('storage/' . $cashier->photo) }}"
-                                        alt="Foto de {{ $cashier->user->name ?? '' }}"
-                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
-                                @else
-                                    <span class="text-muted">Sin foto</span>
-                                @endif
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-sm btn-warning btn-edit-cashier"
-                                    data-id="{{ $cashier->id }}" data-name="{{ $cashier->user->name ?? '' }}"
-                                    data-email="{{ $cashier->user->email ?? '' }}"
+                            <th><i class="fas fa-hashtag me-1"></i> ID</th>
+                            <th><i class="fas fa-user me-1"></i> Nombre</th>
+                            <th><i class="fas fa-envelope me-1"></i> Correo</th>
+                            <th><i class="fas fa-id-badge me-1"></i> Código</th>
+                            <th><i class="fas fa-camera me-1"></i> Foto</th>
+                            <th><i class="fas fa-cogs me-1"></i> Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($cashiers as $cashier)
+                            <tr>
+                                <td>
+                                    <span class="rutvans-badge rutvans-badge-success">{{ $cashier->id }}</span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-user-circle text-muted me-2"></i>
+                                    {{ $cashier->user->name ?? 'Sin usuario' }}
+                                </td>
+                                <td>
+                                    <i class="fas fa-at text-muted me-2"></i>
+                                    {{ $cashier->user->email ?? 'Sin correo' }}
+                                </td>
+                                <td>
+                                    <span class="rutvans-badge rutvans-badge-warning">{{ $cashier->employee_code }}</span>
+                                </td>
+                                <td>
+                                    @if ($cashier->photo)
+                                        <img src="{{ asset('storage/' . $cashier->photo) }}"
+                                            alt="Foto de {{ $cashier->user->name ?? '' }}"
+                                            class="rounded-circle shadow-sm"
+                                            style="width: 50px; height: 50px; object-fit: cover;">
+                                    @else
+                                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-light"
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-user text-muted"></i>
+                                        </div>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="rutvans-btn rutvans-btn-warning rutvans-btn-sm btn-edit-cashier"
+                                            data-id="{{ $cashier->id }}" 
+                                            data-name="{{ $cashier->user->name ?? '' }}"
+                                            data-email="{{ $cashier->user->email ?? '' }}"
                                     data-photo="{{ $cashier->photo ? asset('storage/' . $cashier->photo) : '' }}">
                                     <i class="fas fa-edit"></i>
                                 </button>

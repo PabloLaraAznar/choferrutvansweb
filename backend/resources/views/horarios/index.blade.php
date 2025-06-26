@@ -3,31 +3,37 @@
 @section('title', 'Horarios')
 
 @section('content_header')
-    <div class="d-flex justify-content-between align-items-center">
-        <h1 class="m-0">
-            <i class="fas fa-clock me-2 text-primary"></i> Gestión de Horarios
-        </h1>
+    <div class="rutvans-content-header rutvans-fade-in">
+        <div class="container-fluid">
+            <h1>
+                <i class="fas fa-clock me-2"></i> Gestión de Horarios
+            </h1>
+            <p class="subtitle">Administra los horarios del sistema de transporte</p>
+        </div>
     </div>
 @endsection
 
 @section('content')
-    <div class="card shadow-sm border-0 rounded-4 animate__animated animate__fadeIn">
-        <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #4da3ff; color: white; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-            <h3 class="card-title m-0 fw-semibold">🕒 Administra los horarios</h3>
-            <button type="button" class="btn btn-outline-light fw-semibold rounded-pill transition" data-bs-toggle="modal"
+    <div class="rutvans-card rutvans-hover-lift rutvans-fade-in">
+        <div class="rutvans-card-header d-flex justify-content-between align-items-center">
+            <h3 class="m-0">
+                <i class="fas fa-business-time me-2"></i> Horarios del Sistema
+            </h3>
+            <button type="button" class="rutvans-btn rutvans-btn-primary" data-bs-toggle="modal"
                 data-bs-target="#createHorarioModal">
-                <i class="fas fa-plus-circle me-1"></i> Crear Horario
+                <i class="fas fa-plus"></i> Crear Horario
             </button>
         </div>
 
-        <div class="card-body bg-light rounded-bottom-4">
-            <table id="horariosTable" class="table table-hover table-bordered table-striped align-middle mb-0 rounded-3 overflow-hidden">
-                <thead style="background-color: #e9f4ff;">
-                    <tr>
-                        <th>ID</th>
-                        <th>Día</th>
-                        <th>Hora de Llegada</th>
-                        <th>Hora de Salida</th>
+        <div class="rutvans-card-body">
+            <div class="table-responsive">
+                <table id="horariosTable" class="table rutvans-table table-striped table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag me-1"></i> ID</th>
+                            <th><i class="fas fa-calendar-day me-1"></i> Día</th>
+                            <th><i class="fas fa-clock me-1"></i> Hora Llegada</th>
+                            <th><i class="fas fa-clock me-1"></i> Hora Salida</th>
                         <th class="text-center">Acciones</th>
                     </tr>
                 </thead>

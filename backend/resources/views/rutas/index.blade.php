@@ -3,48 +3,69 @@
 @section('title', 'Rutas')
 
 @section('content_header')
-    <div class="d-flex justify-content-between align-items-center">
-        <h1 class="fw-bold text-dark">
-            <i class="fas fa-map-marked-alt me-2 text-primary"></i> Gestión de Rutas
-        </h1>
-        <button class="btn btn-success rounded-pill shadow-lg px-4 py-2" data-toggle="modal" data-target="#createModal">
-            <i class="fas fa-plus me-2"></i> Nueva Ruta
-        </button>
+    <div class="rutvans-content-header rutvans-fade-in">
+        <div class="container-fluid">
+            <h1>
+                <i class="fas fa-route me-2"></i> Gestión de Rutas
+            </h1>
+            <p class="subtitle">Administra las rutas de transporte del sistema</p>
+        </div>
     </div>
 @endsection
 
 @section('content')
-<div class="container-fluid py-4">
-    <div class="card border-0 shadow rounded-4">
-        <div class="card-body p-0">
-            <table class="table table-hover text-center align-middle mb-0">
-                <thead class="bg-dark text-white">
-                    <tr class="fs-6">
-                        <th class="py-3">ID</th>
-                        <th class="py-3">📍 Inicio</th>
-                        <th class="py-3">📌 Final</th>
-                        <th class="py-3">🔧 Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white">
-                    @forelse($rutas as $ruta)
-                    <tr class="hover-shadow-sm">
-                        <td class="fw-semibold">{{ $ruta->id }}</td>
-                        <td>{{ $ruta->ubicacionInicio->locality ?? 'N/A' }}</td>
-                        <td>{{ $ruta->ubicacionFinal->locality ?? 'N/A' }}</td>
-                        <td>
-                            <button class="btn btn-outline-warning btn-sm rounded-pill me-2" data-toggle="modal" data-target="#editModal{{ $ruta->id }}">
-                                <i class="fas fa-pen"></i>
-                            </button>
-                            <form action="{{ route('rutas.destroy', $ruta->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar esta ruta?')">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-outline-danger btn-sm rounded-pill">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
+    <div class="rutvans-card rutvans-hover-lift rutvans-fade-in">
+        <div class="rutvans-card-header d-flex justify-content-between align-items-center">
+            <h3 class="m-0">
+                <i class="fas fa-map-marked-alt me-2"></i> Rutas de Transporte
+            </h3>
+            <button class="rutvans-btn rutvans-btn-primary" data-toggle="modal" data-target="#createModal">
+                <i class="fas fa-plus"></i> Nueva Ruta
+            </button>
+        </div>
+        
+        <div class="rutvans-card-body">
+            <div class="table-responsive">
+                <table class="table rutvans-table table-striped table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag me-1"></i> ID</th>
+                            <th><i class="fas fa-map-marker-alt me-1"></i> Ubicación Inicio</th>
+                            <th><i class="fas fa-flag-checkered me-1"></i> Ubicación Final</th>
+                            <th><i class="fas fa-cogs me-1"></i> Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($rutas as $ruta)
+                            <tr>
+                                <td>
+                                    <span class="rutvans-badge rutvans-badge-primary">{{ $ruta->id }}</span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-map-pin text-success me-2"></i>
+                                    {{ $ruta->ubicacionInicio->locality ?? 'N/A' }}
+                                </td>
+                                <td>
+                                    <i class="fas fa-flag text-danger me-2"></i>
+                                    {{ $ruta->ubicacionFinal->locality ?? 'N/A' }}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <button class="rutvans-btn rutvans-btn-warning rutvans-btn-sm" data-toggle="modal" data-target="#editModal{{ $ruta->id }}">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </button>
+                                        
+                                        <form action="{{ route('rutas.destroy', $ruta->id) }}" method="POST" class="d-inline" 
+                                            onsubmit="return confirm('¿Eliminar esta ruta?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="rutvans-btn rutvans-btn-danger rutvans-btn-sm" type="submit">
+                                                <i class="fas fa-trash"></i> Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
 
                     <!-- Modal Editar -->
                     <div class="modal fade" id="editModal{{ $ruta->id }}" tabindex="-1">

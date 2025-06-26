@@ -93,10 +93,10 @@
                         @empty
                             <tr>
                                 <td colspan="6" class="text-center">
-                                    <div class="d-flex flex-column align-items-center py-4">
-                                        <i class="fas fa-car-side text-muted mb-3" style="font-size: 3rem;"></i>
-                                        <h5 class="text-muted">No hay conductores registrados</h5>
-                                        <p class="text-muted">Agrega el primer conductor para comenzar</p>
+                                    <div class="rutvans-alert rutvans-alert-info text-center py-5">
+                                        <i class="fas fa-car-side mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
+                                        <h4>No hay conductores registrados</h4>
+                                        <p class="mb-0">Agrega el primer conductor para comenzar a gestionar el transporte</p>
                                     </div>
                                 </td>
                             </tr>
@@ -118,6 +118,12 @@
         body {
             background-color: var(--rutvans-background);
         }
+        
+        .content-wrapper {
+            background-color: var(--rutvans-background);
+        }
+    </style>
+@endsection
         
         .content-wrapper {
             background-color: var(--rutvans-background);
