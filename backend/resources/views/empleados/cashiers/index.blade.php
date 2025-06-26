@@ -73,11 +73,71 @@
                                             data-id="{{ $cashier->id }}" 
                                             data-name="{{ $cashier->user->name ?? '' }}"
                                             data-email="{{ $cashier->user->email ?? '' }}"
-                                    data-photo="{{ $cashier->photo ? asset('storage/' . $cashier->photo) : '' }}">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <form action="{{ route('cashiers.destroy', $cashier) }}" method="POST"
-                                    class="d-inline"
+                                            data-employee-code="{{ $cashier->employee_code }}"
+                                            data-photo="{{ $cashier->photo ? asset('storage/' . $cashier->photo) : '' }}">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </button>
+                                        
+                                        <form action="{{ route('cashiers.destroy', $cashier) }}" method="POST"
+                                            class="d-inline"
+                                            onsubmit="return confirm('¿Seguro que quieres eliminar este cajero?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="rutvans-btn rutvans-btn-danger rutvans-btn-sm" type="submit">
+                                                <i class="fas fa-trash"></i> Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @include('empleados.cashiers.create')
+    @include('empleados.cashiers.edit')
+@endsection
+
+@section('css')
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ asset('css/rutvans-admin.css') }}" rel="stylesheet">
+    <style>
+        body {
+            background-color: var(--rutvans-background);
+        }
+        
+        .content-wrapper {
+            background-color: var(--rutvans-background);
+        }
+    </style>
+@endsection
+
+@section('js')
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const modalEditCashier = new bootstrap.Modal(document.getElementById('modalEditCashier'));
+        const formEditCashier = document.getElementById('formEditCashier');
+
+        document.querySelectorAll('.btn-edit-cashier').forEach(button => {
+            button.addEventListener('click', function() {
+                const cashier = this.dataset;
+
+                document.getElementById('edit_cashier_id').value = cashier.id;
+                document.getElementById('edit_name').value = cashier.name;
+                document.getElementById('edit_email').value = cashier.email;
+                document.getElementById('edit_employee_code').value = cashier.employeeCode;
+                document.getElementById('current_photo_preview').src = cashier.photo || '';
+
+                formEditCashier.action = "{{ url('cashiers') }}/" + cashier.id;
+
+                modalEditCashier.show();
+            });
+        });
+    </script>
+@endsection
                                     onsubmit="return confirm('¿Seguro que quieres eliminar este cajeor?')">
                                     @csrf
                                     @method('DELETE')

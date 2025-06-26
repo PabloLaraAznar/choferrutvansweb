@@ -101,6 +101,7 @@
 @endsection
 
 @section('css')
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('css/rutvans-admin.css') }}" rel="stylesheet">
     <style>
         body {
@@ -111,15 +112,6 @@
             background-color: var(--rutvans-background);
         }
     </style>
-@endsection
-    </div>
-    @include('empleados.coordinates.create')
-    @include('empleados.coordinates.edit')
-@endsection
-
-@section('css')
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
 @endsection
 
 @section('js')
