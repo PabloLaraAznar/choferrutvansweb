@@ -127,20 +127,76 @@
         <!-- Formulario -->
         <div class="form-section">
             <h2>Register</h2>
+
+            {{-- Mostrar errores de validación --}}
+            @if ($errors->any())
+                <div style="background-color: #fee; border: 1px solid #fcc; color: #c66; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 14px;">
+                    @foreach ($errors->all() as $error)
+                        <div style="margin-bottom: 5px;">
+                            {!! $error !!}
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
+            {{-- Mostrar mensajes de sesión --}}
+            @if (session('error'))
+                <div style="background-color: #fee; border: 1px solid #fcc; color: #c66; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                    {!! session('error') !!}
+                </div>
+            @endif
+
+            @if (session('success'))
+                <div style="background-color: #efe; border: 1px solid #cfc; color: #6c6; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                    {!! session('success') !!}
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('register') }}">
                 @csrf
                 <div class="input-group">
-                    <input type="text" name="name" placeholder="Nombre" required />
+                    <input type="text" name="name" placeholder="Nombre" value="{{ old('name') }}" required />
+                    @error('name')
+                        <div style="color: #c66; font-size: 12px; margin-top: 5px;">
+                            {!! $message !!}
+                        </div>
+                    @enderror
                 </div>
                 <div class="input-group">
-                    <input type="email" name="email" placeholder="Correo" required />
+                    <input type="email" name="email" placeholder="Correo" value="{{ old('email') }}" required />
+                    @error('email')
+                        <div style="color: #c66; font-size: 12px; margin-top: 5px;">
+                            {!! $message !!}
+                        </div>
+                    @enderror
                 </div>
                 <div class="input-group">
                     <input type="password" name="password" placeholder="Contraseña" required />
+                    @error('password')
+                        <div style="color: #c66; font-size: 12px; margin-top: 5px;">
+                            {!! $message !!}
+                        </div>
+                    @enderror
                 </div>
                 <div class="input-group">
                     <input type="password" name="password_confirmation" placeholder="Confirmar contraseña" required />
                 </div>
+                
+                {{-- Checkbox de términos y condiciones si está habilitado --}}
+                @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
+                    <div style="margin: 15px 0;">
+                        <label style="display: flex; align-items: center; font-size: 14px;">
+                            <input type="checkbox" name="terms" required style="margin-right: 8px;">
+                            Acepto los <a href="{{ route('terms.show') }}" target="_blank" style="color: #007bff;">términos y condiciones</a>
+                        </label>
+                        @error('terms')
+                            <div style="color: #c66; font-size: 12px; margin-top: 5px;">
+                                {!! $message !!}
+                            </div>
+                        @enderror
+                    </div>
+                @endif
+
                 <button type="submit" class="register-btn">Registrarse</button>
             </form>
             <p class="login-link">¿Ya tienes una cuenta? <a href="{{ route('login') }}">Inicia sesión</a></p>

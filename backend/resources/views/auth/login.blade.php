@@ -162,13 +162,54 @@
         <div class="login-right">
             <h2>Bienvenido de nuevo</h2>
             <p>Por favor ingresa tu usuario y contraseña para continuar.</p>
+
+            {{-- Mostrar errores de validación --}}
+            @if ($errors->any())
+                <div style="background-color: #fee; border: 1px solid #fcc; color: #c66; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                    @foreach ($errors->all() as $error)
+                        <div style="margin-bottom: 5px;">
+                            {!! $error !!}
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
+            {{-- Mostrar mensajes de sesión --}}
+            @if (session('error'))
+                <div style="background-color: #fee; border: 1px solid #fcc; color: #c66; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                    {!! session('error') !!}
+                </div>
+            @endif
+
+            @if (session('success'))
+                <div style="background-color: #efe; border: 1px solid #cfc; color: #6c6; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                    {!! session('success') !!}
+                </div>
+            @endif
+
+            @if (session('status'))
+                <div style="background-color: #eff; border: 1px solid #ccf; color: #66c; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                    {{ session('status') }}
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('login') }}">
                 @csrf
                 <label for="email">Correo electrónico</label>
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" name="email" value="{{ old('email') }}" required>
+                @error('email')
+                    <div style="color: #c66; font-size: 12px; margin-top: 5px;">
+                        {!! $message !!}
+                    </div>
+                @enderror
 
                 <label for="password">Contraseña</label>
                 <input type="password" id="password" name="password" required>
+                @error('password')
+                    <div style="color: #c66; font-size: 12px; margin-top: 5px;">
+                        {!! $message !!}
+                    </div>
+                @enderror
 
                 <div class="forgot-password">
                     <a href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</a>
