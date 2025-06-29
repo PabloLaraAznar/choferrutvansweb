@@ -3,49 +3,51 @@
 @section('title', 'Gestión de Usuarios')
 
 @section('content_header')
-    <div class="rutvans-content-header rutvans-fade-in">
-        <div class="container-fluid">
-            <h1>
-                <i class="fas fa-users me-2"></i> Gestión de Usuarios
+    <div class="d-flex justify-content-between align-items-center mb-4" style="background: linear-gradient(135deg, #ff6600 0%, #ff8533 100%); padding: 1.5rem; border-radius: 15px; box-shadow: 0 8px 25px rgba(255, 102, 0, 0.15); animation: fadeInDown 0.6s ease-out;">
+        <div>
+            <h1 class="text-white mb-2" style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 2rem;">
+                <i class="fas fa-users me-3"></i> Gestión de Usuarios
             </h1>
-            <p class="subtitle">Administra todos los usuarios del sistema</p>
+            <p class="text-white mb-0" style="font-family: 'Poppins', sans-serif; opacity: 0.9; font-size: 1.1rem;">
+                Administra todos los usuarios del sistema
+            </p>
         </div>
     </div>
 @endsection
 
 @section('content')
-    <div class="rutvans-card rutvans-hover-lift rutvans-fade-in">
-        <div class="rutvans-card-header d-flex justify-content-between align-items-center">
-            <h3 class="m-0">
+    <div class="card shadow-sm" style="border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;">
+        <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 15px 15px 0 0; padding: 1.5rem;">
+            <h3 class="mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 600;">
                 <i class="fas fa-user-cog me-2"></i> Administración de Usuarios
             </h3>
-            <button type="button" class="rutvans-btn rutvans-btn-primary" data-bs-toggle="modal" data-bs-target="#createUsuarioModal">
-                <i class="fas fa-user-plus"></i> Crear Usuario
+            <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#createUsuarioModal" style="font-weight: 600; border-radius: 8px; padding: 0.5rem 1.5rem;">
+                <i class="fas fa-user-plus text-primary"></i> Crear Usuario
             </button>
         </div>
         
-        <div class="rutvans-card-body">
+        <div class="card-body" style="padding: 2rem;">
             <div class="table-responsive">
-                <table id="usuariosTable" class="table rutvans-table table-striped table-hover align-middle">
-                    <thead>
+                <table id="usuariosTable" class="table table-hover table-striped align-middle" style="border-radius: 8px; overflow: hidden;">
+                    <thead style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
                         <tr>
-                            <th><i class="fas fa-hashtag me-1"></i> ID</th>
-                            <th><i class="fas fa-user me-1"></i> Nombre</th>
-                            <th><i class="fas fa-envelope me-1"></i> Email</th>
-                            <th><i class="fas fa-phone me-1"></i> Teléfono</th>
-                            <th><i class="fas fa-map-marker-alt me-1"></i> Dirección</th>
-                            <th><i class="fas fa-calendar-plus me-1"></i> Creado</th>
-                            <th><i class="fas fa-calendar-check me-1"></i> Actualizado</th>
-                            <th class="text-center"><i class="fas fa-cogs me-1"></i> Acciones</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-hashtag me-1"></i> ID</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-user me-1"></i> Nombre</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-envelope me-1"></i> Email</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-phone me-1"></i> Teléfono</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-map-marker-alt me-1"></i> Dirección</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-calendar-plus me-1"></i> Creado</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-calendar-check me-1"></i> Actualizado</th>
+                            <th class="fw-bold text-center" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-cogs me-1"></i> Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($usuarios as $usuario)
-                            <tr>
+                            <tr style="transition: all 0.3s ease;">
                                 <td>
-                                    <span class="rutvans-badge rutvans-badge-primary">{{ $usuario->id }}</span>
+                                    <span class="badge bg-primary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">{{ $usuario->id }}</span>
                                 </td>
-                                <td>
+                                <td style="font-weight: 500;">
                                     <i class="fas fa-user-circle text-muted me-2"></i>
                                     {{ e($usuario->name) }}
                                 </td>
@@ -69,18 +71,19 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
-                                        <button class="rutvans-btn rutvans-btn-warning rutvans-btn-sm"
+                                        <button class="btn btn-warning btn-sm"
                                             data-bs-toggle="modal"
                                             data-bs-target="#editUsuarioModal"
                                             data-id="{{ $usuario->id }}"
                                             data-name="{{ e($usuario->name) }}"
                                             data-email="{{ e($usuario->email) }}"
                                             data-phone="{{ e($usuario->phone_number) }}"
-                                            data-address="{{ e($usuario->address) }}">
+                                            data-address="{{ e($usuario->address) }}"
+                                            style="border-radius: 6px; font-weight: 500;">
                                             <i class="fas fa-edit"></i> Editar
                                         </button>
                                         
-                                        <button class="rutvans-btn rutvans-btn-danger rutvans-btn-sm" onclick="confirmDelete({{ $usuario->id }})">
+                                        <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ $usuario->id }})" style="border-radius: 6px; font-weight: 500;">
                                             <i class="fas fa-trash-alt"></i> Eliminar
                                         </button>
                                     </div>
@@ -100,14 +103,14 @@
 @section('css')
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <link href="{{ asset('css/rutvans-admin.css') }}" rel="stylesheet">
     <style>
         body {
-            background-color: var(--rutvans-background);
+            background-color: #f8f9fa;
+            background-color: #f8f9fa;
         }
         
         .content-wrapper {
-            background-color: var(--rutvans-background);
+            background-color: #f8f9fa;
         }
     </style>
 

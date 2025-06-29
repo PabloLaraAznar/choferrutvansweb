@@ -3,61 +3,60 @@
 @section('title', 'Datos Localidades')
 
 @section('content_header')
-    <div class="rutvans-content-header rutvans-fade-in">
-        <div class="container-fluid">
-            <h1>
+    <div class="d-flex justify-content-between align-items-center p-3 mb-3" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div>
+            <h1 class="mb-1" style="font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1.8rem;">
                 <i class="fas fa-table me-2"></i> Datos de Localidades
             </h1>
-            <p class="subtitle">Consulta y exporta información de localidades registradas</p>
+            <p class="mb-0" style="opacity: 0.9; font-size: 0.95rem;">Consulta y exporta información de localidades registradas</p>
         </div>
     </div>
 @stop
 
 @section('content')
-    <div class="rutvans-card rutvans-hover-lift rutvans-fade-in">
-        <div class="rutvans-card-header d-flex justify-content-between align-items-center">
-            <h3 class="m-0">
+    <div class="card shadow-sm" style="border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;">
+        <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 12px 12px 0 0; padding: 1.5rem;">
+            <h3 class="mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 600;">
                 <i class="fas fa-list me-2"></i> Lista de Localidades
             </h3>
             <!-- Botones de exportación -->
             <div class="d-flex align-items-center">
-                <label for="filter-date" class="me-2 rutvans-text-primary">Fecha específica:</label>
-                <input type="date" id="filter-date" class="form-control me-2" style="display: inline-block; width: auto;">
+                <label for="filter-date" class="me-2 text-white" style="font-weight: 500;">Fecha específica:</label>
+                <input type="date" id="filter-date" class="form-control me-2" style="display: inline-block; width: auto; border-radius: 6px;">
 
-                <button id="export-pdf" class="rutvans-btn rutvans-btn-danger me-2">
+                <button id="export-pdf" class="btn btn-light me-2" style="color: #dc3545; font-weight: 600; border-radius: 6px;">
                     <i class="fas fa-file-pdf"></i> Exportar PDF
                 </button>
-                <button id="export-excel" class="rutvans-btn rutvans-btn-success">
+                <button id="export-excel" class="btn btn-light" style="color: #28a745; font-weight: 600; border-radius: 6px;">
                     <i class="fas fa-file-excel"></i> Exportar Excel
                 </button>
             </div>
         </div>
-        <div class="rutvans-card-body">
+        <div class="card-body" style="padding: 2rem;">
             <!-- Tabla de Localidades -->
-            <div class="rutvans-table-responsive">
-                <table id="localidades-table" class="rutvans-table">
-                    <thead>
+            <div class="table-responsive">
+                <table id="localidades-table" class="table table-hover table-striped" style="border-radius: 8px; overflow: hidden;">
+                    <thead style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
                         <tr>
-                            <th>ID</th>
-                            <th>Longitud</th>
-                            <th>Latitud</th>
-                            <th>Localidad</th>
-                            <th>Calle</th>
-                            <th>Código Postal</th>
-                            <th>Fecha</th> <!-- Nueva columna para la fecha -->
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">ID</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">Longitud</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">Latitud</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">Localidad</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">Calle</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">Código Postal</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">Fecha</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($localidades as $localidad)
-                            <tr>
-                                <td>{{ $localidad->id }}</td>
-                                <td>{{ $localidad->longitude }}</td>
-                                <td>{{ $localidad->latitude }}</td>
-                                <td>{{ $localidad->locality }}</td>
+                            <tr style="transition: all 0.3s ease;">
+                                <td><span class="badge bg-primary" style="font-size: 0.85rem;">{{ $localidad->id }}</span></td>
+                                <td style="font-weight: 500;">{{ $localidad->longitude }}</td>
+                                <td style="font-weight: 500;">{{ $localidad->latitude }}</td>
+                                <td style="font-weight: 600; color: #495057;">{{ $localidad->locality }}</td>
                                 <td>{{ $localidad->street }}</td>
-                                <td>{{ $localidad->postal_code }}</td>
-                                <td>{{ \Carbon\Carbon::parse($localidad->created_at)->format('Y-m-d') }}</td>
-                                <!-- Formato solo de fecha -->
+                                <td><span class="badge bg-secondary">{{ $localidad->postal_code }}</span></td>
+                                <td style="color: #6c757d;">{{ \Carbon\Carbon::parse($localidad->created_at)->format('Y-m-d') }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -67,21 +66,22 @@
     </div>
     <!-- Paginación -->
     <div class="d-flex justify-content-center mt-3">
-        {{ $localidades->links() }}
+        <div style="background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            {{ $localidades->links() }}
+        </div>
     </div>
 @stop
 
 @section('css')
     <!-- Estilos de DataTables con Bootstrap -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
-    <link href="{{ asset('css/rutvans-admin.css') }}" rel="stylesheet">
     <style>
         body {
-            background-color: var(--rutvans-background);
+            background-color: #f8f9fa;
         }
         
         .content-wrapper {
-            background-color: var(--rutvans-background);
+            background-color: #f8f9fa;
         }
     </style>
 @stop

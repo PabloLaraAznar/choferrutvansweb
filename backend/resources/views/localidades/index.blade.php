@@ -3,24 +3,26 @@
 @section('title', 'Localidades')
 
 @section('content_header')
-    <div class="rutvans-content-header rutvans-fade-in">
-        <div class="container-fluid">
-            <h1>
-                <i class="fas fa-map-marker-alt me-2"></i> Gestión de Localidades
+    <div class="d-flex justify-content-between align-items-center mb-4" style="background: linear-gradient(135deg, #ff6600 0%, #ff8533 100%); padding: 1.5rem; border-radius: 15px; box-shadow: 0 8px 25px rgba(255, 102, 0, 0.15); animation: fadeInDown 0.6s ease-out;">
+        <div>
+            <h1 class="text-white mb-2" style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 2rem;">
+                <i class="fas fa-map-marker-alt me-3"></i> Gestión de Localidades
             </h1>
-            <p class="subtitle">Administra las ubicaciones geográficas del sistema</p>
+            <p class="text-white mb-0" style="font-family: 'Poppins', sans-serif; opacity: 0.9; font-size: 1.1rem;">
+                Administra las ubicaciones geográficas del sistema
+            </p>
         </div>
     </div>
 @endsection
 
 @section('content')
-<div class="rutvans-card rutvans-hover-lift rutvans-fade-in">
-    <div class="rutvans-card-header d-flex justify-content-between align-items-center">
-        <h3 class="m-0">
-            <i class="fas fa-globe-americas me-2"></i> Total de Localidades: <span class="rutvans-badge rutvans-badge-primary">{{ $localidadesCount }}</span>
+<div class="card shadow-sm" style="border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;">
+    <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 15px 15px 0 0; padding: 1.5rem;">
+        <h3 class="mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 600;">
+            <i class="fas fa-globe-americas me-2"></i> Total de Localidades: <span class="badge bg-light text-dark ms-2">{{ $localidadesCount }}</span>
         </h3>
     </div>
-    <div class="rutvans-card-body">
+    <div class="card-body" style="padding: 2rem;">
         <div class="row">
             <!-- Contenedor del mapa -->
             <div class="col-md-7">
@@ -29,9 +31,9 @@
             </div>
             <!-- Formulario de localidades -->
             <div class="col-md-5">
-                <h4 class="text-center mb-3 rutvans-text-primary">Formulario de Localidad</h4>
-                <div class="rutvans-card rutvans-card-secondary">
-                    <div class="rutvans-card-body">
+                <h4 class="text-center mb-3" style="color: #ff6600; font-family: 'Poppins', sans-serif; font-weight: 600;">Formulario de Localidad</h4>
+                <div class="card" style="border: 2px solid #ff6600; border-radius: 12px;">
+                    <div class="card-body" style="padding: 1.5rem;">
                         {{-- Incluimos el formulario de creación --}}
                         @include('localidades.create')
                     </div>
@@ -45,14 +47,13 @@
 @section('css')
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="{{ asset('css/rutvans-admin.css') }}" rel="stylesheet">
     <style>
         body {
-            background-color: var(--rutvans-background);
+            background-color: #f8f9fa;
         }
         
         .content-wrapper {
-            background-color: var(--rutvans-background);
+            background-color: #f8f9fa;
         }
         
         .swal-toast {

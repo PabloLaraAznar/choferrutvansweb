@@ -3,47 +3,48 @@
 @section('title', 'Horarios')
 
 @section('content_header')
-    <div class="rutvans-content-header rutvans-fade-in">
-        <div class="container-fluid">
-            <h1>
-                <i class="fas fa-clock me-2"></i> Gestión de Horarios
+    <div class="d-flex justify-content-between align-items-center mb-4" style="background: linear-gradient(135deg, #ff6600 0%, #ff8533 100%); padding: 1.5rem; border-radius: 15px; box-shadow: 0 8px 25px rgba(255, 102, 0, 0.15); animation: fadeInDown 0.6s ease-out;">
+        <div>
+            <h1 class="text-white mb-2" style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 2rem;">
+                <i class="fas fa-clock me-3"></i> Gestión de Horarios
             </h1>
-            <p class="subtitle">Administra los horarios del sistema de transporte</p>
+            <p class="text-white mb-0" style="font-family: 'Poppins', sans-serif; opacity: 0.9; font-size: 1.1rem;">
+                Administra los horarios del sistema de transporte
+            </p>
         </div>
     </div>
 @endsection
 
 @section('content')
-    <div class="rutvans-card rutvans-hover-lift rutvans-fade-in">
-        <div class="rutvans-card-header d-flex justify-content-between align-items-center">
-            <h3 class="m-0">
+    <div class="card shadow-sm" style="border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;">
+        <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 15px 15px 0 0; padding: 1.5rem;">
+            <h3 class="mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 600;">
                 <i class="fas fa-business-time me-2"></i> Horarios del Sistema
             </h3>
-            <button type="button" class="rutvans-btn rutvans-btn-primary" data-bs-toggle="modal"
-                data-bs-target="#createHorarioModal">
-                <i class="fas fa-plus"></i> Crear Horario
+            <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#createHorarioModal" style="font-weight: 600; border-radius: 8px; padding: 0.5rem 1.5rem;">
+                <i class="fas fa-plus text-primary"></i> Crear Horario
             </button>
         </div>
 
-        <div class="rutvans-card-body">
+        <div class="card-body" style="padding: 2rem;">
             <div class="table-responsive">
-                <table id="horariosTable" class="table rutvans-table table-striped table-hover align-middle">
-                    <thead>
+                <table id="horariosTable" class="table table-hover table-striped align-middle" style="border-radius: 8px; overflow: hidden;">
+                    <thead style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
                         <tr>
-                            <th><i class="fas fa-hashtag me-1"></i> ID</th>
-                            <th><i class="fas fa-calendar-day me-1"></i> Día</th>
-                            <th><i class="fas fa-clock me-1"></i> Hora Llegada</th>
-                            <th><i class="fas fa-clock me-1"></i> Hora Salida</th>
-                        <th class="text-center">Acciones</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-hashtag me-1"></i> ID</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-calendar-day me-1"></i> Día</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-clock me-1"></i> Hora Llegada</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-clock me-1"></i> Hora Salida</th>
+                        <th class="fw-bold text-center" style="color: #495057; font-family: 'Poppins', sans-serif;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($horarios as $horario)
-                        <tr>
-                            <td>{{ $horario->id }}</td>
-                            <td>{{ e($horario->dia) }}</td>
-                            <td>{{ e($horario->horaLlegada) }}</td>
-                            <td>{{ e($horario->horaSalida) }}</td>
+                        <tr style="transition: all 0.3s ease;">
+                            <td><span class="badge bg-primary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">{{ $horario->id }}</span></td>
+                            <td style="font-weight: 500;">{{ e($horario->dia) }}</td>
+                            <td style="font-weight: 500;">{{ e($horario->horaLlegada) }}</td>
+                            <td style="font-weight: 500;">{{ e($horario->horaSalida) }}</td>
                             <td class="text-center">
                                 <div class="d-flex justify-content-center gap-2">
                                     <button class="btn btn-sm btn-outline-info rounded-circle" data-bs-toggle="modal"

@@ -3,31 +3,31 @@
 @section('title', 'Conductores')
 
 @section('content_header')
-    <div class="rutvans-content-header rutvans-fade-in">
-        <div class="container-fluid">
-            <h1>
+    <div class="d-flex justify-content-between align-items-center p-3 mb-3" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div>
+            <h1 class="mb-1" style="font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1.8rem;">
                 <i class="fas fa-id-card me-2"></i> Gestión de Conductores
             </h1>
-            <p class="subtitle">Administra los conductores del sistema de transporte</p>
+            <p class="mb-0" style="opacity: 0.9; font-size: 0.95rem;">Administra los conductores del sistema de transporte</p>
         </div>
     </div>
 @endsection
 
 @section('content')
-    <div class="rutvans-card rutvans-hover-lift rutvans-fade-in">
-        <div class="rutvans-card-header d-flex justify-content-between align-items-center">
-            <h3 class="m-0">
+    <div class="card shadow-sm" style="border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;">
+        <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 12px 12px 0 0; padding: 1.5rem;">
+            <h3 class="mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 600;">
                 <i class="fas fa-steering-wheel me-2"></i> Conductores Registrados
             </h3>
-            <button type="button" class="rutvans-btn rutvans-btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreateDriver">
-                <i class="fas fa-plus"></i> Nuevo Conductor
+            <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalCreateDriver" style="font-weight: 600; border-radius: 8px; padding: 0.5rem 1.5rem;">
+                <i class="fas fa-plus text-primary"></i> Nuevo Conductor
             </button>
         </div>
         
-        <div class="rutvans-card-body">
-            <div class="rutvans-table-responsive">
-                <table id="driversTable" class="rutvans-table">
-                    <thead>
+        <div class="card-body" style="padding: 2rem;">
+            <div class="table-responsive">
+                <table id="driversTable" class="table table-hover table-striped" style="border-radius: 8px; overflow: hidden;">
+                    <thead style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
                         <tr>
                             <th><i class="fas fa-hashtag me-1"></i> ID</th>
                             <th><i class="fas fa-user me-1"></i> Usuario</th>
@@ -41,7 +41,7 @@
                         @forelse ($drivers as $driver)
                             <tr>
                                 <td>
-                                    <span class="rutvans-badge rutvans-badge-primary">{{ $driver->id }}</span>
+                                    <span class="badge bg-primary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">{{ $driver->id }}</span>
                                 </td>
                                 <td>
                                     <i class="fas fa-user-circle text-muted me-2"></i>
@@ -70,12 +70,13 @@
                                 </td>
                                 <td>
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="rutvans-btn rutvans-btn-warning rutvans-btn-sm btn-edit-driver"
+                                        <button type="button" class="btn btn-warning btn-sm btn-edit-driver"
                                             data-id="{{ $driver->id }}" 
                                             data-name="{{ $driver->user->name ?? '' }}"
                                             data-email="{{ $driver->user->email ?? '' }}" 
                                             data-license="{{ $driver->license }}"
-                                            data-photo="{{ $driver->photo ? asset('storage/' . $driver->photo) : '' }}">
+                                            data-photo="{{ $driver->photo ? asset('storage/' . $driver->photo) : '' }}"
+                                            style="border-radius: 6px; font-weight: 500;">
                                             <i class="fas fa-edit"></i> Editar
                                         </button>
                                         
@@ -83,7 +84,7 @@
                                             onsubmit="return confirm('¿Seguro que quieres eliminar este conductor?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="rutvans-btn rutvans-btn-danger rutvans-btn-sm" type="submit">
+                                            <button class="btn btn-danger btn-sm" type="submit" style="border-radius: 6px; font-weight: 500;">
                                                 <i class="fas fa-trash"></i> Eliminar
                                             </button>
                                         </form>
@@ -93,7 +94,7 @@
                         @empty
                             <tr>
                                 <td colspan="6" class="text-center">
-                                    <div class="rutvans-alert rutvans-alert-info text-center py-5">
+                                    <div class="alert alert-info text-center py-5" style="border: 2px dashed #17a2b8; background-color: rgba(23, 162, 184, 0.1);">
                                         <i class="fas fa-car-side mb-3" style="font-size: 4rem; opacity: 0.5;"></i>
                                         <h4>No hay conductores registrados</h4>
                                         <p class="mb-0">Agrega el primer conductor para comenzar a gestionar el transporte</p>
@@ -113,15 +114,14 @@
 
 @section('css')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ asset('css/rutvans-admin.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <style>
         body {
-            background-color: var(--rutvans-background);
+            background-color: #f8f9fa;
         }
         
         .content-wrapper {
-            background-color: var(--rutvans-background);
+            background-color: #f8f9fa;
         }
     </style>
 @endsection

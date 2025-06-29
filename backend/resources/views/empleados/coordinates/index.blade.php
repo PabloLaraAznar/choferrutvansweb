@@ -3,56 +3,58 @@
 @section('title', 'Coordinadores')
 
 @section('content_header')
-    <div class="rutvans-content-header rutvans-fade-in">
-        <div class="container-fluid">
-            <h1>
-                <i class="fas fa-user-tie me-2"></i> Gestión de Coordinadores
+    <div class="d-flex justify-content-between align-items-center mb-4" style="background: linear-gradient(135deg, #ff6600 0%, #ff8533 100%); padding: 1.5rem; border-radius: 15px; box-shadow: 0 8px 25px rgba(255, 102, 0, 0.15); animation: fadeInDown 0.6s ease-out;">
+        <div>
+            <h1 class="text-white mb-2" style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 2rem;">
+                <i class="fas fa-user-tie me-3"></i> Gestión de Coordinadores
             </h1>
-            <p class="subtitle">Administra los coordinadores responsables de las operaciones</p>
+            <p class="text-white mb-0" style="font-family: 'Poppins', sans-serif; opacity: 0.9; font-size: 1.1rem;">
+                Administra los coordinadores responsables de las operaciones
+            </p>
         </div>
     </div>
 @endsection
 
 @section('content')
-    <div class="rutvans-card rutvans-hover-lift rutvans-fade-in">
-        <div class="rutvans-card-header d-flex justify-content-between align-items-center">
-            <h3 class="m-0">
+    <div class="card shadow-sm" style="border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;">
+        <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 15px 15px 0 0; padding: 1.5rem;">
+            <h3 class="mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 600;">
                 <i class="fas fa-users-cog me-2"></i> Coordinadores del Sistema
             </h3>
-            <button type="button" class="rutvans-btn rutvans-btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreateCoordinate">
-                <i class="fas fa-plus"></i> Nuevo Coordinador
+            <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalCreateCoordinate" style="font-weight: 600; border-radius: 8px; padding: 0.5rem 1.5rem;">
+                <i class="fas fa-plus text-primary"></i> Nuevo Coordinador
             </button>
         </div>
         
-        <div class="rutvans-card-body">
-            <div class="rutvans-table-responsive">
-                <table id="coordinatesTable" class="rutvans-table">
-                    <thead>
+        <div class="card-body" style="padding: 2rem;">
+            <div class="table-responsive">
+                <table id="coordinatesTable" class="table table-hover table-striped" style="border-radius: 8px; overflow: hidden;">
+                    <thead style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
                         <tr>
-                            <th><i class="fas fa-hashtag me-1"></i> ID</th>
-                            <th><i class="fas fa-user me-1"></i> Nombre</th>
-                            <th><i class="fas fa-envelope me-1"></i> Correo</th>
-                            <th><i class="fas fa-id-badge me-1"></i> Código</th>
-                            <th><i class="fas fa-camera me-1"></i> Foto</th>
-                            <th><i class="fas fa-cogs me-1"></i> Acciones</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-hashtag me-1"></i> ID</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-user me-1"></i> Nombre</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-envelope me-1"></i> Correo</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-id-badge me-1"></i> Código</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-camera me-1"></i> Foto</th>
+                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;"><i class="fas fa-cogs me-1"></i> Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($coordinators as $coordinate)
-                            <tr>
+                            <tr style="transition: all 0.3s ease;">
                                 <td>
-                                    <span class="rutvans-badge rutvans-badge-info">{{ $coordinate->id }}</span>
+                                    <span class="badge bg-info" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">{{ $coordinate->id }}</span>
                                 </td>
-                                <td>
+                                <td style="font-weight: 500;">
                                     <i class="fas fa-user-circle text-muted me-2"></i>
                                     {{ $coordinate->user->name ?? 'Sin usuario' }}
                                 </td>
-                                <td>
+                                <td style="font-weight: 500;">
                                     <i class="fas fa-at text-muted me-2"></i>
                                     {{ $coordinate->user->email ?? 'Sin correo' }}
                                 </td>
                                 <td>
-                                    <span class="rutvans-badge rutvans-badge-secondary">{{ $coordinate->employee_code }}</span>
+                                    <span class="badge bg-secondary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">{{ $coordinate->employee_code }}</span>
                                 </td>
                                 <td>
                                     @if ($coordinate->photo)
@@ -69,11 +71,12 @@
                                 </td>
                                 <td>
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="rutvans-btn rutvans-btn-warning rutvans-btn-sm btn-edit-coordinate"
+                                        <button type="button" class="btn btn-warning btn-sm btn-edit-coordinate"
                                             data-id="{{ $coordinate->id }}" 
                                             data-name="{{ $coordinate->user->name ?? '' }}"
                                             data-email="{{ $coordinate->user->email ?? '' }}"
-                                            data-photo="{{ $coordinate->photo ? asset('storage/' . $coordinate->photo) : '' }}">
+                                            data-photo="{{ $coordinate->photo ? asset('storage/' . $coordinate->photo) : '' }}"
+                                            style="border-radius: 6px; font-weight: 500;">
                                             <i class="fas fa-edit"></i> Editar
                                         </button>
                                         
@@ -82,7 +85,7 @@
                                             onsubmit="return confirm('¿Seguro que quieres eliminar este coordinador?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="rutvans-btn rutvans-btn-danger rutvans-btn-sm" type="submit">
+                                            <button class="btn btn-danger btn-sm" type="submit" style="border-radius: 6px; font-weight: 500;">
                                                 <i class="fas fa-trash"></i> Eliminar
                                             </button>
                                         </form>
@@ -102,15 +105,14 @@
 
 @section('css')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ asset('css/rutvans-admin.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <style>
         body {
-            background-color: var(--rutvans-background);
+            background-color: #f8f9fa;
         }
         
         .content-wrapper {
-            background-color: var(--rutvans-background);
+            background-color: #f8f9fa;
         }
     </style>
 @endsection
