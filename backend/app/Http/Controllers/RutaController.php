@@ -4,16 +4,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ruta;
-use App\Models\Localidad;
+use App\Models\Route;
+use App\Models\Locality;
 use Illuminate\Http\Request;
 
 class RutaController extends Controller
 {
     public function index()
     {
-      $rutas = Ruta::with(['ubicacionInicio', 'ubicacionFinal'])->get();
-    $localities = Localidad::all();
+      $rutas = Route::with(['locationStart', 'locationEnd'])->get();
+    $localities = Locality::all();
 
     return view('rutas.index', compact('rutas', 'localities'));
 
@@ -25,7 +25,7 @@ class RutaController extends Controller
     'id_location_s' => 'required|exists:localities,id',
     'id_location_f' => 'required|exists:localities,id',
 ]);
-        Ruta::create($request->all());
+        Route::create($request->all());
         return redirect()->back()->with('success', 'Ruta creada correctamente');
     }
 
@@ -36,14 +36,14 @@ class RutaController extends Controller
     'id_location_f' => 'required|exists:localities,id',
 ]);
 
-        $ruta = Ruta::findOrFail($id);
+        $ruta = Route::findOrFail($id);
         $ruta->update($request->all());
         return redirect()->back()->with('success', 'Ruta actualizada correctamente');
     }
 
     public function destroy($id)
     {
-        Ruta::destroy($id);
+        Route::destroy($id);
         return redirect()->back()->with('success', 'Ruta eliminada correctamente');
     }
 }

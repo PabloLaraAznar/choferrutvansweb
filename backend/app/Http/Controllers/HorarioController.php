@@ -3,20 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Horario;
+use App\Models\RouteUnitSchedule;
 use Illuminate\Support\Facades\Log;
 
 class HorarioController extends Controller
 {
     public function index()
     {
-        $horarios = Horario::all();
+        $horarios = RouteUnitSchedule::all();
         return view('horarios.index', compact('horarios'));
     }
 
     public function apiIndex()
     {
-    return response()->json(Horario::all());
+        return response()->json(RouteUnitSchedule::all());
     }
 
     public function create()
@@ -27,28 +27,30 @@ class HorarioController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'horaLlegada' => 'required|date_format:H:i',
-            'horaSalida' => 'required|date_format:H:i',
-            'dia' => 'required|string|max:50',
+            'id_route_unit' => 'required|exists:route_unit,id',
+            'schedule_date' => 'required|date',
+            'schedule_time' => 'required|date_format:H:i',
+            'status' => 'required|string|max:50',
         ]);
 
-        Horario::create($request->only(['horaLlegada', 'horaSalida', 'dia']));
+        RouteUnitSchedule::create($request->only(['id_route_unit', 'schedule_date', 'schedule_time', 'status']));
         return redirect()->route('horarios.index')->with('success', '¡Horario creado exitosamente!');
     }
 
-    public function update(Request $request, Horario $horario)
+    public function update(Request $request, RouteUnitSchedule $horario)
     {
         $request->validate([
-            'horaLlegada' => 'required|date_format:H:i',
-            'horaSalida' => 'required|date_format:H:i',
-            'dia' => 'required|string|max:50',
+            'id_route_unit' => 'required|exists:route_unit,id',
+            'schedule_date' => 'required|date',
+            'schedule_time' => 'required|date_format:H:i',
+            'status' => 'required|string|max:50',
         ]);
 
-        $horario->update($request->only(['horaLlegada', 'horaSalida', 'dia']));
+        $horario->update($request->only(['id_route_unit', 'schedule_date', 'schedule_time', 'status']));
         return redirect()->route('horarios.index')->with('success', '¡Horario actualizado correctamente!');
     }
 
-    public function destroy(Horario $horario)
+    public function destroy(RouteUnitSchedule $horario)
     {
         try {
             $horario->delete();

@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\Localidad; // Modelo que representa las localidades
+use App\Models\Locality; // Modelo que representa las localidades
 use Illuminate\Contracts\View\View; // Contrato para renderizar vistas en Laravel
 use Maatwebsite\Excel\Concerns\FromView; // Interfaz para exportar desde vistas Blade
 use Maatwebsite\Excel\Concerns\WithStyles; // Interfaz para aplicar estilos al archivo Excel

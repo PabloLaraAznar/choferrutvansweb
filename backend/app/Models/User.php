@@ -81,6 +81,41 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Driver::class, 'id_user');
     }
 
+    // Relación muchos a muchos con sites
+    public function sites()
+    {
+        return $this->belongsToMany(Site::class, 'site_users')
+                    ->withPivot('role', 'status')
+                    ->withTimestamps();
+    }
+
+    // Obtener sites donde el usuario es admin
+    public function adminSites()
+    {
+        return $this->sites()->wherePivot('role', 'admin');
+    }
+
+    // Obtener sites donde el usuario es coordinador
+    public function coordinatorSites()
+    {
+        return $this->sites()->wherePivot('role', 'coordinator');
+    }
+
+    // Verificar si el usuario tiene acceso a un site específico
+    public function hasAccessToSite($siteId)
+    {
+        return $this->sites()->where('sites.id', $siteId)->exists();
+    }
+
+    // Verificar si el usuario es admin de un site específico
+    public function isAdminOfSite($siteId)
+    {
+        return $this->sites()
+                    ->where('sites.id', $siteId)
+                    ->wherePivot('role', 'admin')
+                    ->exists();
+    }
+
     public function adminlte_profile_url()
     {
         return route('profile.edit');

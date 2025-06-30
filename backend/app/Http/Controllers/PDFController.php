@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Localidad; // Modelo que representa las localidades
+use App\Models\Locality; // Modelo que representa las localidades
 use Illuminate\Http\Request; // Clase para manejar solicitudes HTTP
 use Barryvdh\DomPDF\Facade\Pdf; // Facade para generar PDFs con DomPDF
 use App\Models\Unit;
@@ -12,7 +12,7 @@ class PDFController extends Controller
     // Función para exportar localidades a PDF con soporte para filtros
     public function expLocalidades(Request $request)
     {
-        $query = Localidad::query(); // Crea una consulta base para el modelo Localidad
+        $query = Locality::query(); // Crea una consulta base para el modelo Locality
 
         // Filtro por búsqueda
         // Se busca en las columnas 'locality' y 'street' con base en el término proporcionado
@@ -32,7 +32,7 @@ class PDFController extends Controller
         }
 
         // Total de datos (sin filtros) y datos mostrados (después de aplicar filtros)
-        $totalDatos = Localidad::count(); // Cuenta todos los registros en la tabla Localidad
+        $totalDatos = Locality::count(); // Cuenta todos los registros en la tabla Locality
         $localidades = $query->get(); // Obtiene los datos filtrados
         $datosMostrados = $localidades->count(); // Cuenta los registros filtrados
 

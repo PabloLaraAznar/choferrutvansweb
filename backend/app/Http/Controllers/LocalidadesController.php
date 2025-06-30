@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Localidad;
+use App\Models\Locality;
 
 class LocalidadesController extends Controller
 {
@@ -12,10 +12,19 @@ class LocalidadesController extends Controller
      */
     public function index()
     {
-        $localidades = Localidad::all();
+        $localidades = Locality::all();
         $localidadesCount = $localidades->count();
 
         return view('localidades.index', compact('localidades', 'localidadesCount'));
+    }
+
+    /**
+     * Vista de debug para ver todas las localidades
+     */
+    public function debug()
+    {
+        $localities = Locality::all();
+        return view('localidades.debug', compact('localities'));
     }
 
     /**
@@ -36,7 +45,14 @@ class LocalidadesController extends Controller
             'locality_type'  => 'nullable|string|max:50',
         ]);
 
-        Localidad::create($validated);
+        // Asegurar valores por defecto para campos importantes
+        $validated['country'] = $validated['country'] ?: 'México';
+        $validated['municipality'] = $validated['municipality'] ?: null;
+        $validated['state'] = $validated['state'] ?: null;
+        $validated['postal_code'] = $validated['postal_code'] ?: null;
+        $validated['locality_type'] = $validated['locality_type'] ?: null;
+
+        Locality::create($validated);
 
         return redirect()->route('localidades.index')
                          ->with('success', '¡Ubicación guardada correctamente!');
@@ -47,7 +63,7 @@ class LocalidadesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $localidad = Localidad::findOrFail($id);
+        $localidad = Locality::findOrFail($id);
 
         $validated = $request->validate([
             'longitude'      => 'required|numeric',
@@ -72,7 +88,7 @@ class LocalidadesController extends Controller
      */
     public function destroy($id)
     {
-        $localidad = Localidad::findOrFail($id);
+        $localidad = Locality::findOrFail($id);
         $localidad->delete();
 
         return redirect()->route('localidades.index')

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\LocalidadesExport; // Importa la clase de exportación de Excel
 use Illuminate\Http\Request; // Clase para manejar solicitudes HTTP
-use App\Models\Localidad; // Modelo que representa las localidades
+use App\Models\Locality; // Modelo que representa las localidades
 use Maatwebsite\Excel\Facades\Excel; // Facade para la exportación a Excel
 use App\Models\Unit;
 use App\Exports\UnitsExportExcel;
@@ -13,8 +13,8 @@ class EXCELController extends Controller
 {
     public function expLocalidades(Request $request)
     {
-        // Crea una consulta base para el modelo Localidad
-        $query = Localidad::query();
+        // Crea una consulta base para el modelo Locality
+        $query = Locality::query();
 
         // Aplica filtro por término de búsqueda (si existe en la solicitud)
         if ($request->has('search') && !empty($request->search)) {

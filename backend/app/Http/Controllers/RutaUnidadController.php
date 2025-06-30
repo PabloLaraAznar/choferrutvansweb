@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\RutaUnidad;
+use App\Models\RouteUnit;
 use Illuminate\Http\Request;
 
 
@@ -13,7 +13,7 @@ class RutaUnidadController extends Controller
      */
     public function index()
 {
-    $datos = RutaUnidad::with(['ruta', 'conductorUnidad', 'ubicacionIntermedia'])->get();
+    $datos = RouteUnit::with(['route', 'driverUnit'])->get();
     return view('ruta_unidad.index', compact('datos'));
 }
 
@@ -38,7 +38,7 @@ class RutaUnidadController extends Controller
             'price' => 'required|numeric',
         ]);
 
-        RutaUnidad::create($request->all());
+        RouteUnit::create($request->all());
 
         return redirect()->route('ruta_unidad.index')->with('success', 'Registro creado correctamente.');
     }
@@ -48,7 +48,7 @@ class RutaUnidadController extends Controller
      */
     public function edit($id)
     {
-        $rutaUnidad = RutaUnidad::findOrFail($id);
+        $rutaUnidad = RouteUnit::findOrFail($id);
         return view('ruta_unidad.edit', compact('rutaUnidad'));
     }
 
@@ -64,7 +64,7 @@ class RutaUnidadController extends Controller
             'price' => 'required|numeric',
         ]);
 
-        $rutaUnidad = RutaUnidad::findOrFail($id);
+        $rutaUnidad = RouteUnit::findOrFail($id);
         $rutaUnidad->update($request->all());
 
         return redirect()->route('ruta_unidad.index')->with('success', 'Registro actualizado correctamente.');
@@ -75,7 +75,7 @@ class RutaUnidadController extends Controller
      */
     public function destroy($id)
     {
-        RutaUnidad::destroy($id);
+        RouteUnit::destroy($id);
         return redirect()->route('ruta_unidad.index')->with('success', 'Registro eliminado correctamente.');
     }
 }

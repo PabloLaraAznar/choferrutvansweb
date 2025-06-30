@@ -5,14 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\Unit;
 use App\Models\Driver;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class UnitController extends Controller
 {
     public function index()
     {
-        $units = Unit::with(['drivers.user'])->get();
-        $drivers = Driver::with('user')->get();
+        // Get current user's sites
+        $userSites = Auth::user()->sites->pluck('id');
+        
+        // Filter units by sites the user has access to
+        $units = Unit::with(['drivers.user'])
+            ->whereIn('site_id', $userSites)
+            ->get();
+            
+        // Filter drivers by sites the user has access to
+        $drivers = Driver::with('user')
+            ->whereIn('site_id', $userSites)
+            ->get();
+            
         return view('units.index', compact('units', 'drivers'));
     }
 
@@ -25,6 +37,12 @@ class UnitController extends Controller
             ]);
 
             $data = $request->only(['plate', 'capacity']);
+            
+            // Assign to current user's first site
+            $userSites = Auth::user()->sites;
+            if ($userSites->count() > 0) {
+                $data['site_id'] = $userSites->first()->id;
+            }
 
             if ($request->hasFile('photo')) {
                 $data['photo'] = $request->file('photo')->store('units', 'public');

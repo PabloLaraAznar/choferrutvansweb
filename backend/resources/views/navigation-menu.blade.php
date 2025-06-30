@@ -16,6 +16,15 @@
                        class="{{ request()->routeIs('dashboard') ? 'text-indigo-700 border-b-2 border-indigo-700' : 'text-gray-500 hover:text-gray-700' }} px-3 py-2 rounded-md text-sm font-medium">
                         Dashboard
                     </a>
+                    
+                    @hasrole('super-admin')
+                    <a href="{{ route('clients.index') }}"
+                       class="{{ request()->routeIs('clients.*') ? 'text-indigo-700 border-b-2 border-indigo-700' : 'text-gray-500 hover:text-gray-700' }} px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-building mr-1"></i>
+                        Clientes
+                    </a>
+                    @endhasrole
+                    
                     <a href="{{ route('localidades.index') }}"
                        class="{{ request()->routeIs('localidades.*') ? 'text-indigo-700 border-b-2 border-indigo-700' : 'text-gray-500 hover:text-gray-700' }} px-3 py-2 rounded-md text-sm font-medium">
                         Localidades
@@ -81,6 +90,15 @@
                class="{{ request()->routeIs('dashboard') ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
                 Dashboard
             </a>
+            
+            @hasrole('super-admin')
+            <a href="{{ route('clients.index') }}"
+               class="{{ request()->routeIs('clients.*') ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                <i class="fas fa-building mr-1"></i>
+                Clientes
+            </a>
+            @endhasrole
+            
             <a href="{{ route('localidades.index') }}"
                class="{{ request()->routeIs('localidades.*') ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
                 Localidades

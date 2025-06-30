@@ -27,6 +27,11 @@ class AuthServiceProvider extends ServiceProvider
             return $user->hasRole('super-admin');
         });
 
+        // Gate para gestión de compañías y sitios (solo super-admin)
+        Gate::define('manage-companies-and-sites', function (User $user) {
+            return $user->hasRole('super-admin');
+        });
+
         // Gate para admin y coordinate
         Gate::define('admin-coordinate', function (User $user) {
             return $user->hasRole('admin') || $user->hasRole('coordinate');

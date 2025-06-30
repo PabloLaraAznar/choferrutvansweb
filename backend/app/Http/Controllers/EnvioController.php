@@ -2,20 +2,20 @@
 namespace App\Http\Controllers\Api;
 namespace App\Http\Controllers;
 
-use App\Models\Envio;
-use App\Models\Ruta;
-use App\Models\Horario;
-use App\Models\RutaUnidad;
+use App\Models\Shipment;
+use App\Models\Route;
+use App\Models\RouteUnitSchedule;
+use App\Models\RouteUnit;
 use Illuminate\Http\Request;
 
 class EnvioController extends Controller
 {
     public function index()
     {
-        $envios = Envio::with(['route', 'schedules', 'route_unit'])->get();
-        $rutas = Ruta::all();
-        $horarios = Horario::all();
-        $rutasUnidades = RutaUnidad::all();
+        $envios = Shipment::with(['site'])->get();
+        $rutas = Route::all();
+        $horarios = RouteUnitSchedule::all();
+        $rutasUnidades = RouteUnit::all();
         return view('envios.index', compact('envios', 'rutas', 'horarios', 'rutasUnidades'));
     }
 
@@ -37,11 +37,11 @@ class EnvioController extends Controller
             $data['photo'] = $request->file('photo')->store('envios', 'public');
         }
 
-        Envio::create($data);
+        Shipment::create($data);
         return redirect()->route('envios.index')->with('success', 'Envío creado');
     }
 
-    public function update(Request $request, Envio $envio)
+    public function update(Request $request, Shipment $envio)
     {
         $request->validate([
             'sender_name' => 'required|string|max:255',
@@ -63,14 +63,14 @@ class EnvioController extends Controller
         return redirect()->route('envios.index')->with('success', 'Envío actualizado');
     }
 
-    public function destroy(Envio $envio)
+    public function destroy(Shipment $envio)
     {
         $envio->delete();
         return redirect()->route('envios.index')->with('success', 'Envío eliminado');
     }
     public function apiIndex()
 {
-    $envios = Envio::all()->map(function ($envio) {
+    $envios = Shipment::all()->map(function ($envio) {
         return [
             'id' => $envio->id,
             'sender_name' => $envio->sender_name,

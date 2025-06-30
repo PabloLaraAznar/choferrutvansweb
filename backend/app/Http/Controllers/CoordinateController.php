@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Coordinate;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -14,7 +15,14 @@ class CoordinateController extends Controller
 {
     public function index()
     {
-        $coordinators = Coordinate::with('user')->get(); // Obtiene todos los coordinadores con sus usuarios vinculados
+        // Get current user's sites
+        $userSites = Auth::user()->sites->pluck('id');
+        
+        // Filter coordinators by sites the user has access to
+        $coordinators = Coordinate::with('user')
+            ->whereIn('site_id', $userSites)
+            ->get();
+            
         return view('empleados.coordinates.index', compact('coordinators'));
     }
 
@@ -46,6 +54,12 @@ class CoordinateController extends Controller
             $coordinate = new Coordinate();
             $coordinate->id_user = $user->id;
             $coordinate->employee_code = $employeeCode;
+            
+            // Assign to current user's first site
+            $userSites = Auth::user()->sites;
+            if ($userSites->count() > 0) {
+                $coordinate->site_id = $userSites->first()->id;
+            }
 
             if ($request->hasFile('photo')) {
                 $file = $request->file('photo');

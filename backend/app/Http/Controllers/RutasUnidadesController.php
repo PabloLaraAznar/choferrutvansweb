@@ -3,25 +3,25 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\RutaUnidad;
-use App\Models\Ruta;
+use App\Models\RouteUnit;
+use App\Models\Route;
 use App\Models\DriverUnit;
-use App\Models\Localidad;
+use App\Models\Locality;
 
 class RutasUnidadesController extends Controller
 {
     public function index()
     {
-        $rutaUnidades = RutaUnidad::with([
-            'ruta.source',
-            'ruta.destination',
+        $rutaUnidades = RouteUnit::with([
+            'route.source',
+            'route.destination',
             'driverUnit.unit',
             'driverUnit.driver.user'
         ])->get();
 
-        $rutas = Ruta::with(['source', 'destination'])->get();
+        $rutas = Route::with(['source', 'destination'])->get();
         $driverUnits = DriverUnit::with(['unit', 'driver.user'])->get();
-        $localidades = Localidad::all(); 
+        $localidades = Locality::all(); 
 
         return view('rutaunidad.index', compact('rutaUnidades', 'rutas', 'driverUnits', 'localidades'));
     }
@@ -34,7 +34,7 @@ class RutasUnidadesController extends Controller
             'price' => 'required|numeric|min:0'
         ]);
 
-        RutaUnidad::create($request->only(['id_route', 'id_driver_unit', 'price']));
+        RouteUnit::create($request->only(['id_route', 'id_driver_unit', 'price']));
 
         return redirect()->route('rutas-unidades.index')->with('success', 'Ruta asignada correctamente.');
     }
@@ -47,7 +47,7 @@ class RutasUnidadesController extends Controller
             'price' => 'required|numeric|min:0'
         ]);
 
-        $rutaUnidad = RutaUnidad::findOrFail($id);
+        $rutaUnidad = RouteUnit::findOrFail($id);
         $rutaUnidad->update($request->only(['id_route', 'id_driver_unit', 'price']));
 
         return redirect()->route('rutas-unidades.index')->with('success', 'Asignación actualizada correctamente.');
@@ -55,7 +55,7 @@ class RutasUnidadesController extends Controller
 
     public function destroy($id)
     {
-        $registro = RutaUnidad::findOrFail($id);
+        $registro = RouteUnit::findOrFail($id);
         $registro->delete();
 
         return redirect()->route('rutas-unidades.index')->with('success', 'Asignación eliminada.');

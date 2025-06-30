@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Driver;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -14,7 +15,14 @@ class DriverController extends Controller
 {
     public function index()
     {
-        $drivers = Driver::with('user')->get();
+        // Get current user's sites
+        $userSites = Auth::user()->sites->pluck('id');
+        
+        // Filter drivers by sites the user has access to
+        $drivers = Driver::with('user')
+            ->whereIn('site_id', $userSites)
+            ->get();
+            
         return view('empleados.drivers.index', compact('drivers'));
     }
 
@@ -43,6 +51,12 @@ class DriverController extends Controller
             $driver = new Driver();
             $driver->id_user = $user->id;
             $driver->license = $request->license;
+            
+            // Assign to current user's first site (or allow selection in future)
+            $userSites = Auth::user()->sites;
+            if ($userSites->count() > 0) {
+                $driver->site_id = $userSites->first()->id;
+            }
 
             if ($request->hasFile('photo')) {
                 $file = $request->file('photo');

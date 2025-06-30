@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Localidad;
+use App\Models\Locality;
 
 class LocExpController extends Controller
 {
@@ -11,7 +11,7 @@ class LocExpController extends Controller
     public function index()
     {
         // Obtén todas las localidades
-        $localidades = Localidad::paginate(10); // Paginación de 10 localidades por página
+        $localidades = Locality::paginate(10); // Paginación de 10 localidades por página
 
         // Retorna la vista junto con las localidades
         return view('exports.localidades.index', compact('localidades'));

@@ -12,9 +12,16 @@ use Illuminate\Support\Facades\Storage;
 
 class CashierController extends Controller
 {
-     public function index()
+     public function index(Request $request)
     {
-        $cashiers = Cashier::with('user')->get(); // Obtiene todos los coordinadores con sus usuarios vinculados
+        $query = Cashier::with(['user', 'site']);
+        
+        // Filtrar por site_id si se proporciona
+        if ($request->has('site_id') && $request->site_id) {
+            $query->where('site_id', $request->site_id);
+        }
+        
+        $cashiers = $query->get();
         return view('empleados.cashiers.index', compact('cashiers'));
     }
 
@@ -25,6 +32,7 @@ class CashierController extends Controller
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'photo'    => 'nullable|image|max:2048',
+            'site_id'  => 'required|exists:sites,id',
         ]);
 
         DB::transaction(function () use ($request) {

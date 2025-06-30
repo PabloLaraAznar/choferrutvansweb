@@ -19,7 +19,7 @@
 <div class="card shadow-sm" style="border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;">
     <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 15px 15px 0 0; padding: 1.5rem;">
         <h3 class="mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 600;">
-            <i class="fas fa-globe-americas me-2"></i> Total de Localidades: <span class="badge bg-light text-dark ms-2">{{ $localidadesCount }}</span>
+            <i class="fas fa-globe-americas me-2"></i> Gestión de Localidades
         </h3>
     </div>
     <div class="card-body" style="padding: 2rem;">
@@ -58,6 +58,77 @@
                     <div class="card-body" style="padding: 1.5rem;">
                         {{-- Incluimos el formulario de creación --}}
                         @include('localidades.create')
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lista de Localidades Creadas -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card" style="border: 2px solid #ff6600; border-radius: 12px;">
+                    <div class="card-header" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 10px 10px 0 0;">
+                        <h5 class="mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 600;">
+                            <i class="fas fa-list-ul me-2"></i> Localidades Registradas ({{ $localidadesCount }})
+                        </h5>
+                    </div>
+                    <div class="card-body" style="padding: 1.5rem;">
+                        @if($localidades->count() > 0)
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead style="background-color: #f8f9fa;">
+                                        <tr>
+                                            <th style="color: #ff6600; font-weight: 600;">#</th>
+                                            <th style="color: #ff6600; font-weight: 600;"><i class="fas fa-map-marker-alt me-1"></i> Localidad</th>
+                                            <th style="color: #ff6600; font-weight: 600;"><i class="fas fa-road me-1"></i> Calle</th>
+                                            <th style="color: #ff6600; font-weight: 600;"><i class="fas fa-building me-1"></i> Municipio</th>
+                                            <th style="color: #ff6600; font-weight: 600;"><i class="fas fa-map-pin me-1"></i> Estado</th>
+                                            <th style="color: #ff6600; font-weight: 600;"><i class="fas fa-envelope me-1"></i> C.P.</th>
+                                            <th style="color: #ff6600; font-weight: 600;"><i class="fas fa-cog me-1"></i> Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($localidades as $index => $localidad)
+                                            <tr>
+                                                <td style="font-weight: 500;">{{ $index + 1 }}</td>
+                                                <td>
+                                                    <strong style="color: #333;">{{ $localidad->locality }}</strong>
+                                                    <br>
+                                                    <small class="text-muted">{{ $localidad->locality_type }}</small>
+                                                </td>
+                                                <td>{{ $localidad->street ?: 'N/A' }}</td>
+                                                <td style="font-weight: 500; color: #ff6600;">{{ $localidad->municipality }}</td>
+                                                <td>{{ $localidad->state }}</td>
+                                                <td>{{ $localidad->postal_code ?: 'N/A' }}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1 zoom-to-location" 
+                                                            data-lng="{{ $localidad->longitude }}" 
+                                                            data-lat="{{ $localidad->latitude }}"
+                                                            title="Ver en mapa">
+                                                        <i class="fas fa-search-plus"></i>
+                                                    </button>
+                                                    <form method="POST" action="{{ route('localidades.destroy', $localidad->id) }}" 
+                                                          style="display: inline-block;" 
+                                                          onsubmit="return confirm('¿Estás seguro de eliminar esta localidad?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="text-center py-4">
+                                <i class="fas fa-map-marker-alt fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No hay localidades registradas</h5>
+                                <p class="text-muted">Haz clic en el mapa para agregar tu primera localidad</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -213,37 +284,81 @@ function createMap({style, pitch, bearing, zoom, center}) {
 
         flyToLocation(map, coordinates.lng, coordinates.lat);
 
-        // Usar Mapbox Places para el formulario (puedes cambiar a Nominatim si quieres)
-        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${coordinates.lng},${coordinates.lat}.json?access_token=${mapboxgl.accessToken}`;
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            let locality = getRealLocality(data.features);
-            let street = getStreet(data.features);
-            let postalCode = 'N/A', municipality = '', state = '', country = '', locality_type = '';
-            if (data.features.length > 0) {
-                const context = data.features[0].context || [];
-                const postalCodeFeature = context.find(c => c.id.includes('postcode'));
-                if (postalCodeFeature) postalCode = postalCodeFeature.text;
-                const municipalityFeature = context.find(c => c.id.includes('district'));
-                if (municipalityFeature) municipality = municipalityFeature.text;
-                const stateFeature = context.find(c => c.id.includes('region'));
-                if (stateFeature) state = stateFeature.text;
-                const countryFeature = context.find(c => c.id.includes('country'));
-                if (countryFeature) country = countryFeature.text;
-                locality_type = data.features[0].place_type ? data.features[0].place_type.join(', ') : '';
+        // Mostrar indicador de carga
+        const loadingToast = Swal.fire({
+            title: 'Consultando ubicación...',
+            text: 'Obteniendo datos precisos con Geoapify',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
             }
-            document.getElementById('longitude').value = coordinates.lng;
-            document.getElementById('latitude').value = coordinates.lat;
-            document.getElementById('locality').value = locality;
-            document.getElementById('street').value = street;
-            document.getElementById('postal_code').value = postalCode;
-            document.getElementById('municipality').value = municipality;
-            document.getElementById('state').value = state;
-            document.getElementById('country').value = country;
-            document.getElementById('locality_type').value = locality_type;
+        });
+
+        try {
+            // Usar Geoapify como API principal
+            const results = await getLocationFromMultipleAPIs(coordinates.lng, coordinates.lat);
+            const bestResult = getBestLocationResult(results);
+            
+            loadingToast.close();
+            
+            if (bestResult) {
+                // Llenar formulario con los mejores datos
+                document.getElementById('longitude').value = coordinates.lng;
+                document.getElementById('latitude').value = coordinates.lat;
+                document.getElementById('locality').value = bestResult.locality;
+                document.getElementById('street').value = bestResult.street;
+                document.getElementById('postal_code').value = bestResult.postal_code;
+                document.getElementById('municipality').value = bestResult.municipality;
+                document.getElementById('state').value = bestResult.state;
+                document.getElementById('country').value = bestResult.country;
+                document.getElementById('locality_type').value = bestResult.locality_type;
+                
+                // Actualizar el campo de display
+                const displayText = `${bestResult.locality}${bestResult.municipality ? ', ' + bestResult.municipality : ''}${bestResult.state ? ', ' + bestResult.state : ''}${bestResult.country ? ', ' + bestResult.country : ''}`;
+                document.getElementById('locality_display').value = displayText;
+                
+                // Mostrar API usada
+                const apiUsed = results[0]?.api || 'Desconocida';
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Ubicación encontrada',
+                    html: `
+                        <div style="text-align: left;">
+                            <strong>📍 Localidad:</strong> ${bestResult.locality}<br>
+                            <strong>🏛️ Municipio:</strong> ${bestResult.municipality}<br>
+                            <strong>📮 Código Postal:</strong> ${bestResult.postal_code}<br>
+                            <strong>🗺️ Estado:</strong> ${bestResult.state}<br>
+                            <small style="color: #666;">API: ${apiUsed}</small>
+                        </div>
+                    `,
+                    timer: 4000,
+                    timerProgressBar: true,
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false
+                });
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Ubicación no encontrada',
+                    text: 'No se pudo obtener información de esta ubicación',
+                    timer: 2000,
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false
+                });
+            }
         } catch (error) {
-            console.error('Error obteniendo la ubicación:', error);
+            loadingToast.close();
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un problema al obtener la ubicación',
+                timer: 2000,
+                toast: true,
+                position: 'bottom-end',
+                showConfirmButton: false
+            });
         }
     });
 }
@@ -259,7 +374,211 @@ function flyToLocation(map, lng, lat) {
         easing: function (t) { return t; }
     });
 }
+
+// Base de datos de comisarías de Yucatán para mejor detección
+const yucatanComisarias = {
+    'Kanachen': 'Maxcanú',
+    'Kanachén': 'Maxcanú', // Variante con acento
+    'Chocholá': 'Kopomá', 
+    'Samahil': 'Umán',
+    'Texán de Palomeque': 'Hunucmá',
+    'Santa Rosa': 'Maxcanú',
+    'Xcunyá': 'Umán',
+    'Sinanché': 'Hunucmá',
+    'Tetiz': 'Tetiz', // Es municipio
+    'Kinchil': 'Kinchil', // Es municipio
+    'Kopomá': 'Kopomá', // Es municipio
+    'Maxcanú': 'Maxcanú', // Es municipio
+    'Umán': 'Umán', // Es municipio
+    'Hunucmá': 'Hunucmá', // Es municipio
+    // Agregar más comisarías conocidas
+    'Nohpat': 'Maxcanú',
+    'Xanila': 'Maxcanú',
+    'San Antonio Hool': 'Kopomá',
+    'Mucuyché': 'Maxcanú',
+    'Chablekal': 'Mérida',
+    'Dzityá': 'Mérida',
+    'Komchén': 'Mérida',
+    'Cholul': 'Mérida'
+};
+
+function getMunicipalityFromComisaria(localityName) {
+    if (!localityName) return null;
+    
+    // Normalizar el nombre (quitar acentos y convertir a minúsculas)
+    const normalize = (str) => str.toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+    
+    const normalizedLocality = normalize(localityName);
+    
+    // Verificar si la localidad es una comisaría conocida
+    for (const [comisaria, municipio] of Object.entries(yucatanComisarias)) {
+        const normalizedComisaria = normalize(comisaria);
+        
+        // Buscar coincidencia exacta o parcial
+        if (normalizedLocality.includes(normalizedComisaria) || 
+            normalizedComisaria.includes(normalizedLocality)) {
+            return municipio;
+        }
+    }
+    return null;
+}
+
+// Sistema mejorado con Geoapify API - MUY PRECISA PARA MÉXICO
+async function getLocationFromGeoapify(lng, lat) {
+    // REEMPLAZA por tu API key real de Geoapify (obtén una gratis en geoapify.com)
+    const apiKey = '1b268500dc844f61a822f0663bb76584'; // 👈 CLAVE TEMPORAL DE PRUEBA
+    
+    try {
+        const url = `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lng}&apiKey=${apiKey}&format=json`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.results && data.results.length > 0) {
+            const result = data.results[0];
+            
+            return {
+                api: 'Geoapify',
+                locality: result.city || result.village || result.town || result.locality || '',
+                street: result.street || result.address_line1 || '',
+                municipality: result.county || result.municipality || result.city || '',
+                state: result.state || result.region || '',
+                country: result.country || 'México',
+                postal_code: result.postcode || '',
+                confidence: result.rank?.confidence || 0.8,
+                formatted: result.formatted || ''
+            };
+        }
+    } catch (error) {
+        // Error silencioso
+    }
+    
+    return null;
+}
+
+// Función simplificada que usa Geoapify como principal
+async function getLocationFromMultipleAPIs(lng, lat) {
+    const results = [];
+    
+    // 1. Intentar con Geoapify primero (más precisa)
+    const geoapifyResult = await getLocationFromGeoapify(lng, lat);
+    if (geoapifyResult) {
+        results.push(geoapifyResult);
+    }
+    
+    // 2. Si Geoapify falla, usar Nominatim como backup
+    if (results.length === 0) {
+        try {
+            const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&accept-language=es`;
+            const nominatimResponse = await fetch(nominatimUrl);
+            const nominatimData = await nominatimResponse.json();
+            
+            if (nominatimData && nominatimData.address) {
+                results.push({
+                    api: 'Nominatim (Backup)',
+                    locality: nominatimData.address.village || nominatimData.address.town || nominatimData.address.city || nominatimData.address.locality || '',
+                    street: nominatimData.address.road || nominatimData.address.street || '',
+                    municipality: nominatimData.address.municipality || nominatimData.address.county || nominatimData.address.city || '',
+                    state: nominatimData.address.state || '',
+                    country: nominatimData.address.country || 'México',
+                    postal_code: nominatimData.address.postcode || '',
+                    confidence: nominatimData.importance || 0.5
+                });
+            }
+        } catch (error) {
+            // Error silencioso
+        }
+    }
+    
+    // 3. Si todo falla, usar Mapbox como último recurso
+    if (results.length === 0) {
+        try {
+            const mapboxUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxgl.accessToken}`;
+            const mapboxResponse = await fetch(mapboxUrl);
+            const mapboxData = await mapboxResponse.json();
+            
+            if (mapboxData.features && mapboxData.features.length > 0) {
+                const context = mapboxData.features[0].context || [];
+                const placeFeature = mapboxData.features.find(f => f.place_type?.includes('place')) || 
+                                   context.find(c => c.id.includes('place'));
+                const addressFeature = mapboxData.features.find(f => f.place_type?.includes('address'));
+                
+                results.push({
+                    api: 'Mapbox (Último recurso)',
+                    locality: addressFeature?.text || placeFeature?.text || mapboxData.features[0].text || '',
+                    street: addressFeature?.text || '',
+                    municipality: placeFeature?.text || '',
+                    state: context.find(c => c.id.includes('region'))?.text || '',
+                    country: context.find(c => c.id.includes('country'))?.text || 'México',
+                    postal_code: context.find(c => c.id.includes('postcode'))?.text || '',
+                    confidence: 0.6
+                });
+            }
+        } catch (error) {
+            // Error silencioso
+        }
+    }
+
+    return results;
+}
+
+// Función para elegir el mejor resultado combinando múltiples APIs
+function getBestLocationResult(results) {
+    if (results.length === 0) return null;
+    
+    // Combinar información de todas las APIs
+    const combined = {
+        locality: '',
+        street: '',
+        municipality: '',
+        state: '',
+        country: 'México',
+        postal_code: '',
+        locality_type: 'address'
+    };
+    
+    // Priorizar resultados por confianza y completitud
+    const sortedResults = results.sort((a, b) => {
+        const scoreA = (a.municipality ? 2 : 0) + (a.locality ? 1 : 0) + (a.postal_code ? 1 : 0);
+        const scoreB = (b.municipality ? 2 : 0) + (b.locality ? 1 : 0) + (b.postal_code ? 1 : 0);
+        return scoreB - scoreA;
+    });
+    
+    // Usar el mejor resultado como base
+    const best = sortedResults[0];
+    combined.locality = best.locality;
+    combined.street = best.street;
+    combined.municipality = best.municipality;
+    combined.state = best.state;
+    combined.country = best.country;
+    combined.postal_code = best.postal_code;
+    
+    // Completar campos faltantes con otros resultados
+    for (const result of sortedResults.slice(1)) {
+        if (!combined.municipality && result.municipality) combined.municipality = result.municipality;
+        if (!combined.postal_code && result.postal_code) combined.postal_code = result.postal_code;
+        if (!combined.state && result.state) combined.state = result.state;
+        if (!combined.locality && result.locality) combined.locality = result.locality;
+    }
+    
+    // Aplicar corrección de comisarías conocidas
+    const municipalityFromComisaria = getMunicipalityFromComisaria(combined.locality);
+    if (municipalityFromComisaria) {
+        combined.municipality = municipalityFromComisaria;
+    }
+    
+    return combined;
+}
 function getRealLocality(features) {
+    // Primero buscar en features principales por place_type
+    for (const feat of features) {
+        if (feat.place_type && feat.place_type.includes('place')) {
+            return feat.text;
+        }
+    }
+    
+    // Luego buscar por ID que empiece con place.
     for (const feat of features) {
         if (feat.id && feat.id.startsWith('place.')) {
             return feat.text;
@@ -269,6 +588,8 @@ function getRealLocality(features) {
             if (ctx) return ctx.text;
         }
     }
+    
+    // Finalmente buscar por tipos específicos
     const types = ['village','town','locality','neighborhood','hamlet','city'];
     for (const type of types) {
         const f = features.find(f => f.place_type && f.place_type.includes(type));
@@ -399,8 +720,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     const context = data.features[0].context || [];
                     const postalCodeFeature = context.find(c => c.id.includes('postcode'));
                     if (postalCodeFeature) updatedPostalCode = postalCodeFeature.text;
-                    const municipalityFeature = context.find(c => c.id.includes('district'));
+                    
+                    // Buscar municipio - primero en features principales, luego en context
+                    let municipalityFeature = data.features.find(f => 
+                        f.place_type && f.place_type.includes('place')
+                    );
+                    if (!municipalityFeature) {
+                        municipalityFeature = context.find(c => c.id.includes('place'));
+                    }
                     if (municipalityFeature) updatedMunicipality = municipalityFeature.text;
+                    
                     const stateFeature = context.find(c => c.id.includes('region'));
                     if (stateFeature) updatedState = stateFeature.text;
                     const countryFeature = context.find(c => c.id.includes('country'));
@@ -408,7 +737,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     updatedLocalityType = data.features[0].place_type ? data.features[0].place_type.join(', ') : location.locality_type;
                 }
             } catch (error) {
-                console.error('Error obteniendo datos actualizados:', error);
+                // Error silencioso
             }
 
             Swal.fire({
@@ -622,6 +951,39 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('active');
             document.getElementById('switch-2d-btn').classList.remove('active');
         }
+    });
+
+    // Funcionalidad para botones "Ver en mapa"
+    document.querySelectorAll('.zoom-to-location').forEach(button => {
+        button.addEventListener('click', function() {
+            const lng = parseFloat(this.dataset.lng);
+            const lat = parseFloat(this.dataset.lat);
+            
+            // Volar a la ubicación
+            flyToLocation(map, lng, lat);
+            
+            // Resaltar temporalmente el marcador
+            const targetMarker = savedMarkers.find(({location}) => 
+                Math.abs(location.longitude - lng) < 0.0001 && 
+                Math.abs(location.latitude - lat) < 0.0001
+            );
+            
+            if (targetMarker) {
+                // Abrir popup automáticamente
+                setTimeout(() => {
+                    targetMarker.marker.getPopup().addTo(map);
+                }, 500);
+                
+                // Efecto visual temporal
+                const element = targetMarker.marker.getElement();
+                element.style.transform = 'scale(1.3)';
+                element.style.transition = 'transform 0.3s ease';
+                
+                setTimeout(() => {
+                    element.style.transform = 'scale(1)';
+                }, 1000);
+            }
+        });
     });
 });
 

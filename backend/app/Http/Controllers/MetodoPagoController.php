@@ -3,38 +3,44 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\MetodoPago;
+use App\Models\Payment;
 
 class MetodoPagoController extends Controller
 {
     public function index()
     {
-        $metodos = MetodoPago::latest()->get();
+        $metodos = Payment::latest()->get();
         return view('metodoPago.index', compact('metodos'));
     }
 
     public function store(Request $request)
     {
-        $request->validate(['name' => 'required']);
+        $request->validate([
+            'payment_type' => 'required',
+            'description' => 'nullable'
+        ]);
 
-        MetodoPago::create($request->only('name'));
+        Payment::create($request->only(['payment_type', 'description']));
 
         return redirect()->route('metodoPago.index')->with('success', 'Método de pago registrado.');
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate(['name' => 'required']);
+        $request->validate([
+            'payment_type' => 'required',
+            'description' => 'nullable'
+        ]);
 
-        $metodo = MetodoPago::findOrFail($id);
-        $metodo->update($request->only('name'));
+        $metodo = Payment::findOrFail($id);
+        $metodo->update($request->only(['payment_type', 'description']));
 
         return redirect()->route('metodoPago.index')->with('updated', 'Método de pago actualizado.');
     }
 
     public function destroy($id)
     {
-        $metodo = MetodoPago::findOrFail($id);
+        $metodo = Payment::findOrFail($id);
         $metodo->delete();
 
         return redirect()->route('metodoPago.index')->with('deleted', 'Método de pago eliminado.');

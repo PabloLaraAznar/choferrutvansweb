@@ -83,7 +83,6 @@
                 let id = Array.isArray(data) ? data[0] : data.id; // Extraer correctamente
 
                 if (!id) {
-                    console.error("❌ Error: ID no recibido correctamente.");
                     return;
                 }
 

@@ -326,14 +326,19 @@ return [
             'can' => 'super-admin', // Solo super-admin puede ver este header
         ],
         [
-            'text' => 'Registrar clientes',
-            'icon' => 'fas fa-user-shield',
+            'text' => 'Gestión de Clientes',
+            'icon' => 'fas fa-industry',
             'can' => 'super-admin', // Solo super-admin
             'submenu' => [
                 [
-                    'text' => 'Clientes',
-                    'icon' => 'fas fa-user-tag',
-                    'url' => '#',
+                    'text' => 'Empresas/Sindicatos',
+                    'icon' => 'fas fa-building',
+                    'url' => 'companies',
+                ],
+                [
+                    'text' => 'Sitios/Rutas',
+                    'icon' => 'fas fa-route',
+                    'url' => 'clients', // Mantenemos la ruta actual por ahora
                 ],
             ]
         ],
@@ -387,18 +392,18 @@ return [
         ],
         [
             'text' => 'Localidades',
-            'icon' => 'fas fa-file-export', // Ícono representativo para exportaciones
-            'can' => 'admin-coordinate', // Usa el Gate definido
+            'icon' => 'fas fa-map-marker-alt', // Ícono más representativo para localidades
+            'can' => 'super-admin', // Solo super-admin puede gestionar localidades
             'submenu' => [
                 [
-                    'text' => 'Exportar localidades',
-                    'icon' => 'fas fa-file-export', // Ícono representativo para localidades
-                    'url' => 'localidades-exp', // Ruta para la exportación de localidades
+                    'text' => 'Gestionar localidades',
+                    'url' => 'localidades',
+                    'icon' => 'fas fa-edit'
                 ],
                 [
-                    'text' => 'Crear localidades',
-                    'url' => 'localidades',
-                    'icon' => 'fas fa-pencil-alt'
+                    'text' => 'Exportar localidades',
+                    'icon' => 'fas fa-file-export',
+                    'url' => 'localidades-exp',
                 ],
             ]
         ],
@@ -555,7 +560,7 @@ return [
 
     'plugins' => [
         'Datatables' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',

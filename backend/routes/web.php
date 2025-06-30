@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Http\Controllers\{
     CashierController,
+    ClientController,
+    CompanyController,
     DashboardController,
     HomeController,
     EXCELController,
@@ -120,6 +122,8 @@ Route::middleware([
     Route::middleware('can:super-admin')->group(function () {
         Route::resource('roles', RolesController::class);
         Route::resource('permissions', PermissionsController::class);
+        Route::resource('companies', CompanyController::class); // Empresas/Sindicatos
+        Route::resource('clients', ClientController::class); // Sitios/Rutas (renombrar después)
     });
 
     /*
@@ -160,14 +164,14 @@ Route::middleware([
 
     /*
     |--------------------------------------------------------------------------
-    | Vista tabla de localidades (Admin y Coordinate)
+    | Vista tabla de localidades (Solo Super-Admin)
     |--------------------------------------------------------------------------
     */
-    Route::middleware('can:admin-coordinate')->group(function () {
-        Route::resource('horarios', HorarioController::class);
+    Route::middleware('can:super-admin')->group(function () {
         Route::resource('localidades', LocalidadesController::class);
         Route::get('/localidades-exp', [LocExpController::class, 'index'])->name('localidades-exp.index');
         Route::post('/localidades-exp/data', [LocExpController::class, 'getLocalidades'])->name('localidades-exp.data');
+        Route::get('/localidades-debug', [LocalidadesController::class, 'debug'])->name('localidades.debug');
     });
 
     /*
@@ -176,6 +180,7 @@ Route::middleware([
     |--------------------------------------------------------------------------
     */
     Route::middleware('can:admin-coordinate')->group(function () {
+        Route::resource('horarios', HorarioController::class);
         Route::resource('rutas-unidades', RutasUnidadesController::class)->except(['show']);
         Route::post('rutas-unidades/asignar', [RutasUnidadesController::class, 'store'])->name('rutaunidad.store');
         Route::delete('rutas-unidades/{id}', [RutasUnidadesController::class, 'destroy'])->name('rutaunidad.destroy');
