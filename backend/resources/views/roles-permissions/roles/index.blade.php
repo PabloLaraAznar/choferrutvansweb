@@ -1,220 +1,257 @@
 @extends('adminlte::page')
 
-@section('title', 'Roles')
+@section('title', 'Gestión de Roles Rutvans')
 
 @section('content_header')
-    <div class="d-flex justify-content-between align-items-center">
-        <h1 class="m-0">
-            <i class="fas fa-user-shield me-2 text-primary"></i> Gestión de Roles
-        </h1>
+    <div class="d-flex justify-content-between align-items-center p-3 mb-3" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div>
+            <h1 class="mb-1" style="font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1.8rem;">
+                <i class="fas fa-user-shield me-2"></i> Gestión de Roles
+            </h1>
+            <p class="mb-0" style="opacity: 0.9; font-size: 0.95rem;">Administra los roles del sistema Rutvans</p>
+        </div>
     </div>
 @endsection
 
 @section('content')
-    <div class="card shadow rounded-3">
-        <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
-            <h3 class="card-title m-0">🛡️ Administra tus roles</h3>
-            <button type="button" class="btn btn-light text-primary fw-bold" data-bs-toggle="modal"
-                data-bs-target="#createRoleModal">
-                <i class="fas fa-plus-circle me-1"></i> Crear Rol
-            </button>
-        </div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm" style="border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 12px 12px 0 0; padding: 1.5rem;">
+                    <h3 class="mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 600;">
+                        <i class="fas fa-user-shield me-2"></i> Roles del Sistema
+                    </h3>
+                    <div class="ml-auto">
+                        <button type="button" class="btn btn-light" data-toggle="modal" data-target="#createRoleModal" style="font-weight: 600;">
+                            <i class="fas fa-plus mr-1"></i>
+                            Crear Rol
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 8px;">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            {{ session('success') }}
+                            <button type="button" class="close" data-dismiss="alert">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                    @endif
 
-        <div class="card-body">
-            <table id="rolesTable" class="table table-striped table-hover table-bordered align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width: 10%">ID</th>
-                        <th>Nombre</th>
-                        <th class="text-center" style="width: 20%">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($roles as $role)
-                        <tr>
-                            <td>{{ $role->id }}</td>
-                            <td>{{ e($role->name) }}</td>
-                            <td class="text-center">
-                                <div class="d-flex justify-content-center gap-2">
-                                    <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
-                                        data-bs-target="#editRoleModal" data-role-id="{{ $role->id }}"
-                                        data-role-name="{{ e($role->name) }}" aria-label="Editar rol {{ e($role->name) }}">
-                                        <i class="fas fa-edit me-1"></i>
-                                    </button>
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px;">
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            {{ session('error') }}
+                            <button type="button" class="close" data-dismiss="alert">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                    @endif
 
-                                    <button class="btn btn-sm btn-outline-danger" data-role-id="{{ $role->id }}"
-                                        onclick="confirmDelete(this)" aria-label="Eliminar rol {{ e($role->name) }}">
-                                        <i class="fas fa-trash-alt me-1"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover" id="rolesTable" style="border-radius: 8px; overflow: hidden;">
+                            <thead style="background: linear-gradient(135deg, #6c757d, #495057); color: white;">
+                                <tr>
+                                    <th style="width: 10%">#</th>
+                                    <th>Nombre del Rol</th>
+                                    <th style="width: 15%" class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($roles as $role)
+                                    <tr>
+                                        <td class="text-center">{{ $role->id }}</td>
+                                        <td>
+                                            <strong>{{ $role->name }}</strong>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-warning btn-sm" 
+                                                        data-toggle="modal" data-target="#editRoleModal"
+                                                        data-role-id="{{ $role->id }}" data-role-name="{{ $role->name }}"
+                                                        title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-sm" 
+                                                        data-role-id="{{ $role->id }}" onclick="confirmDelete(this)"
+                                                        title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center">
+                                            <div class="py-4">
+                                                <i class="fas fa-user-shield fa-3x text-muted mb-3"></i>
+                                                <h5 class="text-muted">No hay roles registrados</h5>
+                                                <p class="text-muted">Comienza creando tu primer rol del sistema.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-    @include('roles-permissions.roles.edit') <!-- Modales -->
-    @include('roles-permissions.roles.create')
+@include('roles-permissions.roles.create')
+@include('roles-permissions.roles.edit')
+
+<form method="POST" action="/roles/7" style="display: none;" id="deleteRoleForm">
+    @csrf
+    @method('DELETE')
+    <button type="submit">Eliminar Rol</button>
+</form>
 @endsection
 
 @section('css')
-    <!-- SweetAlert2 & DataTables -->
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    {{-- Aquí puedes agregar hojas de estilo específicas --}}
 @endsection
 
 @section('js')
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery (necesario para DataTables) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- DataTables -->
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Inicializar DataTables con idioma español
-            $('#rolesTable').DataTable({
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
-                },
-                responsive: true,
-                autoWidth: false
-            });
-
-            // Edición: cargar datos en modal
-            document.querySelectorAll('[data-bs-target="#editRoleModal"]').forEach(button => {
-                button.addEventListener('click', ({
-                    target
-                }) => {
-                    const id = target.dataset.roleId;
-                    const name = target.dataset.roleName;
-
-                    const form = document.getElementById('editRoleForm');
-                    form.action = `/roles/${id}`;
-                    form.querySelector('#editRoleId').value = id;
-                    form.querySelector('#editRoleName').value = name;
-
-                    // Resetear validación visual al abrir modal de editar
-                    form.classList.remove('was-validated');
-                });
-            });
-
-            // Limpiar formulario Crear cuando se cierra el modal
-            const createModal = document.getElementById('createRoleModal');
-            createModal.addEventListener('hidden.bs.modal', () => {
-                const createForm = document.getElementById('createRoleForm');
-                createForm.reset();
-                createForm.classList.remove('was-validated');
-            });
-
-            // Limpiar formulario Editar cuando se cierra el modal
-            const editModal = document.getElementById('editRoleModal');
-            editModal.addEventListener('hidden.bs.modal', () => {
-                const editForm = document.getElementById('editRoleForm');
-                editForm.reset();
-                editForm.classList.remove('was-validated');
-            });
-
-            // Validación Bootstrap para formulario Crear Rol
-            const createForm = document.getElementById('createRoleForm');
-            createForm.addEventListener('submit', function(event) {
-                if (!this.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
+<script>
+        $(document).ready(function() {
+            let rolesDataTable = null;
+    
+            function initializeDataTable() {
+                const table = $('#rolesTable');
+                if (table.length === 0) return;
+                
+                const tbody = table.find('tbody');
+                const rows = tbody.find('tr');
+                const hasData = rows.length > 0 && !tbody.find('tr td[colspan]').length;
+                
+                if (!hasData) return;
+                
+                try {
+                    if (rolesDataTable) {
+                        rolesDataTable.destroy();
+                        rolesDataTable = null;
+                    }
+                    
+                    rolesDataTable = table.DataTable({
+                        "language": {
+                            "decimal": "",
+                            "emptyTable": "No hay roles registrados",
+                            "info": "Mostrando _START_ a _END_ de _TOTAL_ roles",
+                            "infoEmpty": "Mostrando 0 a 0 de 0 roles",
+                            "infoFiltered": "(filtrado de _MAX_ roles totales)",
+                            "lengthMenu": "Mostrar _MENU_ roles por página",
+                            "loadingRecords": "Cargando...",
+                            "processing": "Procesando...",
+                            "search": "Buscar:",
+                            "zeroRecords": "No se encontraron roles que coincidan",
+                            "paginate": {
+                                "first": "Primero",
+                                "last": "Último",
+                                "next": "Siguiente",
+                                "previous": "Anterior"
+                            }
+                        },
+                        "order": [[ 0, "desc" ]],
+                        "pageLength": 10,
+                        "responsive": true,
+                        "autoWidth": false,
+                        "columnDefs": [
+                            {
+                                "targets": [0],
+                                "width": "10%",
+                                "className": "text-center"
+                            },
+                            {
+                                "targets": [2],
+                                "width": "15%",
+                                "orderable": false,
+                                "searchable": false,
+                                "className": "text-center"
+                            }
+                        ]
+                    });
+                } catch (error) {
+                    // Removed console.error for cleaner code
                 }
-                this.classList.add('was-validated');
+            }
+            
+            setTimeout(initializeDataTable, 250);
+
+            // Manejar edición de roles
+            $(document).on('click', '[data-toggle="modal"][data-target="#editRoleModal"]', function() {
+                const id = $(this).data('role-id');
+                const name = $(this).data('role-name');
+                
+                $('#editRoleForm').attr('action', `/roles/${id}`);
+                $('#editRoleId').val(id);
+                $('#editRoleName').val(name);
             });
 
-            // Validación Bootstrap para formulario Editar Rol
-            const editForm = document.getElementById('editRoleForm');
-            editForm.addEventListener('submit', function(event) {
-                if (!this.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                this.classList.add('was-validated');
+            // Limpiar formulario Crear al cerrar modal
+            $('#createRoleModal').on('hidden.bs.modal', function() {
+                $(this).find('form')[0].reset();
+                $(this).find('form').removeClass('was-validated');
+            });
+
+            // Limpiar formulario Editar al cerrar modal
+            $('#editRoleModal').on('hidden.bs.modal', function() {
+                $(this).find('form')[0].reset();
+                $(this).find('form').removeClass('was-validated');
             });
         });
 
-        // Función para confirmar y ejecutar eliminación con SweetAlert2 y fetch
-        function confirmDelete(button) {
+        // Exponer la función confirmDelete al ámbito global
+        window.confirmDelete = function(button) {
             const id = button.getAttribute('data-role-id');
 
             Swal.fire({
-                title: '¿Eliminar este rol?',
-                text: "Esta acción no se puede revertir.",
-                icon: 'warning',
+                title: '¿Estás seguro?',
+                text: "¿Deseas eliminar este rol? Esta acción no se puede deshacer.",
+                type: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar',
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                width: '500px'
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch(`/roles/${id}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                    'content'),
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log("Respuesta del servidor:", data);
+                    // Crear formulario tradicional para DELETE
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/roles/${id}`;
 
-                            if (data.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: data.message,
-                                    toast: true,
-                                    position: 'bottom-end',
-                                    showConfirmButton: false,
-                                    timer: 2000,
-                                    width: '300px'
-                                }).then(() => {
-                                    // Recargar página para evitar problemas con paginación vacía
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: data.message,
-                                    showConfirmButton: true,
-                                    width: '500px'
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Error eliminando rol:", error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Hubo un problema al eliminar el rol',
-                                showConfirmButton: true,
-                                width: '500px'
-                            });
-                        });
+                    // Token CSRF
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = '{{ csrf_token() }}';
+                    form.appendChild(csrfToken);
+
+                    // Método DELETE
+                    const methodField = document.createElement('input');
+                    methodField.type = 'hidden';
+                    methodField.name = '_method';
+                    methodField.value = 'DELETE';
+                    form.appendChild(methodField);
+
+                    // Agregar al DOM
+                    document.body.appendChild(form);
+
+                    // Enviar formulario
+                    form.submit();
                 }
             });
         }
     </script>
 
-    @if ($errors->any())
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Error de validación',
-                html: `{!! implode('<br>', $errors->all()) !!}`,
-                width: '500px'
-            });
-        </script>
-    @endif
+    {{-- Script para SweetAlert2 --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @if (session('success'))
         <script>

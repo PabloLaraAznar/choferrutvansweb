@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Role;
-use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\DB;
 
 class RolesController extends Controller
 {
@@ -25,7 +25,10 @@ class RolesController extends Controller
             'name' => 'required|string|unique:roles,name|min:3|max:50',
         ]);
 
-        Role::create(['name' => $request->name]);
+        Role::create([
+            'name' => $request->name,
+            'guard_name' => 'web', // Explicitly set guard_name to 'web'
+        ]);
         return redirect()->route('roles.index')->with('success', '¡Rol creado exitosamente!');
     }
 
@@ -42,15 +45,19 @@ class RolesController extends Controller
     public function destroy(Role $role)
     {
         try {
-            if ($role->users()->count() > 0) {
-                return response()->json(['success' => false, 'message' => 'No se puede eliminar: el rol está asignado a usuarios.']);
+            // Verificar si el rol tiene usuarios asignados
+            $usersWithRole = DB::table('model_has_roles')->where('role_id', $role->id)->count();
+
+            if ($usersWithRole > 0) {
+                return redirect()->route('roles.index')->with('error', 'No se puede eliminar: el rol está asignado a ' . $usersWithRole . ' usuario(s).');
             }
 
+            $roleName = $role->name;
             $role->delete();
-            return response()->json(['success' => true, 'message' => '¡Rol eliminado correctamente!']);
+
+            return redirect()->route('roles.index')->with('success', '¡Rol "' . $roleName . '" eliminado correctamente!');
         } catch (\Exception $e) {
-            Log::error('Error al eliminar rol: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Error al eliminar el rol'], 500);
+            return redirect()->route('roles.index')->with('error', 'Error al eliminar el rol.');
         }
     }
 }

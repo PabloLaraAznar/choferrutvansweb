@@ -119,8 +119,8 @@ Route::middleware([
     | CRUDs - Recursos protegidos (Solo Super-Admin)
     |--------------------------------------------------------------------------
     */
-    Route::middleware('can:super-admin')->group(function () {
-        Route::resource('roles', RolesController::class);
+    Route::middleware(['auth', 'can:super-admin'])->group(function () {
+        Route::resource('roles', RolesController::class); // Middleware deshabilitado temporalmente para pruebas
         Route::resource('permissions', PermissionsController::class);
         Route::resource('companies', CompanyController::class); // Empresas/Sindicatos
         Route::resource('clients', ClientController::class); // Sitios/Rutas (renombrar después)
