@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('freights', function (Blueprint $table) {
             $table->id();
             $table->string('folio', 50);
-            $table->unsignedBigInteger('id_service');
+            $table->unsignedBigInteger('service_id');
             $table->date('start_date');
             $table->date('end_date');
             $table->time('start_time');
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->decimal('amount', 10, 2);
             $table->timestamps();
             
-            $table->foreign('id_service')->references('id')->on('services')->onDelete('cascade');
+            $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
         });
     }
 

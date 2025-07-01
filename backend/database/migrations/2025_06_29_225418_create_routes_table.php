@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('routes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_location_s');
-            $table->unsignedBigInteger('id_location_f');
+            $table->unsignedBigInteger('location_s_id');
+            $table->unsignedBigInteger('location_f_id');
             $table->timestamps();
             
-            $table->foreign('id_location_s')->references('id')->on('localities')->onDelete('cascade');
-            $table->foreign('id_location_f')->references('id')->on('localities')->onDelete('cascade');
+            $table->foreign('location_s_id')->references('id')->on('localities')->onDelete('cascade');
+            $table->foreign('location_f_id')->references('id')->on('localities')->onDelete('cascade');
         });
     }
 

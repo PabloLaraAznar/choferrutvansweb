@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('driver_unit', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_driver');
-            $table->unsignedBigInteger('id_unit');
+            $table->unsignedBigInteger('driver_id');
+            $table->unsignedBigInteger('unit_id');
             $table->string('status', 50);
             $table->timestamps();
             
-            $table->foreign('id_driver')->references('id')->on('drivers')->onDelete('cascade');
-            $table->foreign('id_unit')->references('id')->on('units')->onDelete('cascade');
+            $table->foreign('driver_id')->references('id')->on('drivers')->onDelete('cascade');
+            $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');
         });
     }
 

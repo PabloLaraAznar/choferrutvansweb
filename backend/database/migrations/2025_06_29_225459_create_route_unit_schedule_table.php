@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('route_unit_schedule', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_route_unit');
+            $table->unsignedBigInteger('route_unit_id');
             $table->date('schedule_date');
             $table->time('schedule_time');
             $table->string('status', 50)->default('Activo');
             $table->timestamps();
             
-            $table->foreign('id_route_unit')->references('id')->on('route_unit')->onDelete('cascade');
+            $table->foreign('route_unit_id')->references('id')->on('route_unit')->onDelete('cascade');
         });
     }
 

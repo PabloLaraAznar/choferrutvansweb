@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('route_unit', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_route');
-            $table->unsignedBigInteger('id_driver_unit');
+            $table->unsignedBigInteger('route_id');
+            $table->unsignedBigInteger('driver_unit_id');
             $table->unsignedBigInteger('intermediate_location_id')->nullable();
             $table->decimal('price', 10, 2);
             $table->timestamps();
             
-            $table->foreign('id_route')->references('id')->on('routes')->onDelete('cascade');
-            $table->foreign('id_driver_unit')->references('id')->on('driver_unit')->onDelete('cascade');
+            $table->foreign('route_id')->references('id')->on('routes')->onDelete('cascade');
+            $table->foreign('driver_unit_id')->references('id')->on('driver_unit')->onDelete('cascade');
             $table->foreign('intermediate_location_id')->references('id')->on('localities')->onDelete('set null');
         });
     }

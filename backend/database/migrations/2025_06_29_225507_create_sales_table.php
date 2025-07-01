@@ -14,19 +14,19 @@ return new class extends Migration
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
             $table->string('folio', 50);
-            $table->unsignedBigInteger('id_user');
-            $table->unsignedBigInteger('id_payment');
-            $table->unsignedBigInteger('id_route_unit_schedule');
-            $table->unsignedBigInteger('id_rate');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('payment_id');
+            $table->unsignedBigInteger('route_unit_schedule_id');
+            $table->unsignedBigInteger('rate_id');
             $table->json('data');
             $table->string('status', 50)->default('Pendiente');
             $table->decimal('amount', 10, 2);
             $table->timestamps();
             
-            $table->foreign('id_user')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('id_payment')->references('id')->on('payments')->onDelete('cascade');
-            $table->foreign('id_route_unit_schedule')->references('id')->on('route_unit_schedule')->onDelete('cascade');
-            $table->foreign('id_rate')->references('id')->on('rates')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('payment_id')->references('id')->on('payments')->onDelete('cascade');
+            $table->foreign('route_unit_schedule_id')->references('id')->on('route_unit_schedule')->onDelete('cascade');
+            $table->foreign('rate_id')->references('id')->on('rates')->onDelete('cascade');
         });
     }
 

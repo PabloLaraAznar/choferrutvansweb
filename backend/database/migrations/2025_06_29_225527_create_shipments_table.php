@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('shipments', function (Blueprint $table) {
             $table->id();
             $table->string('folio', 50);
-            $table->unsignedBigInteger('id_route_unit');
-            $table->unsignedBigInteger('id_service');
+            $table->unsignedBigInteger('route_unit_id');
+            $table->unsignedBigInteger('service_id');
             $table->string('sender_name', 100);
             $table->string('receiver_name', 100);
             $table->text('package_description')->nullable();
@@ -24,8 +24,8 @@ return new class extends Migration
             $table->decimal('amount', 10, 2);
             $table->timestamps();
             
-            $table->foreign('id_route_unit')->references('id')->on('route_unit')->onDelete('cascade');
-            $table->foreign('id_service')->references('id')->on('services')->onDelete('cascade');
+            $table->foreign('route_unit_id')->references('id')->on('route_unit')->onDelete('cascade');
+            $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
         });
     }
 

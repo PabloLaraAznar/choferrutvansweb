@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('coordinators', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_user');
+            $table->unsignedBigInteger('user_id');
             $table->string('employee_code', 50);
             $table->string('photo', 255)->nullable();
             $table->timestamps();
             
-            $table->foreign('id_user')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
