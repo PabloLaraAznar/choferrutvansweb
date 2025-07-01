@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Permisos')
+@section('title', 'Gestión de Permisos Rutvans')
 
 @section('content_header')
     <div class="d-flex justify-content-between align-items-center p-3 mb-3"
@@ -28,12 +28,12 @@
                             <i class="fas fa-lock me-2"></i> Permisos del Sistema
                         </h3>
                         <div class="ml-auto">
-                            <button type="button" class="btn btn-light" data-bs-toggle="modal"
-                                data-bs-target="#createPermissionModal" style="font-weight: 600;">
+                            <button type="button" class="btn btn-light" data-toggle="modal" data-target="#createPermissionModal" style="font-weight: 600;">
                                 <i class="fas fa-plus-circle me-1"></i> Agregar Permiso
                             </button>
                         </div>
                     </div>
+
                     <div class="card-body">
                         @if(session('success'))
                             <div class="alert alert-success alert-dismissible fade show" role="alert"
@@ -58,39 +58,52 @@
                         @endif
 
                         <div class="table-responsive">
-                            <table id="permissionsTable"
-                                class="table table-bordered table-striped table-hover"
+                            <table class="table table-bordered table-striped table-hover" id="permissionsTable"
                                 style="border-radius: 8px; overflow: hidden;">
                                 <thead style="background: linear-gradient(135deg, #6c757d, #495057); color: white;">
                                     <tr>
-                                        <th style="width: 10%">ID</th>
-                                        <th>Nombre</th>
-                                        <th class="text-center" style="width: 20%">Acciones</th>
+                                        <th style="width: 10%">#</th>
+                                        <th>Nombre del Permiso</th>
+                                        <th style="width: 15%" class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($permissions as $permission)
+                                    @forelse($permissions as $permission)
                                         <tr>
                                             <td class="text-center">{{ $permission->id }}</td>
-                                            <td><strong>{{ $permission->name }}</strong></td>
+                                            <td>
+                                                <strong>{{ $permission->name }}</strong>
+                                            </td>
                                             <td class="text-center">
                                                 <div class="btn-group" role="group">
-                                                    <button class="btn btn-sm btn-outline-info"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#editPermissionModal"
+                                                    <button type="button" class="btn btn-warning btn-sm"
+                                                        data-toggle="modal" data-target="#editPermissionModal"
                                                         data-permission-id="{{ $permission->id }}"
-                                                        data-permission-name="{{ $permission->name }}">
-                                                        <i class="fas fa-edit me-1"></i>
+                                                        data-permission-name="{{ $permission->name }}"
+                                                        title="Editar">
+                                                        <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-outline-danger"
+                                                    <button type="button" class="btn btn-danger btn-sm"
                                                         data-permission-id="{{ $permission->id }}"
-                                                        onclick="confirmDelete(this)">
-                                                        <i class="fas fa-trash-alt me-1"></i>
+                                                        onclick="confirmDelete(this)"
+                                                        title="Eliminar">
+                                                        <i class="fas fa-trash"></i>
                                                     </button>
                                                 </div>
                                             </td>
                                         </tr>
-                                    @endforeach
+                                    @empty
+                                        <tr>
+                                            <td colspan="3" class="text-center">
+                                                <div class="py-4">
+                                                    <i class="fas fa-lock fa-3x text-muted mb-3"></i>
+                                                    <h5 class="text-muted">No hay permisos registrados</h5>
+                                                    <p class="text-muted">Comienza creando tu primer permiso del
+                                                        sistema.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
@@ -99,99 +112,117 @@
             </div>
         </div>
     </div>
+
     @include('roles-permissions.permissions.create')
     @include('roles-permissions.permissions.edit')
 @endsection
 
 @section('css')
-    <!-- SweetAlert2 & DataTables -->
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    {{-- Aquí puedes agregar hojas de estilo específicas --}}
 @endsection
 
 @section('js')
-    <!-- jQuery (necesario para DataTables) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap 5 debe cargarse después de jQuery si ambos se usan -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- DataTables -->
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Inicializar DataTables
-            $('#permissionsTable').DataTable({
-                language: {
-                    url: '/datatables/es-ES.json'
-                },
-                responsive: true,
-                autoWidth: false
-            });
+        $(document).ready(function() {
+            let permissionsDataTable = null;
 
-            // Mostrar datos en modal Editar
-            document.querySelectorAll('[data-bs-target="#editPermissionModal"]').forEach(button => {
-                button.addEventListener('click', function() {
-                    const id = this.getAttribute('data-permission-id');
-                    const name = this.getAttribute('data-permission-name');
+            function initializeDataTable() {
+                const table = $('#permissionsTable');
+                if (table.length === 0) return;
 
-                    document.getElementById('editPermissionId').value = id;
-                    document.getElementById('editPermissionName').value = name;
-                    document.getElementById('editPermissionForm').action = `/permissions/${id}`;
-                });
-            });
+                const tbody = table.find('tbody');
+                const rows = tbody.find('tr');
+                const hasData = rows.length > 0 && !tbody.find('tr td[colspan]').length;
 
-            // Validación Bootstrap para formularios
-            // Crear
-            const createForm = document.getElementById('createPermissionForm');
-            createForm.addEventListener('submit', function(event) {
-                if (!this.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
+                if (!hasData) return;
+
+                try {
+                    if (permissionsDataTable) {
+                        permissionsDataTable.destroy();
+                        permissionsDataTable = null;
+                    }
+
+                    permissionsDataTable = table.DataTable({
+                        "language": {
+                            "decimal": "",
+                            "emptyTable": "No hay permisos registrados",
+                            "info": "Mostrando _START_ a _END_ de _TOTAL_ permisos",
+                            "infoEmpty": "Mostrando 0 a 0 de 0 permisos",
+                            "infoFiltered": "(filtrado de _MAX_ permisos totales)",
+                            "lengthMenu": "Mostrar _MENU_ permisos por página",
+                            "loadingRecords": "Cargando...",
+                            "processing": "Procesando...",
+                            "search": "Buscar:",
+                            "zeroRecords": "No se encontraron permisos que coincidan",
+                            "paginate": {
+                                "first": "Primero",
+                                "last": "Último",
+                                "next": "Siguiente",
+                                "previous": "Anterior"
+                            }
+                        },
+                        "order": [[ 0, "desc" ]],
+                        "pageLength": 10,
+                        "responsive": true,
+                        "autoWidth": false,
+                        "columnDefs": [
+                            {
+                                "targets": [0],
+                                "width": "10%",
+                                "className": "text-center"
+                            },
+                            {
+                                "targets": [2],
+                                "width": "15%",
+                                "orderable": false,
+                                "searchable": false,
+                                "className": "text-center"
+                            }
+                        ]
+                    });
+                } catch (error) {
+                    // Removed console.error for cleaner code
                 }
-                this.classList.add('was-validated');
-            });
+            }
 
-            // Editar
-            const editForm = document.getElementById('editPermissionForm');
-            editForm.addEventListener('submit', function(event) {
-                if (!this.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                this.classList.add('was-validated');
+            setTimeout(initializeDataTable, 250);
+
+            // Manejar edición de permisos
+            $(document).on('click', '[data-toggle="modal"][data-target="#editPermissionModal"]', function() {
+                const id = $(this).data('permission-id');
+                const name = $(this).data('permission-name');
+
+                $('#editPermissionForm').attr('action', `/permissions/${id}`);
+                $('#editPermissionId').val(id);
+                $('#editPermissionName').val(name);
             });
 
             // Limpiar formulario Crear al cerrar modal
-            const createModal = document.getElementById('createPermissionModal');
-            createModal.addEventListener('hidden.bs.modal', () => {
-                createForm.reset();
-                createForm.classList.remove('was-validated');
+            $('#createPermissionModal').on('hidden.bs.modal', function() {
+                $(this).find('form')[0].reset();
+                $(this).find('form').removeClass('was-validated');
             });
 
             // Limpiar formulario Editar al cerrar modal
-            const editModal = document.getElementById('editPermissionModal');
-            editModal.addEventListener('hidden.bs.modal', () => {
-                editForm.reset();
-                editForm.classList.remove('was-validated');
+            $('#editPermissionModal').on('hidden.bs.modal', function() {
+                $(this).find('form')[0].reset();
+                $(this).find('form').removeClass('was-validated');
             });
         });
 
-        function confirmDelete(button) {
+        // Exponer la función confirmDelete al ámbito global
+        window.confirmDelete = function(button) {
             const id = button.getAttribute('data-permission-id');
 
             Swal.fire({
-                title: '¿Eliminar este permiso?',
-                text: "Esta acción no se puede revertir.",
-                icon: 'warning',
+                title: '¿Estás seguro?',
+                text: "¿Deseas eliminar este permiso? Esta acción no se puede deshacer.",
+                type: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar',
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                width: '500px'
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Crear formulario tradicional para DELETE
@@ -213,57 +244,18 @@
                     methodField.value = 'DELETE';
                     form.appendChild(methodField);
 
-                    // Agregar al DOM y enviar formulario
+                    // Agregar al DOM
                     document.body.appendChild(form);
-                    form.addEventListener('submit', async function(event) {
-                        event.preventDefault();
 
-                        try {
-                            const response = await fetch(form.action, {
-                                method: 'POST',
-                                body: new FormData(form),
-                            });
-
-                            const result = await response.json();
-
-                            if (result.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: result.message,
-                                    toast: true,
-                                    position: 'bottom-end',
-                                    showConfirmButton: false,
-                                    timer: 2000,
-                                    width: '300px'
-                                }).then(() => location.reload());
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: result.message,
-                                    toast: true,
-                                    position: 'bottom-end',
-                                    showConfirmButton: false,
-                                    timer: 2000,
-                                    width: '300px'
-                                });
-                            }
-                        } catch (error) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error al eliminar el permiso.',
-                                toast: true,
-                                position: 'bottom-end',
-                                showConfirmButton: false,
-                                timer: 2000,
-                                width: '300px'
-                            });
-                        }
-                    });
+                    // Enviar formulario
                     form.submit();
                 }
             });
         }
     </script>
+
+    {{-- Script para SweetAlert2 --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @if (session('success'))
         <script>
@@ -278,5 +270,4 @@
             });
         </script>
     @endif
-
 @endsection

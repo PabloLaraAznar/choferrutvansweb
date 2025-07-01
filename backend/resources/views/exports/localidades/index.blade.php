@@ -19,32 +19,31 @@
             <h3 class="mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 600;">
                 <i class="fas fa-list me-2"></i> Lista de Localidades
             </h3>
-            <!-- Botones de exportación -->
-            <div class="d-flex align-items-center">
-                <label for="filter-date" class="me-2 text-white" style="font-weight: 500;">Fecha específica:</label>
-                <input type="date" id="filter-date" class="form-control me-2" style="display: inline-block; width: auto; border-radius: 6px;">
-
-                <button id="export-pdf" class="btn btn-light me-2" style="color: #dc3545; font-weight: 600; border-radius: 6px;">
-                    <i class="fas fa-file-pdf"></i> Exportar PDF
+            <div class="ml-auto d-flex align-items-center">
+                <label for="filter-date" class="text-white mx-2" style="font-weight: 500;">Fecha específica:</label>
+                <input type="date" id="filter-date" class="form-control mx-2" style="display: inline-block; width: auto; border-radius: 6px;">
+                
+                <button id="export-pdf" class="btn btn-light mx-2" style="color: #dc3545; font-weight: 600; border-radius: 6px;">
+                    <i class="fas fa-file-pdf me-1"></i> PDF
                 </button>
-                <button id="export-excel" class="btn btn-light" style="color: #28a745; font-weight: 600; border-radius: 6px;">
-                    <i class="fas fa-file-excel"></i> Exportar Excel
+                <button id="export-excel" class="btn btn-light mx-2" style="color: #28a745; font-weight: 600; border-radius: 6px;">
+                    <i class="fas fa-file-excel me-1"></i> Excel
                 </button>
             </div>
         </div>
         <div class="card-body" style="padding: 2rem;">
             <!-- Tabla de Localidades -->
             <div class="table-responsive">
-                <table id="localidades-table" class="table table-hover table-striped" style="border-radius: 8px; overflow: hidden;">
-                    <thead style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
+                <table id="localidades-table" class="table table-bordered table-striped table-hover" style="border-radius: 8px; overflow: hidden;">
+                    <thead style="background: linear-gradient(135deg, #6c757d, #495057); color: white;">
                         <tr>
-                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">ID</th>
-                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">Longitud</th>
-                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">Latitud</th>
-                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">Localidad</th>
-                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">Calle</th>
-                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">Código Postal</th>
-                            <th class="fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">Fecha</th>
+                            <th style="width: 10%">#</th>
+                            <th>Longitud</th>
+                            <th>Latitud</th>
+                            <th>Localidad</th>
+                            <th>Calle</th>
+                            <th>Código Postal</th>
+                            <th>Fecha</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -130,8 +129,21 @@
                     url += (search ? "&" : "?") + "start_date=" + encodeURIComponent(selectedDate);
                 }
 
+                // Mostrar SweetAlert de éxito
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Exportando PDF...',
+                    text: 'La descarga comenzará en breve',
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    width: '300px'
+                });
+
                 window.location.href = url; // Redirige al controlador con los parámetros
             });
+            
             $('#export-excel').on('click', function() {
                 const search = table.search(); // Obtiene el término de búsqueda
                 const selectedDate = $('#filter-date').val(); // Obtiene la fecha seleccionada
@@ -146,6 +158,18 @@
                     url += search ? "&" : "?";
                     url += "start_date=" + encodeURIComponent(selectedDate);
                 }
+
+                // Mostrar SweetAlert de éxito
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Exportando Excel...',
+                    text: 'La descarga comenzará en breve',
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    width: '300px'
+                });
 
                 window.location.href = url; // Redirige al controlador con los parámetros
             });

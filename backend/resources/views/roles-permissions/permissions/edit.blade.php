@@ -9,7 +9,7 @@
                     style="font-family: 'Poppins', sans-serif; font-weight: 600;">
                     <i class="fas fa-edit mr-2"></i> Editar Permiso
                 </h5>
-                <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="Close"
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"
                     style="opacity: 1;">
                     <span aria-hidden="true" style="font-size: 1.5rem;">&times;</span>
                 </button>
@@ -35,7 +35,7 @@
 
                 <div class="modal-footer"
                     style="background-color: #f8f9fa; border-radius: 0 0 12px 12px; padding: 1rem 2rem;">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
                         style="border-radius: 6px; padding: 0.5rem 1.5rem;">
                         <i class="fas fa-times mr-1"></i> Cancelar
                     </button>

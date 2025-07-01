@@ -106,11 +106,6 @@
 @include('roles-permissions.roles.create')
 @include('roles-permissions.roles.edit')
 
-<form method="POST" action="/roles/7" style="display: none;" id="deleteRoleForm">
-    @csrf
-    @method('DELETE')
-    <button type="submit">Eliminar Rol</button>
-</form>
 @endsection
 
 @section('css')

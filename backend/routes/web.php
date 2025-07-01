@@ -135,6 +135,10 @@ Route::middleware([
         Route::get('/roles-permissions', [RolesPermissionsController::class, 'index'])->name('roles-permissions.index');
         Route::get('/roles-permissions/{role}/edit', [RolesPermissionsController::class, 'edit'])->name('roles-permissions.edit');
         Route::put('/roles-permissions/{role}', [RolesPermissionsController::class, 'update'])->name('roles-permissions.update');
+        
+        // Exportaciones - PDF / Excel (Solo Super-Admin)
+        Route::get('exports/pdf/localidades', [PDFController::class, 'expLocalidades'])->name('exports.pdf.localidades');
+        Route::get('exports/excel/localidades', [EXCELController::class, 'expLocalidades'])->name('exports.excel.localidades');
     });
 
     /*
@@ -151,16 +155,6 @@ Route::middleware([
     Route::post('/profile/verify-password', [ProfileController::class, 'verifyPassword'])->name('profile.verify-password');
     Route::post('/profile/delete-account', [ProfileController::class, 'eliminarUsuario'])->name('profile.eliminar');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Exportaciones - PDF / Excel (Admin y Coordinate)
-    |--------------------------------------------------------------------------
-    */
-    Route::middleware('can:admin-coordinate')->group(function () {
-        Route::get('exports/pdf/localidades', [PDFController::class, 'expLocalidades'])->name('exports.pdf.localidades');
-        Route::get('exports/excel/localidades', [EXCELController::class, 'localidades'])->name('exports.excel.localidades');
-    });
 
     /*
     |--------------------------------------------------------------------------

@@ -3,21 +3,19 @@
 @section('title', 'Localidades')
 
 @section('content_header')
-    <div class="d-flex justify-content-between align-items-center mb-4" style="background: linear-gradient(135deg, #ff6600 0%, #ff8533 100%); padding: 1.5rem; border-radius: 15px; box-shadow: 0 8px 25px rgba(255, 102, 0, 0.15); animation: fadeInDown 0.6s ease-out;">
+    <div class="d-flex justify-content-between align-items-center p-3 mb-3" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         <div>
-            <h1 class="text-white mb-2" style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 2rem;">
-                <i class="fas fa-map-marker-alt me-3"></i> Gestión de Localidades
+            <h1 class="mb-1" style="font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1.8rem;">
+                <i class="fas fa-map-marker-alt me-2"></i> Gestión de Localidades
             </h1>
-            <p class="text-white mb-0" style="font-family: 'Poppins', sans-serif; opacity: 0.9; font-size: 1.1rem;">
-                Administra las ubicaciones geográficas del sistema
-            </p>
+            <p class="mb-0" style="opacity: 0.9; font-size: 0.95rem;">Administra las ubicaciones geográficas del sistema Rutvans</p>
         </div>
     </div>
 @endsection
 
 @section('content')
-<div class="card shadow-sm" style="border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;">
-    <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 15px 15px 0 0; padding: 1.5rem;">
+<div class="card shadow-sm" style="border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;">
+    <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 12px 12px 0 0; padding: 1.5rem;">
         <h3 class="mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 600;">
             <i class="fas fa-globe-americas me-2"></i> Gestión de Localidades
         </h3>
@@ -66,25 +64,25 @@
         <!-- Lista de Localidades Creadas -->
         <div class="row mt-4">
             <div class="col-12">
-                <div class="card" style="border: 2px solid #ff6600; border-radius: 12px;">
-                    <div class="card-header" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 10px 10px 0 0;">
+                <div class="card shadow-sm" style="border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;">
+                    <div class="card-header" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 12px 12px 0 0; padding: 1.5rem;">
                         <h5 class="mb-0" style="font-family: 'Poppins', sans-serif; font-weight: 600;">
                             <i class="fas fa-list-ul me-2"></i> Localidades Registradas ({{ $localidadesCount }})
                         </h5>
                     </div>
-                    <div class="card-body" style="padding: 1.5rem;">
+                    <div class="card-body" style="padding: 2rem;">
                         @if($localidades->count() > 0)
                             <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead style="background-color: #f8f9fa;">
+                                <table class="table table-bordered table-striped table-hover" style="border-radius: 8px; overflow: hidden;">
+                                    <thead style="background: linear-gradient(135deg, #6c757d, #495057); color: white;">
                                         <tr>
-                                            <th style="color: #ff6600; font-weight: 600;">#</th>
-                                            <th style="color: #ff6600; font-weight: 600;"><i class="fas fa-map-marker-alt me-1"></i> Localidad</th>
-                                            <th style="color: #ff6600; font-weight: 600;"><i class="fas fa-road me-1"></i> Calle</th>
-                                            <th style="color: #ff6600; font-weight: 600;"><i class="fas fa-building me-1"></i> Municipio</th>
-                                            <th style="color: #ff6600; font-weight: 600;"><i class="fas fa-map-pin me-1"></i> Estado</th>
-                                            <th style="color: #ff6600; font-weight: 600;"><i class="fas fa-envelope me-1"></i> C.P.</th>
-                                            <th style="color: #ff6600; font-weight: 600;"><i class="fas fa-cog me-1"></i> Acciones</th>
+                                            <th style="width: 10%">#</th>
+                                            <th><i class="fas fa-map-marker-alt me-1"></i> Localidad</th>
+                                            <th><i class="fas fa-road me-1"></i> Calle</th>
+                                            <th><i class="fas fa-building me-1"></i> Municipio</th>
+                                            <th><i class="fas fa-map-pin me-1"></i> Estado</th>
+                                            <th><i class="fas fa-envelope me-1"></i> C.P.</th>
+                                            <th style="width: 15%" class="text-center"><i class="fas fa-cog me-1"></i> Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -100,22 +98,20 @@
                                                 <td style="font-weight: 500; color: #ff6600;">{{ $localidad->municipality }}</td>
                                                 <td>{{ $localidad->state }}</td>
                                                 <td>{{ $localidad->postal_code ?: 'N/A' }}</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary me-1 zoom-to-location" 
-                                                            data-lng="{{ $localidad->longitude }}" 
-                                                            data-lat="{{ $localidad->latitude }}"
-                                                            title="Ver en mapa">
-                                                        <i class="fas fa-search-plus"></i>
-                                                    </button>
-                                                    <form method="POST" action="{{ route('localidades.destroy', $localidad->id) }}" 
-                                                          style="display: inline-block;" 
-                                                          onsubmit="return confirm('¿Estás seguro de eliminar esta localidad?')">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                                            <i class="fas fa-trash-alt"></i>
+                                                <td class="text-center">
+                                                    <div class="btn-group" role="group">
+                                                        <button type="button" class="btn btn-warning btn-sm zoom-to-location" 
+                                                                data-lng="{{ $localidad->longitude }}" 
+                                                                data-lat="{{ $localidad->latitude }}"
+                                                                title="Ver en mapa">
+                                                            <i class="fas fa-search-plus"></i>
                                                         </button>
-                                                    </form>
+                                                        <button type="button" class="btn btn-danger btn-sm" 
+                                                                onclick="confirmDelete({{ $localidad->id }})"
+                                                                title="Eliminar">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -123,10 +119,12 @@
                                 </table>
                             </div>
                         @else
-                            <div class="text-center py-4">
-                                <i class="fas fa-map-marker-alt fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">No hay localidades registradas</h5>
-                                <p class="text-muted">Haz clic en el mapa para agregar tu primera localidad</p>
+                            <div class="text-center">
+                                <div class="py-4">
+                                    <i class="fas fa-map-marker-alt fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No hay localidades registradas</h5>
+                                    <p class="text-muted">Haz clic en el mapa para agregar tu primera localidad.</p>
+                                </div>
                             </div>
                         @endif
                     </div>
@@ -986,6 +984,47 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Función para confirmar eliminación igual que en roles
+function confirmDelete(localidadId) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "¿Deseas eliminar esta localidad? Esta acción no se puede deshacer.",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Crear formulario tradicional para DELETE
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/localidades/${localidadId}`;
+
+            // Token CSRF
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+            form.appendChild(csrfToken);
+
+            // Método DELETE
+            const methodField = document.createElement('input');
+            methodField.type = 'hidden';
+            methodField.name = '_method';
+            methodField.value = 'DELETE';
+            form.appendChild(methodField);
+
+            // Agregar al DOM
+            document.body.appendChild(form);
+
+            // Enviar formulario
+            form.submit();
+        }
+    });
+}
 
 function createCustomMarker() {
     const markerDiv = document.createElement('div');

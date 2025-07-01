@@ -23,19 +23,21 @@ class RolesPermissionsController extends Controller
 
         Log::info("Actualizando permisos para el rol ID: " . $role->id);
 
-        // Verificar si se enviaron permisos
-        if (!$request->has('permissions') || empty($request->permissions)) {
-            Log::warning("No se recibieron permisos en la solicitud.");
-            return redirect()->route('roles-permissions.index')->with('error', 'No se recibieron permisos.');
+        // Obtener los permisos enviados (puede ser un array vacío si no se seleccionó ninguno)
+        $permissionIds = $request->input('permissions', []);
+        
+        if (empty($permissionIds)) {
+            // Si no hay permisos seleccionados, quitar todos los permisos del rol
+            Log::info("No se seleccionaron permisos, quitando todos los permisos del rol ID: " . $role->id);
+            $role->syncPermissions([]);
+        } else {
+            // Si hay permisos seleccionados, validar y asignar
+            $permissions = Permission::whereIn('id', $permissionIds)->get();
+            Log::info("Permisos validados: ", $permissions->pluck('name')->toArray());
+            $role->syncPermissions($permissions);
         }
 
-        $permissions = Permission::whereIn('id', $request->permissions)->get();
-        Log::info("Permisos validados: ", $permissions->pluck('name')->toArray());
-
-        // Limpiar los permisos actuales y asignar los nuevos
-        $role->syncPermissions($permissions);
-
-        Log::info("Permisos asignados correctamente al rol ID: " . $role->id);
+        Log::info("Permisos actualizados correctamente para el rol ID: " . $role->id);
 
         return redirect()->route('roles-permissions.index')->with('success', '¡Permisos actualizados correctamente!');
     }
