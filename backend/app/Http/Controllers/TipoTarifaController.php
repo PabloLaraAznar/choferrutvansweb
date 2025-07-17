@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TipoTarifa;
 use Illuminate\Http\Request;
-use App\Models\Service;
-use App\Models\Rate;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class TipoTarifaController extends Controller
 {
     /**
-     * Muestra la lista de servicios y tarifas.
+     * Muestra todos los tipos de tarifa.
      */
     public function index()
     {
-        $servicios = Service::with('rates')->get();
-        return view('tarifas.index', compact('servicios'));
+        $tarifas = TipoTarifa::all();
+        return view('tarifas.index', compact('tarifas'));
     }
 
     /**
-     * Muestra el formulario para crear un nuevo servicio con tarifa.
+     * Muestra el formulario de creación.
      */
     public function create()
     {
@@ -27,90 +27,80 @@ class TipoTarifaController extends Controller
     }
 
     /**
-     * Guarda un nuevo servicio con tarifa en la base de datos.
+     * Guarda un nuevo tipo de tarifa.
      */
     public function store(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255',
-            'precio' => 'required|numeric',
-            'descripcion' => 'nullable|string',
-            'site_id' => 'required|exists:sites,id'
+            'nombre'      => 'required|string|max:255',
+            'porcentaje'  => 'required|numeric|min:0|max:100',
+            'descripcion' => 'nullable|string|max:500',
         ]);
 
-        // Crear el servicio
-        $service = Service::create([
-            'name' => $request->input('nombre'),
-            'description' => $request->input('descripcion'),
-            'price' => $request->input('precio'),
-            'site_id' => $request->input('site_id'),
-            'status' => 'active'
-        ]);
+        DB::transaction(function () use ($request) {
+            TipoTarifa::create([
+                'name'        => $request->nombre,
+                'percentage'  => $request->porcentaje,
+                'description' => $request->descripcion,
+            ]);
+            Log::info("Nuevo tipo de tarifa creado: {$request->nombre}");
+        });
 
-        // Crear la tarifa asociada
-        Rate::create([
-            'id_service' => $service->id,
-            'rate_type' => 'standard',
-            'rate_cost' => $request->input('precio'),
-            'site_id' => $request->input('site_id'),
-            'status' => 'active'
-        ]);
-
-        return redirect()->route('tarifas.index')->with('success', '¡Servicio y tarifa creados exitosamente!');
+        return redirect()->route('tarifas.index')->with('success', '¡Tipo de tarifa creado exitosamente!');
     }
 
     /**
-     * Muestra el formulario para editar un servicio existente.
+     * Muestra el formulario de edición.
      */
-    public function edit(Service $service)
+    public function edit(TipoTarifa $tipoTarifa)
     {
-        return view('tarifas.edit', compact('service'));
+        return view('tarifas.edit', compact('tipoTarifa'));
     }
 
     /**
-     * Actualiza un servicio en la base de datos.
+     * Actualiza un tipo de tarifa existente.
      */
-    public function update(Request $request, Service $service)
-    {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'precio' => 'required|numeric|min:0',
-            'descripcion' => 'nullable|string|max:500'
-        ]);
+ public function update(Request $request, $id)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'percentage' => 'required|numeric|min:0|max:100',
+        'description' => 'nullable|string',
+    ]);
 
-        $service->update([
-            'name' => $request->input('nombre'),
-            'price' => $request->input('precio'),
-            'description' => $request->input('descripcion'),
-        ]);
+    $tipo = TipoTarifa::findOrFail($id);
+    $tipo->update([
+        'name' => $request->name,
+        'percentage' => $request->percentage,
+        'description' => $request->description,
+    ]);
 
-        // Actualizar la tarifa asociada
-        $service->rates()->update([
-            'rate_cost' => $request->input('precio')
-        ]);
+    return redirect()->back()->with('success', 'Tipo de tarifa actualizado correctamente.');
+}
 
-        return redirect()->route('tarifas.index')->with('success', '¡Servicio actualizado correctamente!');
-    }
 
     /**
-     * Elimina un servicio de la base de datos.
+     * Elimina un tipo de tarifa.
      */
-    public function destroy(Service $service)
+    public function destroy($id)
     {
-        try {
-            $service->delete();
-            return response()->json(['success' => true, 'message' => '¡Servicio eliminado correctamente!']);
-        } catch (\Exception $e) {
-            Log::error('Error al eliminar servicio: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Error al eliminar el servicio'], 500);
-        }
+        $tipoTarifa = TipoTarifa::findOrFail($id);
+
+        DB::transaction(function () use ($tipoTarifa) {
+            $nombre = $tipoTarifa->name;
+            $tipoTarifa->delete();
+            Log::info("Tipo de tarifa eliminado: {$nombre}");
+        });
+
+        return response()->json(['success' => true, 'message' => '¡Tipo de tarifa eliminado correctamente!']);
     }
 
     /**
-     * Devuelve todos los servicios en formato JSON (API).
+     * API: Devuelve todos los tipos de tarifa.
      */
     public function apiIndex()
     {
-        return response()->json(Service::with('rates')->get());
+        return response()->json(TipoTarifa::all());
     }
 }
+
