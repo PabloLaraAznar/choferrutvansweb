@@ -480,6 +480,11 @@ return [
                     'icon' => 'fas fa-shuttle-van',  // Vehículo más general
                     'classes' => isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'unidades') !== false ? 'bg-gradient-orange text-white' : '',
                 ],
+    [
+                    'text' => 'Tipos de Tarifas',
+                    'url' => 'tarifas',
+                    'icon' => 'fas fa-tag',
+                ],
 
             ],
         ],
