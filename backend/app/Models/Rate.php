@@ -2,59 +2,29 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Rate extends Model
+class TipoTarifa extends Model
 {
     use HasFactory;
 
+    // Nombre explícito de la tabla (aunque Laravel lo podría inferir)
+    protected $table = 'rates';
+
+    // Campos que pueden asignarse masivamente
     protected $fillable = [
-        'id_service',
-        'rate_type',
-        'rate_cost',
-        'status',
-        'site_id'
+        'name',
+        'percentage',
     ];
 
-    protected $casts = [
-        'rate_cost' => 'decimal:2',
-        'status' => 'string'
-    ];
-
-    // Relación con Site
-    public function site()
-    {
-        return $this->belongsTo(Site::class);
-    }
-
-    // Relación con Service
-    public function service()
-    {
-        return $this->belongsTo(Service::class, 'id_service');
-    }
-
-    // Relación con sales
-    public function sales()
-    {
-        return $this->hasMany(Sale::class, 'id_rate');
-    }
-
-    // Scope para filtrar por site
-    public function scopeBySite($query, $siteId)
-    {
-        return $query->where('site_id', $siteId);
-    }
-
-    // Scope para rates activos
-    public function scopeActive($query)
-    {
-        return $query->where('status', 'active');
-    }
-
-    // Scope por tipo de tarifa
-    public function scopeByType($query, $type)
-    {
-        return $query->where('rate_type', $type);
-    }
+    /**
+     * Aquí puedes definir relaciones si las llegas a necesitar en el futuro.
+     * Ejemplo:
+     * public function tarifasAplicadas()
+     * {
+     *     return $this->hasMany(Servicio::class, 'tipo_tarifa_id');
+     * }
+     */
 }
+
