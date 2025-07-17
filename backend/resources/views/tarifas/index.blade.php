@@ -1,95 +1,143 @@
-<!-- Modal para Editar Usuario -->
-<div class="modal fade" id="editUsuarioModal" tabindex="-1" aria-labelledby="editUsuarioModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <form method="POST" class="needs-validation" novalidate autocomplete="off" id="editUsuarioForm">
-            @csrf
-            @method('PUT')
-            <div class="modal-content border-0 shadow">
-                <!-- Encabezado -->
-                <div class="modal-header text-white" style="background-color: #FF6700;">
-                    <h5 class="modal-title fw-bold">
-                        <i class="fas fa-user-edit me-2"></i>Editar Usuario
-                    </h5>
-                    <button type="button" class="ms-auto text-white fs-2 border-0 bg-transparent" data-bs-dismiss="modal" aria-label="Cerrar">
-                        &times;
-                    </button>
-                </div>
+@extends('adminlte::page')
 
-                <!-- Cuerpo -->
-                <div class="modal-body p-4">
-                    <input type="hidden" id="editUsuarioId" name="usuario_id">
+@section('title', 'Tipos de Tarifas')
 
-                    <div class="row g-3">
-                        <!-- Nombre -->
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Nombre</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0"><i class="fas fa-user text-secondary"></i></span>
-                                <input type="text" class="form-control border-start-0" id="editUsuarioNombre" name="name" required>
-                            </div>
-                            <div class="invalid-feedback small">Por favor ingresa un nombre válido</div>
-                        </div>
-
-                        <!-- Email -->
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Correo Electrónico</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0"><i class="fas fa-envelope text-secondary"></i></span>
-                                <input type="email" class="form-control border-start-0" id="editUsuarioEmail" name="email" required>
-                            </div>
-                            <div class="invalid-feedback small">Ingresa un correo válido</div>
-                        </div>
-
-                        <!-- Teléfono -->
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Teléfono</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0"><i class="fas fa-phone text-secondary"></i></span>
-                                <input type="text" class="form-control border-start-0" id="editUsuarioTelefono" name="phone_number">
-                            </div>
-                            <div class="invalid-feedback small">Ingresa un número válido</div>
-                        </div>
-
-                        <!-- Contraseña (opcional) -->
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Nueva Contraseña <small class="text-muted">(Opcional)</small></label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0"><i class="fas fa-lock text-secondary"></i></span>
-                                <input type="password" class="form-control border-start-0" name="password" autocomplete="new-password">
-                            </div>
-                            <div class="form-text">Dejar en blanco si no deseas cambiarla</div>
-                        </div>
-
-                        <!-- Confirmar contraseña (opcional) -->
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Confirmar Contraseña</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0"><i class="fas fa-lock text-secondary"></i></span>
-                                <input type="password" class="form-control border-start-0" name="password_confirmation" autocomplete="new-password">
-                            </div>
-                        </div>
-
-                        <!-- Dirección -->
-                        <div class="col-12">
-                            <label class="form-label fw-semibold">Dirección</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0 align-items-start"><i class="fas fa-map-marker-alt text-secondary mt-1"></i></span>
-                                <textarea class="form-control border-start-0" id="editUsuarioDireccion" name="address" rows="2"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Footer -->
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-dark fw-semibold shadow-sm rounded-3" data-bs-dismiss="modal">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="btn text-white shadow-sm fw-semibold rounded-3" style="background-color: #FF6700;">
-                        Actualizar
-                    </button>
-                </div>
-            </div>
-        </form>
+@section('content_header')
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="m-0">
+            <i class="fas fa-dollar-sign me-2 text-success"></i> Gestión de Tipos de Tarifas
+        </h1>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createTipoTarifaModal">
+            <i class="fas fa-plus-circle me-1"></i> Crear Tipo de Tarifa
+        </button>
     </div>
-</div>
+@endsection
+
+@section('content')
+    <div class="card">
+        <div class="card-body table-responsive p-0">
+            <table id="tarifasTable" class="table table-hover text-nowrap align-middle">
+                <thead class="table-success">
+                    <tr>
+                        <th style="width: 5%">ID</th>
+                        <th>Nombre</th>
+                        <th>Porcentaje</th>
+                        <th>Creado</th>
+                        <th>Actualizado</th>
+                        <th class="text-center" style="width: 15%">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($tarifas as $tipo)
+                        <tr>
+                            <td>{{ $tipo->id }}</td>
+                            <td>{{ e($tipo->name) }}</td>
+                            <td>{{ $tipo->percentage }}%</td>
+                            <td>{{ $tipo->created_at }}</td>
+                            <td>{{ $tipo->updated_at }}</td>
+                            <td class="text-center">
+                                <button type="button"
+                                        class="btn btn-sm btn-warning btn-edit-tarifa"
+                                        data-id="{{ $tipo->id }}"
+                                        data-name="{{ e($tipo->name) }}"
+                                        data-percentage="{{ $tipo->percentage }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+
+                                <button class="btn btn-sm btn-danger"
+                                        onclick="confirmDelete({{ $tipo->id }})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @include('tarifas.create')
+    @include('tarifas.edit')
+@endsection
+
+@section('css')
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+@endsection
+
+@section('js')
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Inicializar DataTable
+            new DataTable('#tarifasTable', {
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                },
+                responsive: true,
+                autoWidth: false
+            });
+
+            // Manejar clic en botón de editar
+            const buttons = document.querySelectorAll('.btn-edit-tarifa');
+            const form = document.getElementById('editTipoTarifaForm');
+
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const id = button.getAttribute('data-id');
+                    const name = button.getAttribute('data-name');
+                    const percentage = button.getAttribute('data-percentage');
+
+                    document.getElementById('editTipoTarifaId').value = id;
+                    document.getElementById('editTipoTarifaNombre').value = name;
+                    document.getElementById('editTipoTarifaPorcentaje').value = percentage;
+
+                    form.setAttribute('action', `/tarifas/${id}`);
+
+                    // Mostrar el modal manualmente (Bootstrap 5)
+                    const modal = new bootstrap.Modal(document.getElementById('editTipoTarifaModal'));
+                    modal.show();
+                });
+            });
+        });
+
+        function confirmDelete(id) {
+            Swal.fire({
+                title: '¿Eliminar este tipo de tarifa?',
+                text: "Esta acción no se puede deshacer.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                width: '500px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch("{{ url('tarifas') }}/" + id, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        Swal.fire({
+                            icon: data.success ? 'success' : 'error',
+                            title: data.message,
+                            toast: true,
+                            position: 'bottom-end',
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => location.reload());
+                    });
+                }
+            });
+        }
+    </script>
+@endsection
