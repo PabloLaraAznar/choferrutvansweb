@@ -56,6 +56,18 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::resource('tarifas', TipoTarifaController::class);
+
+
+
+  Route::get('tarifas', [TipoTarifaController::class, 'index'])->name('tarifas.index');
+  Route::post('tarifas', [TipoTarifaController::class, 'store'])->name('tarifas.store');
+  Route::get('tarifas/{id}/edit', [TipoTarifaController::class, 'edit'])->name('tarifas.edit');
+  Route::put('tarifas/{id}', [TipoTarifaController::class, 'update'])->name('tarifas.update');
+  Route::put('/fare_types/{id}', [TipoTarifaController::class, 'update'])->name('fare_types.update');
+
+  Route::delete('tarifas/{id}', [TipoTarifaController::class, 'destroy'])->name('tarifas.destroy');
+
 Route::post('/chatbot/handle', [ChatbotController::class, 'handle'])->name('chatbot.handle');
 
 /*
