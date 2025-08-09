@@ -1,79 +1,69 @@
 <div class="modal fade" id="modalEditDriver" tabindex="-1" aria-labelledby="modalEditDriverLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form method="POST" id="formEditDriver" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-            <input type="hidden" name="driver_id" id="edit_driver_id" value="">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form method="POST" id="formEditDriver" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="driver_id" id="edit_driver_id" value="">
 
-            <div class="modal-content" style="border-radius: 12px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);">
-                <div class="modal-header" style="background: linear-gradient(135deg, #ff6600, #e55a00); color: white; border-radius: 12px 12px 0 0; padding: 1.5rem;">
-                    <h5 class="modal-title" id="modalEditDriverLabel" style="font-family: 'Poppins', sans-serif; font-weight: 600;">
-                        <i class="fas fa-user-edit me-2"></i>Editar Conductor
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-edit me-2"></i>
+                        Editar Conductor
                     </h5>
-                    <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Cerrar" style="opacity: 1; filter: brightness(0) invert(1);"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-                <div class="modal-body" style="padding: 2rem;">
-                    <div class="mb-3">
-                        <label for="edit_name" class="form-label fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">
-                            <i class="fas fa-user me-2"></i>Nombre
-                        </label>
-                        <input type="text" class="form-control" id="edit_name" name="name" required 
-                               style="border: 2px solid #ff6600; border-radius: 8px; padding: 0.75rem; font-size: 0.95rem;">
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_email" class="form-label fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">
-                            <i class="fas fa-envelope me-2"></i>Email
-                        </label>
-                        <input type="email" class="form-control" id="edit_email" name="email" required 
-                               style="border: 2px solid #ff6600; border-radius: 8px; padding: 0.75rem; font-size: 0.95rem;">
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_license" class="form-label fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">
-                            <i class="fas fa-id-card me-2"></i>Licencia
-                        </label>
-                        <input type="text" class="form-control" id="edit_license" name="license" required 
-                               style="border: 2px solid #ff6600; border-radius: 8px; padding: 0.75rem; font-size: 0.95rem;">
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_password" class="form-label fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">
-                            <i class="fas fa-lock me-2"></i>Contraseña (dejar vacía para no cambiar)
-                        </label>
-                        <input type="password" class="form-control" id="edit_password" name="password" autocomplete="new-password" 
-                               style="border: 2px solid #ff6600; border-radius: 8px; padding: 0.75rem; font-size: 0.95rem;">
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_password_confirmation" class="form-label fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">
-                            <i class="fas fa-lock me-2"></i>Confirmar Contraseña
-                        </label>
-                        <input type="password" class="form-control" id="edit_password_confirmation" name="password_confirmation" autocomplete="new-password" 
-                               style="border: 2px solid #ff6600; border-radius: 8px; padding: 0.75rem; font-size: 0.95rem;">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">
-                            <i class="fas fa-image me-2"></i>Foto actual
-                        </label><br>
-                        <img id="current_photo_preview" src="" alt="Foto actual"
-                            style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid #ff6600;">
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_photo" class="form-label fw-bold" style="color: #495057; font-family: 'Poppins', sans-serif;">
-                            <i class="fas fa-camera me-2"></i>Nueva foto (opcional)
-                        </label>
-                        <input type="file" class="form-control" id="edit_photo" name="photo" accept="image/*" 
-                               style="border: 2px solid #ff6600; border-radius: 8px; padding: 0.75rem; font-size: 0.95rem;">
+
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="edit_name" class="form-label fw-bold">Nombre</label>
+                            <input type="text" class="form-control" id="edit_name" name="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_email" class="form-label fw-bold">Email</label>
+                            <input type="email" class="form-control" id="edit_email" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_license" class="form-label fw-bold">Licencia</label>
+                            <input type="text" class="form-control" id="edit_license" name="license" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_photo" class="form-label fw-bold">Nueva foto (opcional)</label>
+                            <input type="file" class="form-control" id="edit_photo" name="photo" accept="image/*">
+                            <small class="form-text text-muted">Si no seleccionas una imagen, se mantendrá la
+                                actual.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_password" class="form-label fw-bold">Contraseña (opcional)</label>
+                            <input type="password" class="form-control" id="edit_password" name="password"
+                                autocomplete="new-password">
+                                     <small class="form-text text-muted">Si no desea cambiar la contraseña, se mantendrá la
+                                actual.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_password_confirmation" class="form-label fw-bold">Confirmar
+                                Contraseña</label>
+                            <input type="password" class="form-control" id="edit_password_confirmation"
+                                name="password_confirmation" autocomplete="new-password">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Foto actual</label><br>
+                            <img id="current_photo_preview" src="" alt="Foto actual"
+                                style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid #ff6600;">
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer" style="padding: 1.5rem; background-color: #f8f9fa; border-radius: 0 0 12px 12px;">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" 
-                            style="border-radius: 8px; padding: 0.5rem 1.5rem; font-weight: 500;">
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times me-2"></i>Cancelar
                     </button>
-                    <button type="submit" class="btn" 
-                            style="background: linear-gradient(135deg, #ff6600, #e55a00); border-color: #ff6600; color: white; border-radius: 8px; padding: 0.5rem 1.5rem; font-weight: 600; font-family: 'Poppins', sans-serif;">
+                    <button type="submit" class="btn btn-warning text-white">
                         <i class="fas fa-save me-2"></i>Actualizar Conductor
                     </button>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 </div>

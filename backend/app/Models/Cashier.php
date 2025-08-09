@@ -10,21 +10,28 @@ class Cashier extends Model
 {
     use HasFactory;
 
+
+    // Tabla explícita, aunque Laravel infiere 'drivers' bien
     protected $table = 'cashiers';
     
     protected $fillable = [
-        'id_user', 
+        'user_id', 
         'employee_code', 
         'photo',
         'site_id'
     ];
 
-    public function user(): BelongsTo
+    /**
+     * Relación con User
+     */
+    public function user()
     {
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->belongsTo(User::class, 'user_id');
     }
-
-    public function site(): BelongsTo
+    /**
+     * Relación con Site
+     */
+    public function site()
     {
         return $this->belongsTo(Site::class);
     }

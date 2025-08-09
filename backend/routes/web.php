@@ -15,6 +15,7 @@ use App\Http\Controllers\{
     PDFController,
     ChatbotController,
     CoordinateController,
+    DashCoordinateController,
     DriverController,
     RolesController,
     PermissionsController,
@@ -60,13 +61,13 @@ Route::resource('tarifas', TipoTarifaController::class);
 
 
 
-  Route::get('tarifas', [TipoTarifaController::class, 'index'])->name('tarifas.index');
-  Route::post('tarifas', [TipoTarifaController::class, 'store'])->name('tarifas.store');
-  Route::get('tarifas/{id}/edit', [TipoTarifaController::class, 'edit'])->name('tarifas.edit');
-  Route::put('tarifas/{id}', [TipoTarifaController::class, 'update'])->name('tarifas.update');
-  Route::put('/fare_types/{id}', [TipoTarifaController::class, 'update'])->name('fare_types.update');
+// Route::get('tarifas', [TipoTarifaController::class, 'index'])->name('tarifas.index');
+// Route::post('tarifas', [TipoTarifaController::class, 'store'])->name('tarifas.store');
+// Route::get('tarifas/{id}/edit', [TipoTarifaController::class, 'edit'])->name('tarifas.edit');
+// Route::put('tarifas/{id}', [TipoTarifaController::class, 'update'])->name('tarifas.update');
+// Route::put('/fare_types/{id}', [TipoTarifaController::class, 'update'])->name('fare_types.update');
 
-  Route::delete('tarifas/{id}', [TipoTarifaController::class, 'destroy'])->name('tarifas.destroy');
+// Route::delete('tarifas/{id}', [TipoTarifaController::class, 'destroy'])->name('tarifas.destroy');
 
 Route::post('/chatbot/handle', [ChatbotController::class, 'handle'])->name('chatbot.handle');
 
@@ -136,6 +137,9 @@ Route::middleware([
         Route::resource('permissions', PermissionsController::class);
         Route::resource('companies', CompanyController::class); // Empresas/Sindicatos
         Route::resource('clients', ClientController::class); // Sitios/Rutas (renombrar después)
+
+        // Asignar coordinadores a sitios
+        Route::resource('coordinates', CoordinateController::class);
     });
 
     /*
@@ -147,10 +151,22 @@ Route::middleware([
         Route::get('/roles-permissions', [RolesPermissionsController::class, 'index'])->name('roles-permissions.index');
         Route::get('/roles-permissions/{role}/edit', [RolesPermissionsController::class, 'edit'])->name('roles-permissions.edit');
         Route::put('/roles-permissions/{role}', [RolesPermissionsController::class, 'update'])->name('roles-permissions.update');
-        
+
         // Exportaciones - PDF / Excel (Solo Super-Admin)
         Route::get('exports/pdf/localidades', [PDFController::class, 'expLocalidades'])->name('exports.pdf.localidades');
         Route::get('exports/excel/localidades', [EXCELController::class, 'expLocalidades'])->name('exports.excel.localidades');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Vista tabla de localidades (Solo Super-Admin)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('can:super-admin')->group(function () {
+        Route::resource('localidades', LocalidadesController::class);
+        Route::get('/localidades-exp', [LocExpController::class, 'index'])->name('localidades-exp.index');
+        Route::post('/localidades-exp/data', [LocExpController::class, 'getLocalidades'])->name('localidades-exp.data');
+        Route::get('/localidades-debug', [LocalidadesController::class, 'debug'])->name('localidades.debug');
     });
 
     /*
@@ -167,25 +183,16 @@ Route::middleware([
     Route::post('/profile/verify-password', [ProfileController::class, 'verifyPassword'])->name('profile.verify-password');
     Route::post('/profile/delete-account', [ProfileController::class, 'eliminarUsuario'])->name('profile.eliminar');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Vista tabla de localidades (Solo Super-Admin)
-    |--------------------------------------------------------------------------
-    */
-    Route::middleware('can:super-admin')->group(function () {
-        Route::resource('localidades', LocalidadesController::class);
-        Route::get('/localidades-exp', [LocExpController::class, 'index'])->name('localidades-exp.index');
-        Route::post('/localidades-exp/data', [LocExpController::class, 'getLocalidades'])->name('localidades-exp.data');
-        Route::get('/localidades-debug', [LocalidadesController::class, 'debug'])->name('localidades.debug');
-    });
-
     /*
     |--------------------------------------------------------------------------
     | Vista de unidades con asignacion a choferes (Admin y Coordinate)
     |--------------------------------------------------------------------------
     */
     Route::middleware('can:admin-coordinate')->group(function () {
+    // Ruta del dashboard del coordinador
+        Route::get('/coordinator/dashboard', [DashCoordinateController::class, 'index'])
+            ->name('coordinator.dashboard');
+            
         Route::resource('horarios', HorarioController::class);
         Route::resource('rutas-unidades', RutasUnidadesController::class)->except(['show']);
         Route::post('rutas-unidades/asignar', [RutasUnidadesController::class, 'store'])->name('rutaunidad.store');
@@ -219,7 +226,6 @@ Route::middleware([
     */
     Route::middleware('can:admin-coordinate')->group(function () {
         Route::resource('drivers', DriverController::class);
-        Route::resource('coordinates', CoordinateController::class);
         Route::resource('cashiers', CashierController::class);
     });
     /*

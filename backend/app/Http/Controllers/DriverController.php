@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Driver;
+use App\Models\SiteUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class DriverController extends Controller
 {
@@ -17,87 +19,104 @@ class DriverController extends Controller
     {
         // Get current user's sites
         $userSites = Auth::user()->sites->pluck('id');
-        
+
         // Filter drivers by sites the user has access to
         $drivers = Driver::with('user')
             ->whereIn('site_id', $userSites)
             ->get();
-            
+
         return view('empleados.drivers.index', compact('drivers'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-            'license'  => 'required|string|max:100',
-            'photo'    => 'nullable|image|max:2048',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'name'     => 'required|string|max:255',
+                'email'    => 'required|email|unique:users,email',
+                'password' => 'required|string|min:6|confirmed',
+                'license'  => 'required|string|max:100',
+                'photo'    => 'nullable|image|max:2048',
+            ]);
+        } catch (ValidationException $e) {
+            if ($request->ajax()) {
+                return response()->json(['errors' => $e->errors()], 422);
+            }
+            throw $e;  // si no es ajax, sigue el flujo normal
+        }
 
-        DB::transaction(function () use ($request) {
-            // Crear usuario
+        DB::transaction(function () use ($request, &$user, &$driver) {
             $user = User::create([
                 'name'     => $request->name,
                 'email'    => $request->email,
                 'password' => Hash::make($request->password),
             ]);
-
-            // Asignar rol de driver
             $user->assignRole('driver');
 
-            // Crear chófer con ID de usuario recién creado
-            $driver = new Driver();
-            $driver->id_user = $user->id;
-            $driver->license = $request->license;
-            
-            // Assign to current user's first site (or allow selection in future)
-            $userSites = Auth::user()->sites;
-            if ($userSites->count() > 0) {
-                $driver->site_id = $userSites->first()->id;
-            }
-
+            $photoPath = null;
             if ($request->hasFile('photo')) {
                 $file = $request->file('photo');
                 $extension = $file->getClientOriginalExtension();
 
-                // Función para eliminar tildes y caracteres especiales
-                $normalizeString = function ($string) {
-                    $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string);
-                    $string = preg_replace('/[^a-zA-Z0-9_]/', '_', $string); // Reemplazar caracteres especiales con "_"
-                    return strtolower($string);
-                };
+                $normalizeString = fn($string) =>
+                strtolower(preg_replace('/[^a-zA-Z0-9_]/', '_', iconv('UTF-8', 'ASCII//TRANSLIT', $string)));
 
-                // Definir carpeta y nombre de archivo según el nuevo formato
                 $nameSlug = $normalizeString($user->name);
                 $folderPath = "drivers/{$user->id}/{$nameSlug}";
                 $filename = "driver_photo.{$extension}";
 
-                // Crear carpeta si no existe
                 Storage::disk('public')->makeDirectory($folderPath);
-
-                // Guardar foto en la estructura especificada
-                $path = $file->storeAs($folderPath, $filename, 'public');
-
-                $driver->photo = $path;
+                $photoPath = $file->storeAs($folderPath, $filename, 'public');
+                $user->update(['profile_photo_path' => $photoPath]);
             }
 
-            $driver->save();
+            $siteUser = SiteUser::where('user_id', Auth::id())
+                ->where('status', 'active')
+                ->first();
+
+            $driver = Driver::create([
+                'user_id' => $user->id,
+                'license' => $request->license,
+                'photo'   => $photoPath,
+                'site_id' => $siteUser?->site_id,
+            ]);
+
+            if ($siteUser) {
+                SiteUser::create([
+                    'user_id' => $user->id,
+                    'site_id' => $siteUser->site_id,
+                    'role'    => 'driver',
+                    'status'  => 'active',
+                ]);
+            }
         });
+
+        if ($request->ajax()) {
+            return response()->json([
+                'message' => 'Chófer creado correctamente.',
+                'driver' => $driver,
+            ]);
+        }
 
         return redirect()->route('drivers.index')->with('success', 'Chófer creado correctamente.');
     }
 
     public function update(Request $request, Driver $driver)
     {
-        $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email,' . $driver->user->id,
-            'license'  => 'required|string|max:100',
-            'password' => 'nullable|string|min:6|confirmed',
-            'photo'    => 'nullable|image|max:2048',
-        ]);
+        try {
+            $request->validate([
+                'name'     => 'required|string|max:255',
+                'email'    => 'required|email|unique:users,email,' . $driver->user->id,
+                'license'  => 'required|string|max:100',
+                'password' => 'nullable|string|min:6|confirmed',
+                'photo'    => 'nullable|image|max:2048',
+            ]);
+        } catch (ValidationException $e) {
+            if ($request->ajax()) {
+                return response()->json(['errors' => $e->errors()], 422);
+            }
+            throw $e;
+        }
 
         DB::transaction(function () use ($request, $driver) {
             $user = $driver->user;
@@ -122,57 +141,37 @@ class DriverController extends Controller
             $newFolder = "drivers/{$user->id}/{$newNameSlug}";
             $newFolderPath = storage_path("app/public/{$newFolder}");
 
-            Log::info("Updating driver ID {$user->id} from {$oldFolder} to {$newFolder}");
-
-            // 🔹 Primero renombramos la carpeta antes de manejar la foto
             if ($oldNameSlug !== $newNameSlug) {
                 if (file_exists($oldFolderPath) && is_dir($oldFolderPath)) {
-                    Log::info("Old folder exists: {$oldFolderPath}");
-
                     if (!file_exists($newFolderPath)) {
                         rename(realpath($oldFolderPath), $newFolderPath);
-                        Log::info("Renamed folder {$oldFolder} to {$newFolder}");
                         $driver->photo = str_replace($oldFolder, $newFolder, $driver->photo);
-                    } else {
-                        Log::error("New folder {$newFolder} already exists.");
                     }
-                } else {
-                    Log::error("Old folder {$oldFolder} does not exist at {$oldFolderPath}");
                 }
             }
 
-            // 🔹 Ahora guardamos la nueva foto en la carpeta renombrada
             if ($request->hasFile('photo')) {
-                Log::info("New photo uploaded.");
-
                 $extension = $request->file('photo')->getClientOriginalExtension();
                 $filename = "driver_photo.{$extension}";
-
-                // ✅ Crear carpeta si no existe (por seguridad)
                 Storage::disk('public')->makeDirectory($newFolder);
 
-                // ✅ Eliminar la foto previa antes de guardar la nueva
                 if ($driver->photo && Storage::disk('public')->exists($driver->photo)) {
                     Storage::disk('public')->delete($driver->photo);
-                    Log::info("Deleted previous photo: {$driver->photo}");
                 }
 
-                // ✅ Guardar nueva foto en la carpeta correcta
                 $path = $request->file('photo')->storeAs($newFolder, $filename, 'public');
-                Log::info("Stored new photo at: {$path}");
-
                 $driver->photo = $path;
             }
 
             $driver->license = $request->license;
             $driver->save();
-
-            Log::info("Driver updated successfully for user ID {$user->id}");
         });
 
-        return $request->ajax()
-            ? response()->json(['message' => 'Chófer actualizado correctamente'])
-            : redirect()->route('drivers.index')->with('success', 'Chófer actualizado correctamente.');
+        if ($request->ajax()) {
+            return response()->json(['message' => 'Chófer actualizado correctamente']);
+        }
+
+        return redirect()->route('drivers.index')->with('success', 'Chófer actualizado correctamente.');
     }
 
     public function destroy($id)

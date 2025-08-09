@@ -14,7 +14,7 @@ class Driver extends Model
 
     // Campos que puedes asignar masivamente
     protected $fillable = [
-        'id_user',
+        'user_id',
         'license',
         'photo',
         'site_id'
@@ -25,7 +25,7 @@ class Driver extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
@@ -38,7 +38,7 @@ class Driver extends Model
 
     public function driverUnits()
     {
-        return $this->hasMany(DriverUnit::class, 'id_driver');
+        return $this->hasMany(DriverUnit::class, 'driver_id');
     }
 
     /**
@@ -46,7 +46,7 @@ class Driver extends Model
      */
     public function units()
     {
-        return $this->belongsToMany(Unit::class, 'driver_unit', 'id_driver', 'id_unit')
+        return $this->belongsToMany(Unit::class, 'driver_unit', 'driver_id', 'id_unit')
                     ->withPivot('status')
                     ->withTimestamps();
     }
