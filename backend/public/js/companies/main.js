@@ -3,6 +3,7 @@
 import { initEditCompany } from './edit-company.js';
 import { initViewCompany } from './view-company.js';
 import { initDeleteCompany } from './delete-company.js';
+import { initCreateCompany } from './create-company.js';
 
 $(document).ready(function () {
     $.ajaxSetup({
@@ -14,4 +15,5 @@ $(document).ready(function () {
     initViewCompany();
     initEditCompany();
     initDeleteCompany();
+    initCreateCompany();
 });

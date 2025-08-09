@@ -106,8 +106,18 @@
                                                         aria-label="Ver detalles de {{ $company->name }}">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
-                                                    <button type="button" class="btn btn-warning btn-sm"
-                                                        onclick="editCompany({{ $company->id }})" title="Editar"
+                                                    <button type="button" class="btn btn-warning btn-sm btn-edit-company"
+                                                        data-id="{{ $company->id }}"
+                                                        data-name="{{ $company->name }}"
+                                                        data-business_name="{{ $company->business_name }}"
+                                                        data-rfc="{{ $company->rfc }}"
+                                                        data-locality_id="{{ $company->locality_id }}"
+                                                        data-address="{{ $company->address }}"
+                                                        data-phone="{{ $company->phone }}"
+                                                        data-email="{{ $company->email }}"
+                                                        data-status="{{ $company->status }}"
+                                                        data-notes="{{ $company->notes }}"
+                                                        title="Editar"
                                                         aria-label="Editar {{ $company->name }}">
                                                         <i class="fas fa-edit"></i>
                                                     </button>

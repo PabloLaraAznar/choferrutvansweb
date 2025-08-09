@@ -90,7 +90,7 @@ class Site extends Model
     // Relación con rates
     public function rates()
     {
-        return $this->hasMany(Rate::class);
+        return $this->hasMany(TipoTarifa::class);
     }
 
     // Relación con freights

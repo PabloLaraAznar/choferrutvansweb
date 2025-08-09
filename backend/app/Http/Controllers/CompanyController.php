@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use App\Models\CompanyUser;
 use App\Models\Locality;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -51,6 +52,15 @@ class CompanyController extends Controller
                 'address', 'phone', 'email', 'status', 'notes'
             ]));
 
+            // Crear un sitio principal para la empresa
+            $mainSite = $company->sites()->create([
+                'name' => 'Sede Principal',
+                'locality_id' => $request->locality_id,
+                'address' => $request->address,
+                'phone' => $request->phone,
+                'status' => 'active'
+            ]);
+
             // Crear el usuario admin principal
             $user = User::create([
                 'name' => $request->admin_name,
@@ -59,8 +69,16 @@ class CompanyController extends Controller
                 'email_verified_at' => now(),
             ]);
 
-            // Asignar rol de admin
+            // Asignar rol de admin en el sistema
             $user->assignRole('admin');
+
+            // Vincular el usuario como dueño de la compañía
+            CompanyUser::create([
+                'company_id' => $company->id,
+                'user_id' => $user->id,
+                'role' => 'admin',
+                'status' => 'active'
+            ]);
         });
 
         return redirect()->route('companies.index')
@@ -69,15 +87,10 @@ class CompanyController extends Controller
 
     public function show(Company $company)
     {
-        $company->load(['locality', 'sites.locality', 'sites.users']);
+        $company->load(['locality']);
         
         return response()->json([
-            'company' => $company,
-            'stats' => [
-                'sites' => $company->sites()->count(),
-                'total_users' => $company->sites->sum(fn($site) => $site->users->count()),
-                'active_sites' => $company->sites()->where('status', 'active')->count(),
-            ]
+            'company' => $company
         ]);
     }
 
