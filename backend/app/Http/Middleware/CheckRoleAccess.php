@@ -16,12 +16,17 @@ class CheckRoleAccess
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
+        // Excluir rutas de almacenamiento público (imágenes, archivos) para evitar bloqueos 403
+        if ($request->is('storage/*')) {
+            return $next($request);
+        }
+
         if (!Auth::check()) {
             return redirect()->route('login');
         }
 
         $user = Auth::user();
-        
+
         // Si no se especifican roles, permitir el acceso
         if (empty($roles)) {
             return $next($request);

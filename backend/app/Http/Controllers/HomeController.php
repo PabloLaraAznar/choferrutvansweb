@@ -7,6 +7,7 @@ use App\Models\Sale;
 use App\Models\Unit;
 use Carbon\Carbon;
 use DB;
+use Illuminate\Support\Facades\DB as FacadesDB;
 
 class HomeController extends Controller
 {
@@ -21,13 +22,13 @@ class HomeController extends Controller
 
         // Ventas por día (gráfico de barras)
         $salesData = Sale::whereBetween('created_at', [$startDate, $endDate])
-            ->select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(amount) as total'))
+            ->select(FacadesDB::raw('DATE(created_at) as date'), FacadesDB::raw('SUM(amount) as total'))
             ->groupBy('date')
             ->orderBy('date')
             ->get();
 
         // Ventas por chofer (gráfico de pastel)
-        $pieData = DB::table('sales')
+        $pieData = FacadesDB::table('sales')
             ->join('route_unit_schedule', 'sales.id_route_unit_schedule', '=', 'route_unit_schedule.id')
             ->join('route_unit', 'route_unit_schedule.id_route_unit', '=', 'route_unit.id')
             ->join('driver_unit', 'route_unit.id_driver_unit', '=', 'driver_unit.id')
@@ -35,7 +36,7 @@ class HomeController extends Controller
             ->join('users', 'drivers.id_user', '=', 'users.id')
             ->where('driver_unit.status', 'activo')
             ->whereBetween('sales.created_at', [$startDate, $endDate])
-            ->select('users.name as driver', DB::raw('SUM(sales.amount) as total'))
+            ->select('users.name as driver', FacadesDB::raw('SUM(sales.amount) as total'))
             ->groupBy('users.name')
             ->get();
 
@@ -43,7 +44,7 @@ class HomeController extends Controller
         $totalSales = Sale::whereDate('created_at', today())->sum('amount');
 
         // Tarjeta: choferes activos
-        $activeDrivers = DB::table('driver_unit')
+        $activeDrivers = FacadesDB::table('driver_unit')
             ->where('status', 'activo')
             ->distinct('id_driver')
             ->count('id_driver');

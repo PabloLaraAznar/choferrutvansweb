@@ -13,7 +13,7 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
+
         if (!$user) {
             return redirect()->route('login');
         }
@@ -55,17 +55,6 @@ class DashboardController extends Controller
         $homeController = new \App\Http\Controllers\HomeController();
         $request = request(); // Obtener la instancia actual de Request
         return $homeController->index($request);
-    }
-
-    /**
-     * Dashboard para Coordinate
-     */
-    private function coordinateDashboard()
-    {
-        return view('dashboards.coordinate')->with([
-            'welcomeMessage' => '¡Bienvenido Coordinador! Gestiona rutas, unidades y supervisiona operaciones.',
-            'userRole' => 'Coordinador'
-        ]);
     }
 
     /**
@@ -123,7 +112,7 @@ class DashboardController extends Controller
         } elseif ($user->hasRole('admin')) {
             return route('dashboard');
         } elseif ($user->hasRole('coordinate')) {
-            return route('dashboard.role');
+            return route('coordinator.dashboard');
         } elseif ($user->hasRole('driver')) {
             return route('dashboard.role');
         } elseif ($user->hasRole('cashier')) {

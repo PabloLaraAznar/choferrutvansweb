@@ -41,7 +41,7 @@ class FortifyServiceProvider extends ServiceProvider
         // Personalizar autenticación fallida
         Fortify::authenticateUsing(function ($request) {
             $user = \App\Models\User::where('email', $request->email)->first();
-            
+
             if ($user && Hash::check($request->password, $user->password)) {
                 // Email verificado?
                 if (!$user->hasVerifiedEmail()) {
@@ -51,7 +51,7 @@ class FortifyServiceProvider extends ServiceProvider
                 }
                 return $user;
             }
-            
+
             // Determinar tipo de error específico
             if ($user) {
                 // Usuario existe pero contraseña incorrecta
@@ -71,7 +71,7 @@ class FortifyServiceProvider extends ServiceProvider
             public function toResponse($request)
             {
                 $user = $request->user();
-                
+
                 if (!$user) {
                     return redirect()->route('login');
                 }
@@ -82,7 +82,7 @@ class FortifyServiceProvider extends ServiceProvider
                 } elseif ($user->hasRole('admin')) {
                     return redirect()->route('dashboard')->with('success', '¡Bienvenido Admin!');
                 } elseif ($user->hasRole('coordinate')) {
-                    return redirect()->route('dashboard.role')->with('success', '¡Bienvenido Coordinador!');
+                    return redirect()->route('coordinator.dashboard');
                 } elseif ($user->hasRole('driver')) {
                     return redirect()->route('dashboard.role')->with('success', '¡Bienvenido Conductor!');
                 } elseif ($user->hasRole('cashier')) {
@@ -105,7 +105,7 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
+            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())) . '|' . $request->ip());
 
             return Limit::perMinute(5)->by($throttleKey);
         });
