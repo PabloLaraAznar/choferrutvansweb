@@ -4,13 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Site;
 use App\Models\Company;
+use App\Models\Coordinate;
 use App\Models\User;
 use App\Models\Locality;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 
 class ClientController extends Controller
 {
@@ -24,27 +22,21 @@ class ClientController extends Controller
     public function index(Request $request)
     {
         $query = Site::with(['locality', 'users', 'company']);
-        
-        // Filtrar por empresa si se especifica
+
         if ($request->has('company') && $request->company != '') {
             $query->where('company_id', $request->company);
         }
-        
-        // Filtrar por estado si se especifica
+
         if ($request->has('status') && $request->status != '') {
             $query->where('status', $request->status);
         }
-        
+
         $sites = $query->orderBy('name')->paginate(10);
         $companies = Company::where('status', 'active')->orderBy('name')->get();
         $localities = Locality::orderBy('locality')->get();
-        
-        // Obtener usuarios con rol admin para poder asignarlos a sitios
-        $availableAdmins = User::whereHas('roles', function($query) {
-            $query->where('name', 'admin');
-        })->orderBy('name')->get();
-        
-        return view('rutvans.sites.index', compact('sites', 'companies', 'localities', 'availableAdmins'));
+
+        // Ya no traemos admins porque no los usamos en creación/edición
+        return view('rutvans.sites.index', compact('sites', 'companies', 'localities'));
     }
 
     public function store(Request $request)
@@ -52,56 +44,24 @@ class ClientController extends Controller
         $validationRules = [
             'company_id' => 'required|exists:companies,id',
             'name' => 'required|string|max:255',
-            'route_name' => 'nullable|string|max:255', // Ruta principal opcional
+            'route_name' => 'nullable|string|max:255',
             'locality_id' => 'required|exists:localities,id',
             'address' => 'required|string|max:500',
             'phone' => 'required|string|max:20',
             'status' => 'required|in:active,inactive',
-            'admin_type' => 'required|in:existing,new',
         ];
-
-        // Agregar validaciones condicionales según el tipo de admin
-        if ($request->input('admin_type') === 'existing') {
-            $validationRules['existing_admin_id'] = 'required|exists:users,id';
-        } else {
-            $validationRules['admin_name'] = 'required|string|max:255';
-            $validationRules['admin_email'] = 'required|email|unique:users,email';
-            $validationRules['admin_password'] = 'required|string|min:6|confirmed';
-        }
 
         $request->validate($validationRules);
 
-        DB::transaction(function () use ($request) {
-            // Crear el sitio/terminal
-            $site = Site::create([
-                'company_id' => $request->company_id,
-                'name' => $request->name,
-                'route_name' => $request->route_name, // Ruta principal opcional
-                'locality_id' => $request->locality_id,
-                'address' => $request->address,
-                'phone' => $request->phone,
-                'status' => $request->status,
-            ]);
-
-            // Seleccionar o crear admin
-            if ($request->admin_type === 'existing') {
-                $user = User::find($request->existing_admin_id);
-            } else {
-                // Crear nuevo usuario admin
-                $user = User::create([
-                    'name' => $request->admin_name,
-                    'email' => $request->admin_email,
-                    'password' => Hash::make($request->admin_password),
-                    'email_verified_at' => now(),
-                ]);
-
-                // Asignar rol de admin al usuario
-                $user->assignRole('admin');
-            }
-
-            // Asociar el usuario al sitio como admin
-            $user->sites()->attach($site->id, ['role' => 'admin']);
-        });
+        Site::create([
+            'company_id' => $request->company_id,
+            'name' => $request->name,
+            'route_name' => $request->route_name,
+            'locality_id' => $request->locality_id,
+            'address' => $request->address,
+            'phone' => $request->phone,
+            'status' => $request->status,
+        ]);
 
         return redirect()->route('clients.index')
             ->with('success', 'Sitio/Terminal creado exitosamente.');
@@ -109,87 +69,27 @@ class ClientController extends Controller
 
     public function update(Request $request, Site $client)
     {
-        // Obtener el usuario admin principal del sitio
-        $adminUser = $client->users()
-            ->wherePivot('role', 'admin')
-            ->first();
-
-        $request->validate([
+        $validationRules = [
             'company_id' => 'required|exists:companies,id',
             'name' => 'required|string|max:255',
-            'route_name' => 'nullable|string|max:255', // Ruta principal opcional
+            'route_name' => 'nullable|string|max:255',
             'locality_id' => 'required|exists:localities,id',
             'address' => 'required|string|max:500',
             'phone' => 'required|string|max:20',
             'status' => 'required|in:active,inactive',
-            // Seleccionar admin existente o crear nuevo
-            'admin_type' => 'required|in:existing,new',
-            'existing_admin_id' => 'required_if:admin_type,existing|exists:users,id',
-            // Datos del nuevo usuario admin (solo si admin_type = new)
-            'admin_name' => 'required_if:admin_type,new|string|max:255',
-            'admin_email' => [
-                'required_if:admin_type,new',
-                'email',
-                Rule::unique('users', 'email')->ignore($adminUser?->id),
-            ],
-            'admin_password' => 'nullable|string|min:6|confirmed',
+        ];
+
+        $request->validate($validationRules);
+
+        $client->update([
+            'company_id' => $request->company_id,
+            'name' => $request->name,
+            'route_name' => $request->route_name,
+            'locality_id' => $request->locality_id,
+            'address' => $request->address,
+            'phone' => $request->phone,
+            'status' => $request->status,
         ]);
-
-        DB::transaction(function () use ($request, $client, $adminUser) {
-            // Actualizar el sitio/terminal
-            $client->update([
-                'company_id' => $request->company_id,
-                'name' => $request->name,
-                'route_name' => $request->route_name, // Ruta principal opcional
-                'locality_id' => $request->locality_id,
-                'address' => $request->address,
-                'phone' => $request->phone,
-                'status' => $request->status,
-            ]);
-
-            // Manejar admin
-            if ($request->admin_type === 'existing') {
-                $newAdmin = User::find($request->existing_admin_id);
-                
-                // Si cambia el admin, desasociar el anterior y asociar el nuevo
-                if ($adminUser && $adminUser->id !== $newAdmin->id) {
-                    $client->users()->detach($adminUser->id);
-                    $client->users()->attach($newAdmin->id, ['role' => 'admin']);
-                } elseif (!$adminUser) {
-                    // Si no había admin, asociar el nuevo
-                    $client->users()->attach($newAdmin->id, ['role' => 'admin']);
-                }
-            } else {
-                // Crear o actualizar admin
-                if ($adminUser) {
-                    $userData = [
-                        'name' => $request->admin_name,
-                        'email' => $request->admin_email,
-                    ];
-
-                    // Solo actualizar password si se proporciona uno nuevo
-                    if ($request->filled('admin_password')) {
-                        $userData['password'] = Hash::make($request->admin_password);
-                    }
-
-                    $adminUser->update($userData);
-                } else {
-                    // Crear nuevo usuario admin
-                    $user = User::create([
-                        'name' => $request->admin_name,
-                        'email' => $request->admin_email,
-                        'password' => Hash::make($request->admin_password),
-                        'email_verified_at' => now(),
-                    ]);
-
-                    // Asignar rol de admin al usuario
-                    $user->assignRole('admin');
-                    
-                    // Asociar el usuario al sitio como admin
-                    $user->sites()->attach($client->id, ['role' => 'admin']);
-                }
-            }
-        });
 
         return redirect()->route('clients.index')
             ->with('success', 'Sitio/Terminal actualizado exitosamente.');
@@ -198,21 +98,9 @@ class ClientController extends Controller
     public function destroy(Site $client)
     {
         DB::transaction(function () use ($client) {
-            // Obtener usuarios del sitio antes de eliminar las relaciones
-            $users = $client->users()->get();
-            
-            // Desasociar usuarios del sitio
+            // Desasociar usuarios para evitar problemas (si quieres puedes quitar esta parte)
             $client->users()->detach();
-            
-            // Verificar si hay usuarios que solo pertenecían a este sitio
-            // y eliminarlos si no tienen otros sitios
-            foreach ($users as $user) {
-                if ($user->sites()->count() === 0) {
-                    $user->delete();
-                }
-            }
-            
-            // Eliminar el sitio
+
             $client->delete();
         });
 
@@ -222,23 +110,60 @@ class ClientController extends Controller
 
     public function show(Site $client)
     {
-        $client->load(['locality', 'users', 'company']);
-        
-        // Estadísticas simples para evitar errores con modelos inexistentes
-        $stats = [
-            'drivers' => $client->users()->whereHas('roles', function($query) {
-                $query->where('name', 'driver');
-            })->count(),
-            'cashiers' => $client->users()->whereHas('roles', function($query) {
-                $query->where('name', 'cashier');
-            })->count(),
-            'coordinates' => 0, // Placeholder para futuras implementaciones
-            'units' => 0, // Placeholder para futuras implementaciones
-        ];
-        
-        return response()->json([
+        $client->load(['locality', 'company', 'users.roles']);
+
+        $coordinators = $client->users->filter(function ($user) {
+            return $user->hasRole('coordinate');
+        });
+
+        $coordinatorUserId = DB::table('site_users')
+            ->where('site_id', $client->id)
+            ->where('role', 'coordinator')
+            ->value('user_id');
+
+        $assignedCoordinator = null;
+
+        if ($coordinatorUserId) {
+            $assignedCoordinator = User::with('roles')
+                ->where('id', $coordinatorUserId)
+                ->first();
+
+            if ($assignedCoordinator) {
+                $coordinateData = Coordinate::where('user_id', $assignedCoordinator->id)->first();
+
+                $assignedCoordinator->employee_code = $coordinateData->employee_code ?? null;
+                $assignedCoordinator->photo = $coordinateData->photo ?? null;
+                $assignedCoordinator->coordinate_id = $coordinateData->id ?? null; // 👈 necesario para el update
+            }
+        }
+
+        return view('rutvans.sites.asignar.index', [
             'site' => $client,
-            'stats' => $stats
+            'coordinators' => $coordinators,
+            'assignedCoordinator' => $assignedCoordinator,
         ]);
     }
+
+
+
+    // public function show(Site $client)
+    // {
+    //     $client->load(['locality', 'users', 'company']);
+
+    //     $stats = [
+    //         'drivers' => $client->users()->whereHas('roles', function ($query) {
+    //             $query->where('name', 'driver');
+    //         })->count(),
+    //         'cashiers' => $client->users()->whereHas('roles', function ($query) {
+    //             $query->where('name', 'cashier');
+    //         })->count(),
+    //         'coordinates' => 0,
+    //         'units' => 0,
+    //     ];
+
+    //     return response()->json([
+    //         'site' => $client,
+    //         'stats' => $stats
+    //     ]);
+    // }
 }

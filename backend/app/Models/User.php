@@ -78,7 +78,11 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function driver()
     {
-        return $this->hasOne(Driver::class, 'id_user');
+        return $this->hasOne(Driver::class, 'user_id');
+    }
+        public function cashier()
+    {
+        return $this->hasOne(Cashier::class, 'user_id');
     }
 
     // Relación muchos a muchos con sites
