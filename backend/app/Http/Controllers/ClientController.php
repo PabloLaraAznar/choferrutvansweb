@@ -63,8 +63,8 @@ class ClientController extends Controller
             'status' => $request->status,
         ]);
 
-        return redirect()->route('clients.index')
-            ->with('success', 'Sitio/Terminal creado exitosamente.');
+        // Devolver JSON en lugar de redirigir para peticiones AJAX
+        return response()->json(['message' => 'Sitio/Terminal creado exitosamente.']);
     }
 
     public function update(Request $request, Site $client)
@@ -91,8 +91,8 @@ class ClientController extends Controller
             'status' => $request->status,
         ]);
 
-        return redirect()->route('clients.index')
-            ->with('success', 'Sitio/Terminal actualizado exitosamente.');
+        // Devolver JSON en lugar de redirigir para peticiones AJAX
+        return response()->json(['message' => 'Sitio/Terminal actualizado exitosamente.']);
     }
 
     public function destroy(Site $client)
