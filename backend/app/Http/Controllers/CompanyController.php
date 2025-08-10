@@ -52,21 +52,12 @@ class CompanyController extends Controller
                 'address', 'phone', 'email', 'status', 'notes'
             ]));
 
-            // Crear un sitio principal para la empresa
-            $mainSite = $company->sites()->create([
-                'name' => 'Sede Principal',
-                'locality_id' => $request->locality_id,
-                'address' => $request->address,
-                'phone' => $request->phone,
-                'status' => 'active'
-            ]);
-
             // Crear el usuario admin principal
             $user = User::create([
                 'name' => $request->admin_name,
                 'email' => $request->admin_email,
                 'password' => Hash::make($request->admin_password),
-                'email_verified_at' => now(),
+                'email_verified_at' => now()
             ]);
 
             // Asignar rol de admin en el sistema

@@ -1,6 +1,16 @@
+// Función auxiliar para escapar HTML y prevenir XSS
+function escapeHtml(text) {
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 export function initDeleteSite() {
-    function deleteSite(siteId, siteName) {
-        Swal.fire({
+    async function deleteSite(siteId, siteName) {
+        const result = await Swal.fire({
             title: '¿Estás seguro?',
             html: `¿Deseas eliminar el sitio/ruta <strong>${escapeHtml(siteName)}</strong>?<br><br>
                    <div class="alert alert-warning">
@@ -14,39 +24,66 @@ export function initDeleteSite() {
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const form = $('<form>', {
-                    method: 'POST',
-                    action: `/clients/${siteId}`
+        });
+
+        if (result.isConfirmed) {
+            try {
+                // Mostrar loading
+                Swal.fire({
+                    title: 'Eliminando...',
+                    text: 'Por favor espera',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
                 });
 
-                form.append($('<input>', {
-                    type: 'hidden',
-                    name: '_token',
-                    value: $('meta[name="csrf-token"]').attr('content')
-                }));
+                // Crear y enviar el formulario
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/clients/${siteId}`;
 
-                form.append($('<input>', {
-                    type: 'hidden',
-                    name: '_method',
-                    value: 'DELETE'
-                }));
+                const methodInput = document.createElement('input');
+                methodInput.type = 'hidden';
+                methodInput.name = '_method';
+                methodInput.value = 'DELETE';
 
-                $('body').append(form);
-                form.submit();
+                const tokenInput = document.createElement('input');
+                tokenInput.type = 'hidden';
+                tokenInput.name = '_token';
+                tokenInput.value = document.querySelector('meta[name="csrf-token"]').content;
+
+                form.appendChild(methodInput);
+                form.appendChild(tokenInput);
+                document.body.appendChild(form);
+
+                await new Promise((resolve) => {
+                    form.addEventListener('submit', () => {
+                        setTimeout(resolve, 1000); // dar tiempo para que el formulario se envíe
+                    });
+                    form.submit();
+                });
+
+                await Swal.fire({
+                    title: '¡Eliminado!',
+                    text: 'El sitio ha sido eliminado correctamente',
+                    icon: 'success',
+                    confirmButtonColor: '#28a745'
+                });
+
+                window.location.reload();
+            } catch (error) {
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message || 'Hubo un error al eliminar el sitio',
+                    icon: 'error',
+                    confirmButtonColor: '#28a745'
+                });
             }
-        });
+        }
     }
 
+    // Hacer la función accesible globalmente
     window.deleteSite = deleteSite;
-}
-
-function escapeHtml(text) {
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
 }
