@@ -46,8 +46,8 @@ export function validateForm(fields) {
         const phoneDigitsOnly = phone.replace(/\D/g, '');
         if (!phone) {
             errors.phone_number = 'El teléfono es obligatorio.';
-        } else if (phoneDigitsOnly.length < 10 || phoneDigitsOnly.length > 15) {
-            errors.phone_number = 'El teléfono debe tener entre 10 y 15 dígitos.';
+        } else if (phoneDigitsOnly.length !== 10) {
+            errors.phone_number = 'El teléfono debe tener exactamente 10 dígitos.';
         } else if (!/^\+?\d+$/.test(phone)) {
             errors.phone_number = 'El teléfono solo debe contener números y opcionalmente un + al inicio.';
         }

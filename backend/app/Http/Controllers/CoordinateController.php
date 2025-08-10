@@ -82,8 +82,7 @@ class CoordinateController extends Controller
             $coordinate->site->users()->syncWithoutDetaching([$user->id]);
         });
 
-        return redirect()->route('clients.show', $request->site_id)
-            ->with('success', 'Coordinador creado correctamente.');
+        return response()->json(['message' => 'Coordinador creado correctamente.']);
     }
 
     public function update(Request $request, Coordinate $coordinate)

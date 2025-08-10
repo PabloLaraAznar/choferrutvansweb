@@ -1,4 +1,4 @@
-// edit-coordinator.js
+import { validateForm } from './validation.js';
 export function initEditCoordinator() {
     const btnsEditar = document.querySelectorAll('.btnEditarCoordinador');
     const modalElement = document.getElementById('editCoordinatorModal');
@@ -57,7 +57,29 @@ export function initEditCoordinator() {
     form.addEventListener('submit', function handleSubmit(e) {
         e.preventDefault();
 
-        // Aquí podrías agregar validaciones propias si quieres
+        // Validaciones
+        const fields = {
+            name: form.querySelector('[name="name"]'),
+            email: form.querySelector('[name="email"]'),
+            address: form.querySelector('[name="address"]'),
+            phone_number: form.querySelector('[name="phone_number"]')
+        };
+
+        const errors = validateForm(fields);
+
+        // Limpiar errores previos
+        form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+        if (Object.keys(errors).length > 0) {
+            // Mostrar errores con SweetAlert2
+            Swal.fire({
+                title: 'Error de Validación',
+                html: Object.values(errors).map(error => `• ${error}`).join('<br>'),
+                icon: 'error',
+                confirmButtonColor: '#28a745'
+            });
+            return;
+        }
 
         Swal.fire({
             title: 'Guardando cambios...',
@@ -70,6 +92,7 @@ export function initEditCoordinator() {
         });
 
         form.removeEventListener('submit', handleSubmit);
+        form.submit();
         form.submit();
     });
 

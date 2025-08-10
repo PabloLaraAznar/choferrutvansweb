@@ -61,9 +61,9 @@
                 </h5>
 
                 @unless ($assignedCoordinator)
-                    <button id="btnCrearCoordinador" class="btn btn-sm"
-                        style="background-color: #963c00; color: white; border: none; font-weight: 600;">
-                        <i class="fas fa-plus me-1"></i> Crear Coordinador
+                    <button id="btnCrearCoordinador" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#createCoordinatorModal"
+                    style="background-color: #963c00; color: white; border: none; font-weight: 600;">
+                    <i class="fas fa-plus me-1"></i> Crear Coordinador
                     </button>
                 @else
                     @php

@@ -1,52 +1,43 @@
-// create-coordinator.js
-import { validateForm } from './validation.js'; // Si usas validación externa, sino comentar
+import { validateForm } from './validation.js';
 
 export function initCreateCoordinator() {
     const form = document.getElementById('createCoordinatorForm');
+    if (!form) return;
+
     const modalElement = document.getElementById('createCoordinatorModal');
-    const btnOpenModal = document.getElementById('btnCrearCoordinador');
-
-    if (!form || !modalElement || !btnOpenModal) return;
-
     const bsModal = bootstrap.Modal.getOrCreateInstance(modalElement);
-
-    btnOpenModal.addEventListener('click', () => {
-        bsModal.show();
-    });
 
     form.addEventListener('submit', function handleSubmit(e) {
         e.preventDefault();
 
-        const getValue = id => document.getElementById(id)?.value.trim();
-
+        // Obtener valores del formulario
         const fields = {
-            name: { value: getValue('name'), rules: ['required'] },
-            email: { value: getValue('email'), rules: ['required', 'email'] },
-            password: { value: getValue('password'), rules: ['required', 'minLength:8'] },
-            address: { value: getValue('address'), rules: ['required'] },
-            phone_number: { value: getValue('phone_number'), rules: ['required', 'phone'] },
-            employee_code: { value: getValue('employee_code'), rules: ['required'] }
+            name: form.querySelector('[name="name"]'),
+            email: form.querySelector('[name="email"]'),
+            password: form.querySelector('[name="password"]'),
+            address: form.querySelector('[name="address"]'),
+            phone_number: form.querySelector('[name="phone_number"]'),
+            site_id: form.querySelector('[name="site_id"]')
         };
 
-        // Validar con tu función o dejar vacía si no usas
-        const errors = validateForm ? validateForm(fields) : {};
+        // Validaciones
+        const errors = validateForm(fields);
 
-        // Limpiar estados anteriores
+        // Limpiar errores previos
         form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-        form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
 
         if (Object.keys(errors).length > 0) {
-            let errorList = Object.values(errors).map(msg => `<li>${msg}</li>`).join('');
+            // Mostrar errores con SweetAlert2
             Swal.fire({
+                title: 'Error de Validación',
+                html: Object.values(errors).map(error => `• ${error}`).join('<br>'),
                 icon: 'error',
-                title: 'Errores en el formulario',
-                html: `<ul style="text-align: left;">${errorList}</ul>`,
-                confirmButtonColor: '#dc3545'
+                confirmButtonColor: '#28a745'
             });
             return;
         }
 
-        // Mostrar loading y enviar formulario
+        // Mostrar loading
         Swal.fire({
             title: 'Guardando...',
             text: 'Por favor espera',
@@ -57,44 +48,90 @@ export function initCreateCoordinator() {
             }
         });
 
-        form.removeEventListener('submit', handleSubmit);
-        form.submit();
-    });
+        // Crear el coordinador
+        const formData = new FormData(form);
 
-    // Reset modal al abrir
-    modalElement.addEventListener('show.bs.modal', () => {
-        form.reset();
-        form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-        form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
-    });
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(async response => {
+            const contentType = response.headers.get('content-type');
+            if (!response.ok) {
+                let errorText = `Error: ${response.statusText} (${response.status})`;
+                if (contentType && contentType.includes('application/json')) {
+                    const errorData = await response.json();
+                    errorText = errorData.message || JSON.stringify(errorData.errors);
+                } else {
+                    console.error("Respuesta de error no JSON del servidor:", await response.text().catch(() => ''));
+                }
+                throw new Error(errorText);
+            }
 
-    // Reset modal al cerrar con botones
-    modalElement.querySelectorAll('[data-bs-dismiss="modal"]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            form.reset();
-            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-            form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+            if (!contentType || !contentType.includes('application/json')) {
+                console.error("Respuesta inesperada del servidor (no es JSON):", await response.text().catch(() => ''));
+                throw new TypeError("Respuesta inesperada del servidor. Se esperaba JSON.");
+            }
+
+            return response.json();
+        })
+        .then(data => {
+            Swal.fire({
+                title: '¡Éxito!',
+                text: data.message || 'El coordinador se ha creado correctamente',
+                icon: 'success',
+                confirmButtonColor: '#28a745'
+            }).then(() => {
+                bsModal.hide();
+                window.location.reload();
+            });
+        })
+        .catch(error => {
+            Swal.close(); // Cierra el Swal de "cargando"
+            Swal.fire({
+                title: 'Error',
+                text: error.message || 'Hubo un error al crear el coordinador',
+                icon: 'error',
+                confirmButtonColor: '#28a745'
+            });
         });
     });
 
-    // Preview foto
-    const photoInput = document.getElementById('photo');
-    const photoPreview = document.getElementById('photoPreview');
+    const photoInput = form.querySelector('#photo');
+    const photoPreview = form.querySelector('#photoPreview');
 
     if (photoInput) {
         photoInput.addEventListener('change', function () {
             const file = this.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function (e) {
+                reader.onload = e => {
                     photoPreview.src = e.target.result;
                     photoPreview.style.display = 'block';
                 };
                 reader.readAsDataURL(file);
             } else {
-                photoPreview.src = '#';
                 photoPreview.style.display = 'none';
+                photoPreview.src = '#';
             }
         });
     }
+
+    // Reset del formulario al abrir el modal
+    modalElement.addEventListener('show.bs.modal', () => {
+        form.reset();
+        form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+    });
+
+    // Reset del formulario al cerrar con botones
+    modalElement.querySelectorAll('[data-bs-dismiss="modal"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            form.reset();
+            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        });
+    });
 }
