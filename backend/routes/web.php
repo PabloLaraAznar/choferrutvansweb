@@ -136,7 +136,8 @@ Route::middleware([
         Route::resource('roles', RolesController::class); // Middleware deshabilitado temporalmente para pruebas
         Route::resource('permissions', PermissionsController::class);
         Route::resource('companies', CompanyController::class); // Empresas/Sindicatos
-        Route::resource('clients', ClientController::class); // Sitios/Rutas (renombrar después)
+        Route::put('/companies/{company}/admin', [CompanyController::class, 'updateAdmin'])->name('companies.updateAdmin');
+            Route::resource('clients', ClientController::class); // Sitios/Rutas (renombrar después)
 
         // Asignar coordinadores a sitios
         Route::resource('coordinates', CoordinateController::class);

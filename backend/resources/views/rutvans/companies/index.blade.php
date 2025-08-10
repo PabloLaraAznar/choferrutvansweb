@@ -75,6 +75,7 @@
                                         <th>Razón Social</th>
                                         <th>RFC</th>
                                         <th>Localidad</th>
+                                        <th>Admin</th>
                                         <th>Teléfono</th>
                                         <th>Estado</th>
                                         <th>Sitios/Rutas</th>
@@ -89,6 +90,7 @@
                                             <td>{{ $company->business_name ?: 'N/A' }}</td>
                                             <td>{{ $company->rfc ?: 'N/A' }}</td>
                                             <td>{{ $company->locality->locality ?? 'N/A' }}</td>
+                                            <td>{{ $company->admin_name }}</td>
                                             <td>{{ $company->phone }}</td>
                                             <td>
                                                 @if ($company->status === 'active')
@@ -126,6 +128,15 @@
                                                         aria-label="Gestionar sitios y rutas de {{ $company->name }}">
                                                         <i class="fas fa-route"></i>
                                                     </a>
+                                                    <button type="button" class="btn btn-secondary btn-sm btn-edit-admin"
+                                                        data-company-id="{{ $company->id }}"
+                                                        data-admin-id="{{ $company->admin_id }}"
+                                                        data-admin-name="{{ $company->admin_name }}"
+                                                        data-admin-email="{{ $company->admin_email }}"
+                                                        title="Editar Admin"
+                                                        aria-label="Editar Admin de {{ $company->name }}">
+                                                        <i class="fas fa-user-edit"></i>
+                                                    </button>
                                                     <button type="button" class="btn btn-danger btn-sm"
                                                         onclick="deleteCompany({{ $company->id }}, '{{ addslashes($company->name) }}')"
                                                         title="Eliminar" aria-label="Eliminar {{ $company->name }}">
@@ -165,6 +176,7 @@
     @include('rutvans.companies.create')
     @include('rutvans.companies.edit')
     @include('rutvans.companies.show')
+    @include('rutvans.companies.edit-admin.edit-admin')
 
 @endsection
 

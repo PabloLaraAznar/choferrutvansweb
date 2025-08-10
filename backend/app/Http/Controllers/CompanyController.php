@@ -21,7 +21,21 @@ class CompanyController extends Controller
 
     public function index()
     {
-        $companies = Company::with(['locality', 'sites'])->paginate(10);
+        $companies = Company::with(['locality', 'sites', 'users' => function($query) {
+            $query->where('company_users.role', 'admin');
+        }])->paginate(10);
+
+        foreach ($companies as $company) {
+            $admin = CompanyUser::where('company_id', $company->id)
+                ->where('role', 'admin')
+                ->first();
+            if ($admin) {
+                $user = User::find($admin->user_id);
+                $company->admin_id = $user->id ?? null;
+                $company->admin_name = $user->name ?? '';
+                $company->admin_email = $user->email ?? '';
+            }
+        }
         $localities = Locality::orderBy('locality')->get();
         
         return view('rutvans.companies.index', compact('companies', 'localities'));
@@ -106,6 +120,30 @@ class CompanyController extends Controller
 
         return redirect()->route('companies.index')
             ->with('success', 'Empresa/Sindicato actualizado exitosamente.');
+    }
+
+    public function updateAdmin(Request $request, Company $company)
+    {
+        $request->validate([
+            'admin_name' => 'required|string|max:255',
+            'admin_email' => 'required|email|unique:users,email,' . $request->input('admin_id'),
+            'admin_password' => 'nullable|string|min:6',
+        ]);
+
+        $user = User::find($request->input('admin_id'));
+
+        if ($user) {
+            $user->name = $request->admin_name;
+            $user->email = $request->admin_email;
+
+            if ($request->filled('admin_password')) {
+                $user->password = Hash::make($request->admin_password);
+            }
+
+            $user->save();
+        }
+
+        return response()->json(['success' => 'Administrador actualizado exitosamente.']);
     }
 
     public function destroy(Company $company)

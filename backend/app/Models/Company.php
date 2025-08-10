@@ -37,12 +37,10 @@ class Company extends Model
         return $this->hasMany(Site::class);
     }
 
-    // Relación con usuarios a través de sites (muchos a muchos)
+    // Relación con usuarios a través de CompanyUser (muchos a muchos)
     public function users()
     {
-        return User::whereHas('sites', function($query) {
-            $query->where('company_id', $this->id);
-        });
+        return $this->belongsToMany(User::class, 'company_users', 'company_id', 'user_id');
     }
 
     // Scopes para filtrar por estado

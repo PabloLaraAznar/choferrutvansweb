@@ -41,6 +41,6 @@ class CompanyUser extends Model
 
     public function scopeOwners($query)
     {
-        return $query->where('role', 'owner');
+        return $query->where('role', 'admin');
     }
 }
