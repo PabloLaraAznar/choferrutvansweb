@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\Api\SuperAdmin;
 
 use App\Models\Complaint;
 use Illuminate\Http\Request;

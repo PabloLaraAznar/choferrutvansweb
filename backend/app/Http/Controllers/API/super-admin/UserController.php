@@ -1,10 +1,12 @@
 <?php
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\Api\SuperAdmin;
+
 
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+
 
 class UserController extends Controller
 {

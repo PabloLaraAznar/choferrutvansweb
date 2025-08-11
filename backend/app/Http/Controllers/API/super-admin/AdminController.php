@@ -1,7 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\API;
-
+namespace App\Http\Controllers\Api\SuperAdmin;
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Site;
 use App\Models\Unit;
@@ -9,6 +9,8 @@ use App\Models\Complaint;
 use App\Models\Comment;
 use App\Models\Form;
 use Illuminate\Support\Facades\DB;
+
+
 
 class AdminController extends Controller
 {

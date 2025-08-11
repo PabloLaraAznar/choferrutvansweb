@@ -123,3 +123,10 @@ Route::post('/mobile-register', function (Request $request) {
     ], 201);
 });
 
+use App\Http\Controllers\Api\SuperAdmin\ProfileController;
+
+Route::middleware('auth:sanctum')->prefix('super-admin')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::put('/profile', [ProfileController::class, 'update']);
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
+});

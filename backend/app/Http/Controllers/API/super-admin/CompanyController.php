@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\Api\SuperAdmin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Company;
 use Illuminate\Http\Request;
 
