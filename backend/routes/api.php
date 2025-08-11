@@ -75,7 +75,7 @@ Route::post('/forms', [FormController::class, 'store']);
 use App\Models\User;
 use App\Http\Resources\UserResource;
 
-Route::post('/mobile-login', function (Request $request) {
+Route::post('super-admin/mobile-login', function (Request $request) {
     $request->validate([
         'email' => 'required|email',
         'password' => 'required',
@@ -102,7 +102,7 @@ Route::post('/mobile-login', function (Request $request) {
     ]);
 });
 
-Route::post('/mobile-register', function (Request $request) {
+Route::post('super-admin/mobile-register', function (Request $request) {
     $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|email|unique:users',
