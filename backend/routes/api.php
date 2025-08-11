@@ -18,10 +18,20 @@ Route::get('/envios', [EnvioController::class, 'apiIndex']);
 Route::get('/horarios', [HorarioController::class, 'apiIndex']);
 Route::get('/localidades', [LocalidadesController::class, 'apiIndex']);
 
-use App\Http\Controllers\API\AdminController;
-use App\Http\Controllers\API\CompanyController;
-use App\Http\Controllers\API\SiteController;
-use App\Http\Controllers\API\UnitController;
+use App\Http\Controllers\API\SuperAdmin\AdminController;
+use App\Http\Controllers\API\SuperAdmin\CompanyController;
+use App\Http\Controllers\API\SuperAdmin\SiteController;
+use App\Http\Controllers\API\SuperAdmin\UnitController;
+use App\Http\Controllers\API\SuperAdmin\CommentController;
+use App\Http\Controllers\API\SuperAdmin\FaqController;
+use App\Http\Controllers\API\SuperAdmin\FormController;
+
+use App\Http\Controllers\Api\SuperAdmin\ProfileController;
+Route::middleware('auth:sanctum')->prefix('super-admin')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::put('/profile', [ProfileController::class, 'update']);
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
+});
 
 // Admin
 Route::get('/admin/stats', [AdminController::class, 'stats']);
@@ -43,15 +53,11 @@ Route::get('/sites/{id}', [SiteController::class, 'show']);
 Route::get('/units', [UnitController::class, 'index']);
 Route::get('/units/{id}', [UnitController::class, 'show']);
 
-use App\Http\Controllers\API\CommentController;
-
 // Comentarios API
 Route::get('/comments', [CommentController::class, 'index']);
 Route::post('/comments', [CommentController::class, 'store']);
 Route::put('/comments/{id}', [CommentController::class, 'update']);
 Route::delete('/comments/{id}', [CommentController::class, 'destroy']);
-
-use App\Http\Controllers\API\FaqController;
 
 // FAQs API
 Route::get('/faqs', [FaqController::class, 'index']);
@@ -60,8 +66,6 @@ Route::get('/faqs/{id}', [FaqController::class, 'show']);
 Route::put('/faqs/{id}', [FaqController::class, 'update']);
 Route::delete('/faqs/{id}', [FaqController::class, 'destroy']);
 Route::patch('/faqs/{id}', [FaqController::class, 'update']);
-
-use App\Http\Controllers\API\FormController;
 
 // Cotizaciones (Formularios de Cotización)
 Route::get('/forms', [FormController::class, 'index']);   
@@ -123,10 +127,3 @@ Route::post('/mobile-register', function (Request $request) {
     ], 201);
 });
 
-use App\Http\Controllers\Api\SuperAdmin\ProfileController;
-
-Route::middleware('auth:sanctum')->prefix('super-admin')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'show']);
-    Route::put('/profile', [ProfileController::class, 'update']);
-    Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
-});
