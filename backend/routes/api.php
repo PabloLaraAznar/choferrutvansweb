@@ -34,11 +34,11 @@ Route::middleware('auth:sanctum')->prefix('super-admin')->group(function () {
 });
 
 // Admin
-Route::get('/admin/stats', [AdminController::class, 'stats']);
-Route::get('/admin/forms-monthly', [AdminController::class, 'formsMonthly']);
-Route::get('/admin/sites-count', [AdminController::class, 'sitesCount']);
-Route::get('/admin/units-count', [AdminController::class, 'unitsCount']);
-Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+Route::get('super-admin/admin/stats', [AdminController::class, 'stats']);
+Route::get('super-admin/admin/forms-monthly', [AdminController::class, 'formsMonthly']);
+Route::get('super-admin/admin/sites-count', [AdminController::class, 'sitesCount']);
+Route::get('super-admin/admin/units-count', [AdminController::class, 'unitsCount']);
+Route::get('super-admin/admin/dashboard', [AdminController::class, 'dashboard']);
 
 // Companies
 Route::get('/companies/stats', [CompanyController::class, 'stats']); // <-- antes que /companies/{id}
