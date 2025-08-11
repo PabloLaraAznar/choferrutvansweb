@@ -3,46 +3,113 @@
 namespace App\Http\Controllers;
 
 use App\Models\Unit;
-use App\Models\Reservation;
+use App\Models\Driver;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class UnitController extends Controller
 {
-    public function show($id)
+    public function index()
     {
-        $unit = Unit::findOrFail($id);
-
-        return response()->json([
-            'id' => $unit->id,
-            'model' => $unit->model,
-            'plate' => $unit->plate,
-            'capacity' => $unit->capacity,
-            'photo' => $unit->photo,
-            'created_at' => $unit->created_at,
-            'updated_at' => $unit->updated_at
-        ]);
+        // Get current user's sites
+        $userSites = Auth::user()->sites->pluck('id');
+        
+        // Filter units by sites the user has access to
+        $units = Unit::with(['drivers.user'])
+            ->whereIn('site_id', $userSites)
+            ->get();
+            
+        // Filter drivers by sites the user has access to
+        $drivers = Driver::with('user')
+            ->whereIn('site_id', $userSites)
+            ->get();
+            
+        return view('units.index', compact('units', 'drivers'));
     }
 
-    public function getOccupiedSeats(Request $request, $unitId)
-    {
-        $query = Reservation::where('unit_id', $unitId)
-            ->whereDate('travel_date', Carbon::today())
-            ->where('status', '!=', 'cancelled');
+    public function store(Request $request)
+        {
+            $request->validate([
+                'plate' => 'required|unique:units,plate|max:20',
+                'capacity' => 'required|integer|min:1',
+                'photo' => 'nullable|image|max:2048'
+            ]);
 
-        if ($request->has('schedule_id')) {
-            $query->where('route_unit_schedule_id', $request->query('schedule_id'));
+            $data = $request->only(['plate', 'capacity']);
+            
+            // Assign to current user's first site
+            $userSites = Auth::user()->sites;
+            if ($userSites->count() > 0) {
+                $data['site_id'] = $userSites->first()->id;
+            }
+
+            if ($request->hasFile('photo')) {
+                $data['photo'] = $request->file('photo')->store('units', 'public');
+            }
+
+            Unit::create($data);
+
+            return redirect()->route('units.index')->with('success', 'Unidad registrada correctamente.');
         }
 
-        $occupiedSeats = $query->pluck('seats')
-            ->flatten()
-            ->unique()
-            ->values()
-            ->toArray();
-
-        return response()->json([
-            'occupied_seats' => $occupiedSeats,
-            'available_seats' => Unit::find($unitId)->capacity - count($occupiedSeats)
+    public function update(Request $request, Unit $unit)
+    {
+        $request->validate([
+            'plate' => 'required|unique:units,plate,' . $unit->id . '|max:20',
+            'capacity' => 'required|integer|min:1',
+            'photo' => 'nullable|image|max:2048'
         ]);
+
+        $data = $request->only(['plate', 'capacity']);
+
+        if ($request->hasFile('photo')) {
+            // Eliminar foto anterior si existe
+            if ($unit->photo) {
+                Storage::disk('public')->delete($unit->photo);
+            }
+            $data['photo'] = $request->file('photo')->store('units', 'public');
+        }
+
+        $unit->update($data);
+
+        return redirect()->route('units.index')->with('success', 'Unidad actualizada.');
+    }
+
+    public function destroy(Unit $unit)
+    {
+        // Eliminar foto si existe
+        if ($unit->photo) {
+            Storage::disk('public')->delete($unit->photo);
+        }
+
+        // Eliminar relaciones con conductores
+        $unit->drivers()->detach();
+
+        $unit->delete();
+
+        return redirect()->route('units.index')->with('success', 'Unidad eliminada.');
+    }
+
+    public function assignDriver(Request $request, Unit $unit)
+    {
+        $request->validate([
+            'driver_id' => 'required|exists:drivers,id',
+            'status' => 'required|string|max:50'
+        ]);
+
+        // CORRECCIÓN: Usar 'id_driver' en lugar de 'driver_id'
+        if (!$unit->drivers()->where('id_driver', $request->driver_id)->exists()) {
+            $unit->drivers()->attach($request->driver_id, ['status' => $request->status]);
+            return redirect()->back()->with('success', 'Conductor asignado correctamente.');
+        }
+
+        return redirect()->back()->with('error', 'Este conductor ya está asignado a la unidad.');
+    }
+
+    public function removeDriver(Unit $unit, Driver $driver)
+    {
+        $unit->drivers()->detach($driver->id);
+        return redirect()->back()->with('success', 'Conductor desvinculado de la unidad.');
     }
 }

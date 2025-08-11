@@ -2,53 +2,84 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\RouteUnitSchedule;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
+use App\Models\RouteUnitSchedule;
+use App\Models\RouteUnit;
+use Illuminate\Support\Facades\Auth;
 
 class RouteUnitScheduleController extends Controller
 {
-    public function getRouteUnitSchedules(Request $request)
+    public function index()
     {
-        $today = Carbon::today();
-        Log::info('Fecha actual para filtro: ' . $today);
-        Log::info('Parámetros de filtro: origin=' . $request->query('origin') . ', destination=' . $request->query('destination'));
+        // Get current user's sites
+        $userSites = Auth::user()->sites->pluck('id');
+        
+        // Filter route units by sites the user has access to through drivers
+        $units = RouteUnit::with('driverUnit.driver.user')
+            ->whereHas('driverUnit.driver', function($query) use ($userSites) {
+                $query->whereIn('site_id', $userSites);
+            })
+            ->get();
+            
+        return view('route_unit_schedule.index', compact('units'));
+    }
 
-        $query = RouteUnitSchedule::join('route_unit', 'route_unit_schedule.id_route_unit', '=', 'route_unit.id')
-            ->join('routes', 'route_unit.id_route', '=', 'routes.id')
-            ->join('localities as origin', 'routes.id_location_s', '=', 'origin.id')
-            ->join('localities as destination', 'routes.id_location_f', '=', 'destination.id')
-            ->join('driver_unit', 'route_unit.id_driver_unit', '=', 'driver_unit.id')
-            ->join('drivers', 'driver_unit.id_driver', '=', 'drivers.id')
-            ->join('users', 'drivers.id_user', '=', 'users.id')
-            ->join('units', 'driver_unit.id_unit', '=', 'units.id')
-            ->select(
-                'route_unit_schedule.schedule_date',
-                'route_unit_schedule.schedule_time',
-                \DB::raw("CONCAT(origin.locality, ' - ', destination.locality) as route_unit_description"),
-                'users.name as driver_name',
-                'units.model as vehicle_model',
-                'units.plate as license_plate',
-                'units.capacity',
-                'units.photo as font_url',
-                'route_unit.estimated_duration_seconds',
-                'units.id as unit_id'
-            )
-            ->where('route_unit_schedule.schedule_date', '=', $today);
+    public function getEvents()
+    {
+        // Get current user's sites
+        $userSites = Auth::user()->sites->pluck('id');
+        
+        return RouteUnitSchedule::with([
+            'routeUnit.driverUnit.driver.user',
+            'routeUnit.route.locationStart',
+            'routeUnit.route.locationEnd',
+        ])->whereHas('routeUnit.driverUnit.driver', function($query) use ($userSites) {
+            $query->whereIn('site_id', $userSites);
+        })->get()->map(function ($schedule) {
+            $driverName = $schedule->routeUnit->driverUnit->driver->user->name ?? 'Sin conductor';
 
-        // Aplicar filtros de origen y destino si se proporcionan
-        if ($request->has('origin')) {
-            $query->where('origin.locality', $request->query('origin'));
-        }
-        if ($request->has('destination')) {
-            $query->where('destination.locality', $request->query('destination'));
-        }
+            $route = $schedule->routeUnit->route ?? null;
+            $locationStart = $route?->locationStart?->locality ?? 'Origen desconocido';
+            $locationEnd = $route?->locationEnd?->locality ?? 'Destino desconocido';
 
-        $schedules = $query->orderBy('route_unit_schedule.schedule_time', 'asc')->get();
+            return [
+                'id' => $schedule->id,
+                'title' => "Ruta: $locationStart → $locationEnd | Unidad {$schedule->id_route_unit} - Conductor: $driverName ({$schedule->status})",
+                'start' => $schedule->schedule_date . 'T' . $schedule->schedule_time,
+                'route_unit_id' => $schedule->id_route_unit,
+                'status' => $schedule->status,
+            ];
+        });
+    }
 
-        Log::info('Horarios obtenidos: ' . $schedules->toJson());
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'id_route_unit' => 'required|exists:route_unit,id',
+            'schedule_date' => 'required|date',
+            'schedule_time' => 'required',
+            'status' => 'required|string'
+        ]);
 
-        return response()->json($schedules, 200);
+        $event = RouteUnitSchedule::create($validated);
+
+        return response()->json($event, 201);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $event = RouteUnitSchedule::findOrFail($id);
+
+        $event->update($request->only(['id_route_unit', 'schedule_date', 'schedule_time', 'status']));
+
+        return response()->json($event);
+    }
+
+    public function destroy($id)
+    {
+        $event = RouteUnitSchedule::findOrFail($id);
+        $event->delete();
+
+        return response()->json(['success' => true]);
     }
 }

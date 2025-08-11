@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RouteUnit extends Model
 {
@@ -14,24 +13,24 @@ class RouteUnit extends Model
         'id_driver_unit',
         'intermediate_location_id',
         'price',
-        'estimated_duration_seconds',
-        'created_at',
-        'updated_at',
     ];
 
-    protected $casts = [
-        'price' => 'decimal:2',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
-
-    public function route(): BelongsTo
+    public function schedules()
     {
-        return $this->belongsTo(Route::class, 'id_route');
+        return $this->hasMany(RouteUnitSchedule::class, 'id_route_unit');
     }
+    public function route()
+{
+    return $this->belongsTo(Route::class, 'id_route');
+}
 
-    public function driverUnit(): BelongsTo
+
+    // Relaciones opcionales si tienes las otras tablas
+
+    public function driverUnit()
     {
         return $this->belongsTo(DriverUnit::class, 'id_driver_unit');
     }
+
+
 }

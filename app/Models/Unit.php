@@ -2,114 +2,44 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Unit extends Model
 {
     use HasFactory;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'units';
-
-    /**
-     * The primary key for the model.
-     *
-     * @var string
-     */
-    protected $primaryKey = 'id';
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
-        'model',
-        'plate',
-        'capacity',
-        'photo'
+        'plate', 
+        'capacity', 
+        'photo',
+        'site_id'
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'capacity' => 'integer',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime'
-    ];
-
-    /**
-     * Get the reservations for the unit.
-     */
-    public function reservations()
+    // Relación con Site
+    public function site()
     {
-        return $this->hasMany(Reservation::class, 'unit_id');
+        return $this->belongsTo(Site::class);
     }
 
-    /**
-     * Get the photo URL attribute.
-     * (Ejemplo de accesor para manejar la URL de la foto)
-     */
-    public function getPhotoUrlAttribute()
+    // Relación con drivers
+    public function drivers()
     {
-        if ($this->photo) {
-            return asset('storage/' . $this->photo);
-        }
-        return null;
+        return $this->belongsToMany(Driver::class, 'driver_unit', 'id_unit', 'id_driver')
+                    ->withPivot('status')
+                    ->withTimestamps();
     }
 
-    /**
-     * Scope para unidades disponibles (ejemplo)
-     */
-    public function scopeAvailable($query)
+    // Relación con routes
+    public function routes()
     {
-        return $query->whereDoesntHave('reservations', function($q) {
-            $q->where('status', 'active')
-              ->whereDate('travel_date', now()->toDateString());
-        });
+        return $this->belongsToMany(Route::class, 'route_unit', 'id_unit', 'id_route')
+                    ->withTimestamps();
     }
 
-    /**
-     * Obtener asientos ocupados para una fecha específica
-     */
-    public function occupiedSeats($date = null)
+    // Scope para filtrar por site
+    public function scopeBySite($query, $siteId)
     {
-        $date = $date ?: now()->toDateString();
-
-        return $this->reservations()
-            ->whereDate('travel_date', $date)
-            ->where('status', '!=', 'cancelled')
-            ->pluck('seats')
-            ->flatten()
-            ->unique()
-            ->values()
-            ->toArray();
-    }
-
-    /**
-     * Obtener asientos disponibles para una fecha
-     */
-    public function availableSeats($date = null)
-    {
-        $occupied = $this->occupiedSeats($date);
-        $allSeats = range(1, $this->capacity);
-
-        return array_values(array_diff($allSeats, $occupied));
-    }
-
-    /**
-     * Verificar si un asiento está disponible
-     */
-    public function isSeatAvailable($seatNumber, $date = null)
-    {
-        return in_array($seatNumber, $this->availableSeats($date));
+        return $query->where('site_id', $siteId);
     }
 }

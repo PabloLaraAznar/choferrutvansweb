@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RouteUnitSchedule extends Model
 {
@@ -14,19 +13,15 @@ class RouteUnitSchedule extends Model
         'schedule_date',
         'schedule_time',
         'status',
-        'created_at',
-        'updated_at',
     ];
 
-    protected $casts = [
-        'schedule_date' => 'date',
-        'schedule_time' => 'string',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
-
-    public function routeUnit(): BelongsTo
+    public function routeUnit()
     {
         return $this->belongsTo(RouteUnit::class, 'id_route_unit');
+    }
+
+    public function getStartAttribute()
+    {
+        return $this->schedule_date . 'T' . $this->schedule_time;
     }
 }

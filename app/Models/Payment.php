@@ -2,23 +2,38 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Payment extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'reservation_id',
-        'amount',
-        'method',
-        'status',
+        'payment_type',
+        'description',
+        'status'
     ];
 
-    // Optionally, define relationship to Reservation
-    public function reservation()
+    protected $casts = [
+        'status' => 'string'
+    ];
+
+    // Relación con sales
+    public function sales()
     {
-        return $this->belongsTo(Reservation::class);
+        return $this->hasMany(Sale::class, 'id_payment');
+    }
+
+    // Scope para payments activos
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    // Scope por tipo de pago
+    public function scopeByType($query, $type)
+    {
+        return $query->where('payment_type', $type);
     }
 }

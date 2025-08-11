@@ -3,11 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Sale extends Model
 {
-    protected $table = 'sales';
+    use HasFactory;
+
+    protected $table = "sales";
+
+    protected $primaryKey = 'id';
 
     protected $fillable = [
         'folio',
@@ -17,25 +21,52 @@ class Sale extends Model
         'id_rate',
         'data',
         'status',
-        'amount',
-        'created_at',
-        'updated_at',
+        'site_id'
     ];
 
     protected $casts = [
-        'data' => 'array',
-        'amount' => 'decimal:2',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'data' => 'array'
     ];
 
-    public function user(): BelongsTo
+    // Relación con Site
+    public function site()
+    {
+        return $this->belongsTo(Site::class);
+    }
+
+    // Relación con User
+    public function user()
     {
         return $this->belongsTo(User::class, 'id_user');
     }
 
-    public function routeUnitSchedule(): BelongsTo
+    // Relación con Payment
+    public function payment()
+    {
+        return $this->belongsTo(Payment::class, 'id_payment');
+    }
+
+    // Relación con RouteUnitSchedule
+    public function routeUnitSchedule()
     {
         return $this->belongsTo(RouteUnitSchedule::class, 'id_route_unit_schedule');
+    }
+
+    // Relación con Rate
+    public function rate()
+    {
+        return $this->belongsTo(Rate::class, 'id_rate');
+    }
+
+    // Scope para filtrar por site
+    public function scopeBySite($query, $siteId)
+    {
+        return $query->where('site_id', $siteId);
+    }
+
+    // Scope para filtrar por estado
+    public function scopeByStatus($query, $status)
+    {
+        return $query->where('status', $status);
     }
 }

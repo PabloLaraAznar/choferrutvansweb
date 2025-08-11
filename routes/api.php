@@ -1,58 +1,43 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\TravelHistoryController;
-use App\Http\Controllers\RouteUnitScheduleController;
-use App\Http\Controllers\SaleController;
-use App\Http\Controllers\ShipmentController;
 
-Route::post('/shipment', [ShipmentController::class, 'index']);
-Route::get('/users', [UserController::class, 'index']);
-Route::post('/users', [UserController::class, 'store']);
-Route::post('/login', [UserController::class, 'login']);
-Route::get('/recent-trips', [TravelHistoryController::class, 'getRecentTrips']);
-Route::get('/user', [UserController::class, 'getUser']);
-Route::patch('/user', [UserController::class, 'updateUser']);
-Route::post('/user/upload-photo', [UserController::class, 'uploadPhoto']);
-Route::patch('/travel-history/{id}', [TravelHistoryController::class, 'updateTravelRating']);
-Route::get('/route-unit-schedules', [RouteUnitScheduleController::class, 'getRouteUnitSchedules']);
-Route::get('/ping', function () {
-    return response()->json([
-        'status' => 'ok',
-        'message' => 'API funcionando en Laravel 12 con api.php 🧠🔥'
-    ]);
-});
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
 
 
+use App\Http\Controllers\EnvioController;
+use App\Http\Controllers\HorarioController;
+use App\Http\Controllers\LocalidadesController;
 
-// Recent Sales (Boletos/Ventas)
-Route::get('/sales/recent', [SaleController::class, 'recentSales']);
+Route::get('/envios', [EnvioController::class, 'apiIndex']);
+Route::get('/horarios', [HorarioController::class, 'apiIndex']);
+Route::get('/localidades', [LocalidadesController::class, 'apiIndex']);
 
+use App\Http\Controllers\API\AdminController;
+use App\Http\Controllers\API\CompanyController;
+use App\Http\Controllers\API\SiteController;
+use App\Http\Controllers\API\UnitController;
 
+// Admin routes
+Route::get('/admin/stats', [AdminController::class, 'stats']);
+Route::get('/admin/forms-monthly', [AdminController::class, 'formsMonthly']);
+Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+Route::get('/admin/sites-count', [AdminController::class, 'sitesCount']);
+Route::get('/admin/units-count', [AdminController::class, 'unitsCount']);
+Route::get('/admin/sites', [AdminController::class, 'sites']);
 
-// Unidades
-// Unidades
-Route::get('/units/{unit}', [App\Http\Controllers\UnitController::class, 'show']);
-Route::get('/units/{unit}/occupied-seats', [App\Http\Controllers\UnitController::class, 'getOccupiedSeats']);
+// Companies
+Route::get('/companies', [CompanyController::class, 'index']);
+Route::get('/companies/{id}', [CompanyController::class, 'show']);
+Route::get('/companies/stats', [CompanyController::class, 'stats']);
 
-// Rates (tarifas)
-Route::get('/rates', [App\Http\Controllers\RateController::class, 'index']);
-Route::get('/rates/{id}', [App\Http\Controllers\RateController::class, 'show']);
-Route::post('/rates', [App\Http\Controllers\RateController::class, 'store']);
-Route::put('/rates/{id}', [App\Http\Controllers\RateController::class, 'update']);
-Route::delete('/rates/{id}', [App\Http\Controllers\RateController::class, 'destroy']);
+// Sites
+Route::get('/sites', [SiteController::class, 'index']);
+Route::get('/sites/{id}', [SiteController::class, 'show']);
 
-
-// Reservaciones
-Route::post('/reservations', [App\Http\Controllers\ReservationController::class, 'store']);
-Route::delete('/reservations/{id}', [App\Http\Controllers\ReservationController::class, 'destroy']);
-
-
-// Payments
-Route::post('/payments', [App\Http\Controllers\PaymentController::class, 'store']);
-Route::get('/payments', [App\Http\Controllers\PaymentController::class, 'index']);
-
-// Ventas
-Route::post('/sales', [App\Http\Controllers\SaleController::class, 'store']);
-
+// Units
+Route::get('/units', [UnitController::class, 'index']);
+Route::get('/units/{id}', [UnitController::class, 'show']);

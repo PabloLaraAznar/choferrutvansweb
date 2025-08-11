@@ -4,140 +4,112 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Auth\Events\Registered;
 
 class UserController extends Controller
 {
-    // Listar todos los usuarios
+    /**
+     * Muestra la lista de usuarios.
+     */
     public function index()
     {
-        return response()->json(User::all());
+        $usuarios = User::all();
+        return view('usuarios.index', compact('usuarios'));
     }
 
-    // Crear nuevo usuario
+    /**
+     * Muestra el formulario para crear un nuevo usuario.
+     */
+    public function create()
+    {
+        return view('usuarios.create');
+    }
+
+    /**
+     * Guarda un nuevo usuario en la base de datos y envía correo de verificación.
+     */
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
+            'phone_number' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
-            'phone_number' => 'nullable|string|max:255',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'address' => $request->address,
-            'phone_number' => $request->phone_number,
+        $usuario = User::create([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'phone_number' => $request->input('phone_number'),
+            'address' => $request->input('address'),
+            'password' => Hash::make($request->input('password')),
         ]);
 
-        return response()->json($user, 201);
+        // Disparar evento para enviar correo de verificación
+        event(new Registered($usuario));
+
+        return redirect()->route('usuarios.index')->with('success', 'Usuario creado exitosamente y correo de verificación enviado.');
     }
 
-    // Método para login
-    public function login(Request $request)
+    /**
+     * Muestra el formulario para editar un usuario existente.
+     */
+    public function edit(User $usuario)
+    {
+        return view('usuarios.edit', compact('usuario'));
+    }
+
+    /**
+     * Actualiza un usuario en la base de datos.
+     */
+    public function update(Request $request, $id)
     {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'phone_number' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $usuario = User::findOrFail($id);
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Credenciales incorrectas'], 401);
+        $usuario->name = $request->input('name');
+        $usuario->email = $request->input('email');
+        $usuario->phone_number = $request->input('phone_number');
+        $usuario->address = $request->input('address');
+
+        if ($request->filled('password')) {
+            $usuario->password = Hash::make($request->input('password'));
         }
 
-        return response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-        ]);
+        $usuario->save();
+
+        return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado correctamente.');
     }
 
-    // Obtener datos del usuario autenticado
-    public function getUser(Request $request)
+    /**
+     * Elimina un usuario de la base de datos.
+     */
+    public function destroy(User $usuario)
     {
-        $userId = $request->input('user_id');
-        if (!$userId) {
-            return response()->json(['error' => 'Falta el user_id'], 400);
+        try {
+            $usuario->delete();
+            return response()->json(['success' => true, 'message' => '¡Usuario eliminado correctamente!']);
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar usuario: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Error al eliminar el usuario'], 500);
         }
-
-        $user = User::find($userId);
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no encontrado'], 404);
-        }
-
-        return response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'phone_number' => $user->phone_number,
-            'address' => $user->address,
-            'profile_photo_path' => $user->profile_photo_path,
-        ], 200);
     }
 
-    // Actualizar datos del usuario
-    public function updateUser(Request $request)
+    /**
+     * Devuelve todos los usuarios en formato JSON (API).
+     */
+    public function apiIndex()
     {
-        $userId = $request->input('user_id');
-        if (!$userId) {
-            return response()->json(['error' => 'Falta el user_id'], 400);
-        }
-
-        $user = User::find($userId);
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no encontrado'], 404);
-        }
-
-        $allData = $request->all();
-        \Log::info('Datos recibidos: ', $allData); // Depuración de todos los datos recibidos
-
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|email|unique:users,email,' . $user->id,
-            'phone_number' => 'sometimes|nullable|string|max:255',
-            'address' => 'sometimes|nullable|string|max:255',
-        ]);
-
-        \Log::info('Datos validados: ', $validated); // Depuración de datos validados
-
-        $user->update($validated);
-
-        return response()->json(['message' => 'Datos actualizados con éxito'], 200);
-    }
-
-    // Subir foto de perfil
-    public function uploadPhoto(Request $request)
-    {
-        $userId = $request->input('user_id');
-        if (!$userId) {
-            return response()->json(['error' => 'Falta el user_id'], 400);
-        }
-
-        $user = User::find($userId);
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no encontrado'], 404);
-        }
-
-        if ($request->hasFile('photo')) {
-            $file = $request->file('photo');
-            $fileName = 'profile_' . time() . '.' . $file->getClientOriginalExtension();
-            // Cambiado disco a 'public' para que la imagen quede en storage/app/public
-            $path = $file->storeAs("users/{$user->id}", $fileName, 'public');
-
-            $user->profile_photo_path = Storage::url($path);
-            $user->save();
-
-            return response()->json([
-                'profile_photo_path' => asset($user->profile_photo_path)
-            ], 200);
-        }
-
-        return response()->json(['error' => 'No se proporcionó una foto'], 400);
+        return response()->json(User::all());
     }
 }

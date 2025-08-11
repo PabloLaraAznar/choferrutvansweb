@@ -2,28 +2,37 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class DriverUnit extends Model
+class DriverUnit extends Pivot
 {
     protected $table = 'driver_unit';
 
     protected $fillable = [
         'id_driver',
         'id_unit',
-        'status',
-        'created_at',
-        'updated_at',
+        'status'
     ];
+    public function units()
+    {
+        return $this->belongsToMany(Unit::class, 'driver_unit', 'id_driver', 'id_unit')
+                    ->withPivot('status')
+                    ->withTimestamps();
+    }
 
-    protected $casts = [
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
-
-    public function driver(): BelongsTo
+    public function driver()
     {
         return $this->belongsTo(Driver::class, 'id_driver');
     }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class, 'id_unit');
+    }
+
+    public function routeUnits()
+    {
+        return $this->hasMany(RouteUnit::class, 'id_driver_unit');
+    }
+
 }
