@@ -33,16 +33,17 @@ class ProfileController extends Controller
     {
         $request->validate([
             'current_password' => 'required',
-            'password' => 'required|confirmed|min:8',
+            'password' => 'required|confirmed|min:6', // puse mínimo 6 para que coincida con Flutter
         ]);
 
-        if (!Hash::check($request->current_password, $request->user()->password)) {
+        $user = $request->user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
             return response()->json(['message' => 'La contraseña actual es incorrecta'], 422);
         }
 
-        $request->user()->update([
-            'password' => Hash::make($request->password),
-        ]);
+        $user->password = Hash::make($request->password);
+        $user->save();
 
         return response()->json(['message' => 'Contraseña actualizada correctamente']);
     }
