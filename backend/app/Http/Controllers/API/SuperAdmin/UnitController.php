@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\SuperAdmin;
+namespace App\Http\Controllers\API\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Unit;

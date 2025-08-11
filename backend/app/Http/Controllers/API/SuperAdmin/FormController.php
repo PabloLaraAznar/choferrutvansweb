@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\SuperAdmin;
+namespace App\Http\Controllers\API\SuperAdmin;
 
 use App\Models\Form;
 use Illuminate\Http\Request;

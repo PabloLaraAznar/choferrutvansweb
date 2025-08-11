@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\SuperAdmin;
+namespace App\Http\Controllers\API\SuperAdmin;
 
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
