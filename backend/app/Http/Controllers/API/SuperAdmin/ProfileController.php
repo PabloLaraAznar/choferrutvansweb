@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\SuperAdmin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -46,5 +47,36 @@ class ProfileController extends Controller
         $user->save();
 
         return response()->json(['message' => 'Contraseña actualizada correctamente']);
+    }
+
+    public function updatePhoto(Request $request)
+    {
+        $request->validate([
+            'profile_photo_path' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        $user = $request->user();
+
+        if ($request->hasFile('profile_photo_path')) {
+            // Eliminar la foto anterior si existe
+            if ($user->profile_photo_path) {
+                $oldPath = str_replace('/storage', '', $user->profile_photo_path);
+                if (Storage::disk('public')->exists($oldPath)) {
+                    Storage::disk('public')->delete($oldPath);
+                }
+            }
+
+            // Guardar la nueva foto
+            $path = $request->file('profile_photo_path')->store('profile-photos', 'public');
+            $user->profile_photo_path = '/storage/' . $path;
+            $user->save();
+
+            return response()->json([
+                'message' => 'Foto de perfil actualizada correctamente',
+                'profile_photo_path' => $user->profile_photo_path
+            ]);
+        }
+
+        return response()->json(['message' => 'No se recibió ninguna imagen'], 422);
     }
 }

@@ -26,11 +26,12 @@ use App\Http\Controllers\API\SuperAdmin\CommentController;
 use App\Http\Controllers\API\SuperAdmin\FaqController;
 use App\Http\Controllers\API\SuperAdmin\FormController;
 
-use App\Http\Controllers\Api\SuperAdmin\ProfileController;
+use App\Http\Controllers\API\SuperAdmin\ProfileController;
 Route::middleware('auth:sanctum')->prefix('super-admin')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::put('/profile', [ProfileController::class, 'update']);
     Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
+    Route::post('/profile/photo', [ProfileController::class, 'updatePhoto']);
 });
 
 // Admin
